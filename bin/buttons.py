@@ -1,5 +1,4 @@
-import pygame
-from settings import *
+from bin.settings import *
 
 class Button:
     def __init__(self, x, y, w, h, text, im_inact, im_act, sound):
@@ -20,7 +19,12 @@ class Button:
         current_im = self.im_act if self.is_hov else self.im_inact
         screen.blit(current_im, (self.x, self.y))
 
-        font = pygame.font.Font('fonts/pixel_font.otf', 36)
+        font2 = pygame.font.Font('resources/fonts/pixel_font.otf', 36)
+        text_surface2 = font2.render(self.text, True, (0, 0, 0))
+        text_rect2 = text_surface2.get_rect(center=(self.rect.center[0] + 4, self.rect.center[1] + 4))
+        screen.blit(text_surface2, text_rect2)
+
+        font = pygame.font.Font('resources/fonts/pixel_font.otf', 36)
         text_surface = font.render(self.text, True, (200, 200, 200))
         text_rect = text_surface.get_rect(center=self.rect.center)
         screen.blit(text_surface, text_rect)
@@ -66,9 +70,13 @@ class SelectButton:
         if self.im:
             screen.blit(self.im, (self.x + (self.width_r - self.width) // 2, self.y))
 
-        font = pygame.font.Font('fonts/pixel_font.otf', 36)
+        font = pygame.font.Font('resources/fonts/pixel_font.otf', 36)
         text_surface = font.render(self.text, True, (200, 200, 200))
-        text_rect = text_surface.get_rect(center=(self.width_r // 2 + self.x, self.y + self.height_r // 2 + (self.height_r - self.height) // 2))
+        font2 = pygame.font.Font('resources/fonts/pixel_font.otf', 36)
+        text_surface2 = font2.render(self.text, True, (0, 0, 0))
+        text_rect = text_surface.get_rect(center=(self.width_r // 2 + self.x, self.y + self.height_r // 2 + (self.height_r - self.height) * 0.6))
+        text_rect2 = text_surface.get_rect(center=(self.width_r // 2 + self.x + 4, self.y + 4 + self.height_r // 2 + (self.height_r - self.height) * 0.6))
+        screen.blit(text_surface2, text_rect2)
         screen.blit(text_surface, text_rect)
 
     def check(self, mouse_pos):
