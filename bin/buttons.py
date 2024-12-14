@@ -1,4 +1,4 @@
-from bin.settings import *
+import pygame
 
 
 class Button:
@@ -81,13 +81,13 @@ class SelectButton:
             self.text_rect = self.text_surface.get_rect(
                 center=(self.width_r // 2 + self.x, self.y + self.height_r // 2 + (self.height_r - self.height) * 0.6))
             self.text_rect2 = self.text_surface.get_rect(center=(
-            self.width_r // 2 + self.x + 4, self.y + 4 + self.height_r // 2 + (self.height_r - self.height) * 0.6))
+                self.width_r // 2 + self.x + 4, self.y + 4 + self.height_r // 2 + (self.height_r - self.height) * 0.6))
 
     def draw(self, screen):
         if self.is_hov or self.is_cl:
-            pygame.draw.rect(screen, button_color, self.rect)
+            pygame.draw.rect(screen, (50, 60, 50), self.rect)
         else:
-            pygame.draw.rect(screen, button_color, self.rect, self.border)
+            pygame.draw.rect(screen, (50, 60, 50), self.rect, self.border)
 
         if self.im:
             screen.blit(self.im, (self.x + (self.width_r - self.width) // 2, self.y))

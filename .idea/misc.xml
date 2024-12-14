@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Black">
-    <option name="sdkName" value="Python 3.12 (Tank_Simulator)" />
+    <option name="sdkName" value="Python 3.12 (pygameProject)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (Modern_Tanks_Abud)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (pygameProject)" project-jdk-type="Python SDK" />
 </project>
