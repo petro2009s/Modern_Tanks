@@ -5,7 +5,6 @@ import pygame
 import random
 from bin.text import Text
 from bin.settings import Settings
-import gif_pygame
 
 
 class Game:
@@ -21,25 +20,25 @@ class Game:
         # menu_im = self.s.menu_list[random.randint(0, 4)]
 
 
-        header_bl = Text(self.s.WIDTH // 2 + 4, round(self.s.HEIGHT * 0.1) + 4, (0, 0, 0), 'World of Modern Tanks', 70)
-        header = Text(self.s.WIDTH // 2, round(self.s.HEIGHT * 0.1), (200, 200, 200), 'World of Modern Tanks', 70)
+        header_bl = Text(self.s.WIDTH * 0.5028, self.s.HEIGHT * 0.1052, (0, 0, 0), 'World of Modern Tanks', int(self.s.WIDTH * 0.052))
+        header = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.1, (200, 200, 200), 'World of Modern Tanks', int(self.s.WIDTH * 0.052))
 
-        play_button = Button(self.s.WIDTH // 2 - 323, 450, 645, 100, 'Играть', 'resources/images/button_inact.png',
+        play_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.32, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1, 'Играть', self.s.size_text_b, 'resources/images/button_inact.png',
                              'resources/images/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
 
-        settings_button = Button(self.s.WIDTH // 2 - 323, 600, 645, 100, 'Настройки', 'resources/images/button_inact.png',
+        settings_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.51, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1, 'Настройки', self.s.size_text_b, 'resources/images/button_inact.png',
                                  'resources/images/button_active.png',
                                  'resources/sounds/button_menu_sound.mp3')
 
-        quit_button = Button(self.s.WIDTH // 2 - 323, 750, 645, 100, 'Выйти', 'resources/images/button_inact.png',
+        quit_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.69, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1, 'Выйти', self.s.size_text_b, 'resources/images/button_inact.png',
                              'resources/images/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
-        fps_count_text_bl = Text(self.s.WIDTH * 0.96 + 2, self.s.HEIGHT * 0.97 + 2, (0, 0, 0),
-                                 str(int(self.s.clock.get_fps())) + ' FPS', 20,
+        fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
+                                 str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                                  is_topleft=True)
         fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200),
-                              str(int(self.s.clock.get_fps())) + ' FPS', 20,
+                              str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                               is_topleft=True)
         while show:
 
@@ -85,40 +84,42 @@ class Game:
         sett = True
         menu_im = self.s.menu_list[random.randint(0, 4)]
 
-        header_bl = Text(self.s.WIDTH // 2 + 4, round(self.s.HEIGHT * 0.1) + 4, (0, 0, 0), 'Настройки графики', 60)
-        header = Text(self.s.WIDTH // 2, round(self.s.HEIGHT * 0.1), (200, 200, 200), 'Настройки графики', 60)
+        header_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.104, (0, 0, 0), 'Настройки графики', int(self.s.WIDTH * 0.03125))
+        header = Text(self.s.WIDTH // 2, self.s.HEIGHT * 0.1, (200, 200, 200), 'Настройки графики', int(self.s.WIDTH * 0.03125))
 
-        gr_text_bl = Text(self.s.WIDTH // 2 + 4, round(self.s.HEIGHT * 0.2) + 4, (0, 0, 0), 'Разрешение рендера', 48)
-        gr_text = Text(self.s.WIDTH // 2, round(self.s.HEIGHT * 0.2), (200, 200, 200), 'Разрешение рендера', 48)
+        gr_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.204, (0, 0, 0), 'Разрешение рендера', int(self.s.WIDTH * 0.025))
+        gr_text = Text(self.s.WIDTH // 2, self.s.HEIGHT * 0.2, (200, 200, 200), 'Разрешение рендера', int(self.s.WIDTH * 0.025))
 
-        d_text_bl = Text(self.s.WIDTH // 2 + 4, round(self.s.HEIGHT * 0.4) + 4, (0, 0, 0), 'Дальность прорисовки', 48)
-        d_text = Text(self.s.WIDTH // 2, round(self.s.HEIGHT * 0.4), (200, 200, 200), 'Дальность прорисовки', 48)
+        d_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.404, (0, 0, 0), 'Дальность прорисовки', int(self.s.WIDTH * 0.025))
+        d_text = Text(self.s.WIDTH // 2, self.s.HEIGHT * 0.4, (200, 200, 200), 'Дальность прорисовки', int(self.s.WIDTH * 0.025))
 
-        fps_text_bl = Text(self.s.WIDTH // 2 + 4, round(self.s.HEIGHT * 0.6) + 4, (0, 0, 0), 'Частота кадров', 48)
-        fps_text = Text(self.s.WIDTH // 2, round(self.s.HEIGHT * 0.6), (200, 200, 200), 'Частота кадров', 48)
+        fps_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.604, (0, 0, 0), 'Частота кадров', int(self.s.WIDTH * 0.025))
+        fps_text = Text(self.s.WIDTH // 2, self.s.HEIGHT * 0.6, (200, 200, 200), 'Частота кадров', int(self.s.WIDTH * 0.025))
 
-        back_button = Button(self.s.WIDTH // 2 - 323, 850, 645, 100, 'Назад', 'resources/images/button_inact.png',
+        back_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.79, self.s.WIDTH * 0.335, self.s.HEIGHT * 0.0925, 'Назад', self.s.size_text_b, 'resources/images/button_inact.png',
                              'resources/images/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
-        gr_low = SelectButton(510, self.s.HEIGHT * 0.23, 300, 150, 'Низкое', sound='resources/sounds/button_menu_sound.mp3')
-        gr_mid = SelectButton(810, self.s.HEIGHT * 0.23, 300, 150, 'Среднее', sound='resources/sounds/button_menu_sound.mp3')
-        gr_high = SelectButton(1110, self.s.HEIGHT * 0.23, 300, 150, 'Высокое', sound='resources/sounds/button_menu_sound.mp3')
+        gr_low = SelectButton(self.s.WIDTH * 0.265, self.s.HEIGHT * 0.23, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Низкое', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        gr_mid = SelectButton(self.s.WIDTH * 0.42, self.s.HEIGHT * 0.23, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Среднее', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        gr_high = SelectButton(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.23, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Высокое', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
 
-        d_low = SelectButton(510, self.s.HEIGHT * 0.43, 300, 150, 'Низкая', sound='resources/sounds/button_menu_sound.mp3')
-        d_mid = SelectButton(810, self.s.HEIGHT * 0.43, 300, 150, 'Средняя', sound='resources/sounds/button_menu_sound.mp3')
-        d_high = SelectButton(1110, self.s.HEIGHT * 0.43, 300, 150, 'Высокая', sound='resources/sounds/button_menu_sound.mp3')
+        d_low = SelectButton(self.s.WIDTH * 0.265, self.s.HEIGHT * 0.43, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Низкая', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        d_mid = SelectButton(self.s.WIDTH * 0.42, self.s.HEIGHT * 0.43, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Средняя', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        d_high = SelectButton(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.43, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Высокая', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
 
-        fps_low = SelectButton(510, self.s.HEIGHT * 0.63, 300, 150, '30', sound='resources/sounds/button_menu_sound.mp3')
-        fps_mid = SelectButton(810, self.s.HEIGHT * 0.63, 300, 150, '60', sound='resources/sounds/button_menu_sound.mp3')
-        fps_high = SelectButton(1110, self.s.HEIGHT * 0.63, 300, 150, '90', sound='resources/sounds/button_menu_sound.mp3')
+        fps_low = SelectButton(self.s.WIDTH * 0.265, self.s.HEIGHT * 0.63, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, '30', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        fps_mid = SelectButton(self.s.WIDTH * 0.42, self.s.HEIGHT * 0.63, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, '60', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        fps_high = SelectButton(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.63, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, '90', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
 
         gr_list = [gr_low, gr_mid, gr_high]
         d_list = [d_low, d_mid, d_high]
         fps_list = [fps_low, fps_mid, fps_high]
 
-        fps_count_text_bl = Text(self.s.WIDTH * 0.96 + 2, self.s.HEIGHT * 0.97 + 2, (0, 0, 0), str(int(self.s.clock.get_fps())) + ' FPS', 20,
-                              is_topleft=True)
-        fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200), str(int(self.s.clock.get_fps())) + ' FPS', 20,
+        fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
+                                 str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
+                                 is_topleft=True)
+        fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200),
+                              str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                               is_topleft=True)
 
         all_list = [back_button, gr_high, gr_low, gr_mid, d_high, d_low, d_mid, fps_high, fps_low, fps_mid, gr_text_bl,
@@ -233,76 +234,78 @@ class Game:
 
         menu_im = self.s.menu_list[random.randint(0, 4)]
 
-        header_bl = Text(self.s.WIDTH // 2 + 4, round(self.s.HEIGHT * 0.05) + 4, (0, 0, 0), 'Игра', 60)
-        header = Text(self.s.WIDTH // 2, round(self.s.HEIGHT * 0.05), (200, 200, 200), 'Игра', 60)
+        header_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.053, (0, 0, 0), 'Игра', int(self.s.WIDTH * 0.03125))
+        header = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.05, (200, 200, 200), 'Игра', int(self.s.WIDTH * 0.03125))
 
-        t_bl = Text(round(self.s.WIDTH // 2 * 0.06) + 4, round(self.s.HEIGHT * 0.14) + 4, (0, 0, 0), 'Выбор техники', 48,
+        t_bl = Text(self.s.WIDTH * 0.032, self.s.HEIGHT * 0.144, (0, 0, 0), 'Выбор техники', int(self.s.WIDTH * 0.025),
                     is_topleft=True)
-        t = Text(round(self.s.WIDTH // 2 * 0.06), round(self.s.HEIGHT * 0.14), (200, 200, 200), 'Выбор техники', 48, is_topleft=True)
+        t = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.14, (200, 200, 200), 'Выбор техники', int(self.s.WIDTH * 0.025), is_topleft=True)
 
-        lvl_bl = Text(round(self.s.WIDTH // 2 * 0.06) + 4, round(self.s.HEIGHT * 0.37) + 4, (0, 0, 0), 'Выбор уровня', 48,
+        lvl_bl = Text(self.s.WIDTH * 0.032, self.s.HEIGHT * 0.373, (0, 0, 0), 'Выбор уровня', int(self.s.WIDTH * 0.025),
                       is_topleft=True)
-        lvl = Text(round(self.s.WIDTH // 2 * 0.06), round(self.s.HEIGHT * 0.37), (200, 200, 200), 'Выбор уровня', 48, is_topleft=True)
+        lvl = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.37, (200, 200, 200), 'Выбор уровня', int(self.s.WIDTH * 0.025), is_topleft=True)
 
-        am_bl = Text(round(self.s.WIDTH // 2 * 0.06) + 4, round(self.s.HEIGHT * 0.57) + 4, (0, 0, 0), 'Выбор боеприпасов', 48,
+        am_bl = Text(self.s.WIDTH * 0.032, self.s.HEIGHT * 0.573, (0, 0, 0), 'Выбор боеприпасов', int(self.s.WIDTH * 0.025),
                      is_topleft=True)
-        am = Text(round(self.s.WIDTH // 2 * 0.06), round(self.s.HEIGHT * 0.57), (200, 200, 200), 'Выбор боеприпасов', 48,
+        am = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.57, (200, 200, 200), 'Выбор боеприпасов', int(self.s.WIDTH * 0.025),
                   is_topleft=True)
 
-        am_d = Text(round(self.s.WIDTH // 2 * 0.89) + 500, round(self.s.HEIGHT * 0.633), (200, 200, 200), 'Описание боеприпасов', 17)
-        tank_descr = Text(round(self.s.WIDTH // 2 * 0.89) + 300, round(self.s.HEIGHT * 0.15), (200, 200, 200), 'Описание техники', 17)
-        tank_tth = Text(round(self.s.WIDTH // 2 * 1.75), round(self.s.HEIGHT * 0.15), (200, 200, 200), 'ТТХ техники', 17)
-        lvl_descr = Text(round(self.s.WIDTH // 2 * 0.89) + 300, round(self.s.HEIGHT * 0.4), (200, 200, 200), 'Описание уровня', 17)
+        am_d = Text(self.s.WIDTH * 0.705, self.s.HEIGHT * 0.633, (200, 200, 200), 'Описание боеприпасов', int(self.s.WIDTH * 0.009))
+        tank_descr = Text(self.s.WIDTH * 0.60125, self.s.HEIGHT * 0.15, (200, 200, 200), 'Описание техники', int(self.s.WIDTH * 0.009))
+        tank_tth = Text(self.s.WIDTH * 0.875, self.s.HEIGHT * 0.15, (200, 200, 200), 'ТТХ техники', int(self.s.WIDTH * 0.009))
+        lvl_descr = Text(self.s.WIDTH * 0.60125, self.s.HEIGHT * 0.4, (200, 200, 200), 'Описание уровня', int(self.s.WIDTH * 0.009))
 
-        apfsds_txt = SelectButton(round(self.s.WIDTH // 2 * 0.1), round(self.s.HEIGHT * 0.63), w=160, h=45, w_r=176, h_r=80,
-                                  text='БОПС', im='resources/images/apfsds.png', font_size=30)
-        he_txt = SelectButton(round(self.s.WIDTH // 2 * 0.37), round(self.s.HEIGHT * 0.63), w=160, h=45, w_r=176, h_r=80,
-                              text='ОФС', im='resources/images/he.png', font_size=30)
-        heat_txt = SelectButton(round(self.s.WIDTH // 2 * 0.64), round(self.s.HEIGHT * 0.63), w=160, h=45, w_r=176, h_r=80,
-                                text='КС', im='resources/images/heat.png', font_size=30)
+        apfsds_txt = SelectButton(self.s.WIDTH * 0.05, self.s.HEIGHT * 0.63, w=self.s.WIDTH * 0.083, h=self.s.HEIGHT * 0.042, w_r=self.s.WIDTH * 0.092, h_r=self.s.HEIGHT * 0.074,
+                                  text='БОПС', im='resources/images/apfsds.png', font_size=self.s.size_text_b)
+        he_txt = SelectButton(self.s.WIDTH * 0.185, self.s.HEIGHT * 0.63, w=self.s.WIDTH * 0.083, h=self.s.HEIGHT * 0.042, w_r=self.s.WIDTH * 0.092, h_r=self.s.HEIGHT * 0.074,
+                              text='ОФС', im='resources/images/he.png', font_size=self.s.size_text_b)
+        heat_txt = SelectButton(self.s.WIDTH * 0.32, self.s.HEIGHT * 0.63, w=self.s.WIDTH * 0.083, h=self.s.HEIGHT * 0.042, w_r=self.s.WIDTH * 0.092, h_r=self.s.HEIGHT * 0.074,
+                                text='КС', im='resources/images/heat.png', font_size=self.s.size_text_b)
 
-        plus1 = Button(round(self.s.WIDTH // 2 * 0.07), round(self.s.HEIGHT * 0.725), 60, 60, '', 'resources/images/plus.png',
+        plus1 = Button(round(self.s.WIDTH // 2 * 0.07), round(self.s.HEIGHT * 0.725), self.s.WIDTH * 0.03125, self.s.HEIGHT * 0.055, '', 1, 'resources/images/plus.png',
                        'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
-        plus2 = Button(round(self.s.WIDTH // 2 * 0.34), round(self.s.HEIGHT * 0.725), 60, 60, '', 'resources/images/plus.png',
+        plus2 = Button(round(self.s.WIDTH // 2 * 0.34), round(self.s.HEIGHT * 0.725), self.s.WIDTH * 0.03125, self.s.HEIGHT * 0.055, '', 1, 'resources/images/plus.png',
                        'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
-        plus3 = Button(round(self.s.WIDTH // 2 * 0.61), round(self.s.HEIGHT * 0.725), 60, 60, '', 'resources/images/plus.png',
+        plus3 = Button(round(self.s.WIDTH // 2 * 0.61), round(self.s.HEIGHT * 0.725), self.s.WIDTH * 0.03125, self.s.HEIGHT * 0.055, '', 1, 'resources/images/plus.png',
                        'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
-        minus1 = Button(round(self.s.WIDTH // 2 * 0.25), round(self.s.HEIGHT * 0.725), 60, 60, '', 'resources/images/minus.png',
+        minus1 = Button(round(self.s.WIDTH // 2 * 0.25), round(self.s.HEIGHT * 0.725), self.s.WIDTH * 0.03125, self.s.HEIGHT * 0.055, '', 1, 'resources/images/minus.png',
                         'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
-        minus2 = Button(round(self.s.WIDTH // 2 * 0.52), round(self.s.HEIGHT * 0.725), 60, 60, '', 'resources/images/minus.png',
+        minus2 = Button(round(self.s.WIDTH // 2 * 0.52), round(self.s.HEIGHT * 0.725), self.s.WIDTH * 0.03125, self.s.HEIGHT * 0.055, '', 1, 'resources/images/minus.png',
                         'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
-        minus3 = Button(round(self.s.WIDTH // 2 * 0.79), round(self.s.HEIGHT * 0.725), 60, 60, '', 'resources/images/minus.png',
+        minus3 = Button(round(self.s.WIDTH // 2 * 0.79), round(self.s.HEIGHT * 0.725), self.s.WIDTH * 0.03125, self.s.HEIGHT * 0.055, '', 1, 'resources/images/minus.png',
                         'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
 
-        apfsds_count_txt = Text(round(self.s.WIDTH // 2 * 0.187), round(self.s.HEIGHT * 0.75), (200, 200, 200), str(APFSDS_COUNT), 32)
-        apfsds_count_txt_bl = Text(round(self.s.WIDTH // 2 * 0.187) + 4, round(self.s.HEIGHT * 0.75) + 4, (0, 0, 0),
-                                   str(APFSDS_COUNT), 32)
-        he_count_txt = Text(round(self.s.WIDTH // 2 * 0.457), round(self.s.HEIGHT * 0.75), (200, 200, 200), str(HE_COUNT), 32)
-        he_count_txt_bl = Text(round(self.s.WIDTH // 2 * 0.457) + 4, round(self.s.HEIGHT * 0.75) + 4, (0, 0, 0), str(HE_COUNT), 32)
-        heat_count_txt = Text(round(self.s.WIDTH // 2 * 0.727), round(self.s.HEIGHT * 0.75), (200, 200, 200), str(HEAT_COUNT), 32)
-        heat_count_txt_bl = Text(round(self.s.WIDTH // 2 * 0.727) + 4, round(self.s.HEIGHT * 0.75) + 4, (0, 0, 0), str(HEAT_COUNT),
-                                 32)
-        max_ammo_text_bl = Text(round(self.s.WIDTH // 2 * 0.457) + 4, round(self.s.HEIGHT * 0.8) + 4, (0, 0, 0), f'0/{str(MAX_AMMO)}',
-                                32)
-        max_ammo_text = Text(round(self.s.WIDTH // 2 * 0.457), round(self.s.HEIGHT * 0.8), (200, 200, 200), f'0/{str(MAX_AMMO)}', 32)
+        apfsds_count_txt = Text(round(self.s.WIDTH // 2 * 0.187), round(self.s.HEIGHT * 0.75), (200, 200, 200), str(APFSDS_COUNT), int(self.s.WIDTH * 0.016))
+        apfsds_count_txt_bl = Text(self.s.WIDTH * 0.0955, self.s.HEIGHT * 0.754, (0, 0, 0),
+                                   str(APFSDS_COUNT), int(self.s.WIDTH * 0.016))
+        he_count_txt = Text(round(self.s.WIDTH // 2 * 0.457), round(self.s.HEIGHT * 0.75), (200, 200, 200), str(HE_COUNT), int(self.s.WIDTH * 0.016))
+        he_count_txt_bl = Text(self.s.WIDTH * 0.2305, round(self.s.HEIGHT * 0.753), (0, 0, 0), str(HE_COUNT), int(self.s.WIDTH * 0.016))
+        heat_count_txt = Text(round(self.s.WIDTH // 2 * 0.727), round(self.s.HEIGHT * 0.75), (200, 200, 200), str(HEAT_COUNT), int(self.s.WIDTH * 0.016))
+        heat_count_txt_bl = Text(self.s.WIDTH * 0.365, round(self.s.HEIGHT * 0.753), (0, 0, 0), str(HEAT_COUNT),
+                                 int(self.s.WIDTH * 0.016))
+        max_ammo_text_bl = Text(self.s.WIDTH * 0.2305, round(self.s.HEIGHT * 0.803), (0, 0, 0), f'0/{str(MAX_AMMO)}',
+                                int(self.s.WIDTH * 0.016))
+        max_ammo_text = Text(round(self.s.WIDTH // 2 * 0.457), round(self.s.HEIGHT * 0.8), (200, 200, 200), f'0/{str(MAX_AMMO)}', int(self.s.WIDTH * 0.016))
 
-        back_button = Button(round(self.s.WIDTH // 2 * 0.5) - 323, 900, 645, 100, 'Назад', 'resources/images/button_inact.png',
+        back_button = Button(self.s.WIDTH * 0.081, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336, self.s.HEIGHT * 0.0925, 'Назад', self.s.size_text_b, 'resources/images/button_inact.png',
                              'resources/images/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
-        play_button = Button(round(self.s.WIDTH // 4 * 3) - 323, 900, 645, 100, 'Играть', 'resources/images/button_inact.png',
+        play_button = Button(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336, self.s.HEIGHT * 0.0925, 'Играть', self.s.size_text_b, 'resources/images/button_inact.png',
                              'resources/images/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
-        tank1_button = SelectButton(round(self.s.WIDTH // 2 * 0.060), round(self.s.HEIGHT * 0.23), w=180, h=92, w_r=200, h_r=150,
+        tank1_button = SelectButton(round(self.s.WIDTH // 2 * 0.060), round(self.s.HEIGHT * 0.23), w=self.s.WIDTH * 0.09375, h=self.s.HEIGHT * 0.085, w_r=self.s.WIDTH * 0.104, h_r=self.s.HEIGHT * 0.139,
                                     text='Т-90М', im='resources/images/T-90M_profile.png',
-                                    sound='resources/sounds/button_menu_sound.mp3')
-        guide_button = SelectButton(round(self.s.WIDTH // 2 * 0.060), round(self.s.HEIGHT * 0.43), w=64, h=100, w_r=200, h_r=150,
+                                    sound='resources/sounds/button_menu_sound.mp3',
+                                    font_size=self.s.size_text_b)
+        guide_button = SelectButton(round(self.s.WIDTH // 2 * 0.060), round(self.s.HEIGHT * 0.43), w=self.s.WIDTH * 0.033, h=self.s.HEIGHT * 0.0925, w_r=self.s.WIDTH * 0.104, h_r=self.s.HEIGHT * 0.139,
                                     text='Обучение', im='resources/images/guide.png',
-                                    sound='resources/sounds/button_menu_sound.mp3')
+                                    sound='resources/sounds/button_menu_sound.mp3',
+                                    font_size=self.s.size_text_b)
 
         ammo_descr_list = []
         k = 0.63
         for i in self.s.ammo:
-            temp = Text(round(self.s.WIDTH // 2 * 0.9), round(self.s.HEIGHT * k), (200, 200, 200), i, 15, (50, 60, 50),
+            temp = Text(round(self.s.WIDTH // 2 * 0.9), round(self.s.HEIGHT * k), (200, 200, 200), i, int(self.s.WIDTH * 0.0078), (50, 60, 50),
                         is_topleft=True)
             k += 0.018
             ammo_descr_list.append(temp)
@@ -310,7 +313,7 @@ class Game:
         tank_descr_list = []
         k2 = 0.17
         for i in self.s.T_90M_descr:
-            temp = Text(round(self.s.WIDTH // 2 * 0.9), round(self.s.HEIGHT * k2), (200, 200, 200), i, 15, (50, 60, 50),
+            temp = Text(round(self.s.WIDTH // 2 * 0.9), round(self.s.HEIGHT * k2), (200, 200, 200), i, int(self.s.WIDTH * 0.0078), (50, 60, 50),
                         is_topleft=True)
             k2 += 0.0166
             tank_descr_list.append(temp)
@@ -318,7 +321,7 @@ class Game:
         k3 = 0.17
         T_90M_TTH_list = []
         for i in self.s.T_90M_TTH:
-            temp = Text(round(self.s.WIDTH // 2 * 1.5), round(self.s.HEIGHT * k3), (200, 200, 200), i, 15, (50, 60, 50),
+            temp = Text(round(self.s.WIDTH // 2 * 1.5), round(self.s.HEIGHT * k3), (200, 200, 200), i, int(self.s.WIDTH * 0.0078), (50, 60, 50),
                         is_topleft=True)
             k3 += 0.0167
             T_90M_TTH_list.append(temp)
@@ -326,7 +329,7 @@ class Game:
         k4 = 0.43
         guide_list = []
         for i in self.s.guide_descr:
-            temp = Text(round(self.s.WIDTH // 2 * 0.9), round(self.s.HEIGHT * k4), (200, 200, 200), i, 15, (50, 60, 50),
+            temp = Text(round(self.s.WIDTH // 2 * 0.9), round(self.s.HEIGHT * k4), (200, 200, 200), i, int(self.s.WIDTH * 0.0078), (50, 60, 50),
                         is_topleft=True)
             k4 += 0.0167
             guide_list.append(temp)
@@ -338,11 +341,11 @@ class Game:
         button_list = [back_button, tank1_button, guide_button, play_button, plus1, plus2, plus3, minus1, minus2,
                        minus3]
 
-        fps_count_text_bl = Text(self.s.WIDTH * 0.96 + 2, self.s.HEIGHT * 0.97 + 2, (0, 0, 0),
-                                 str(int(self.s.clock.get_fps())) + ' FPS', 20,
+        fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
+                                 str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                                  is_topleft=True)
         fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200),
-                              str(int(self.s.clock.get_fps())) + ' FPS', 20,
+                              str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                               is_topleft=True)
 
         text_list = [header_bl, header, t_bl, t, lvl_bl, lvl, am_bl, am, apfsds_txt, heat_txt, he_txt,

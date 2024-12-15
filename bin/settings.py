@@ -1,10 +1,12 @@
 import pygame
 import gif_pygame
+import screeninfo
 
 class Settings:
     def __init__(self):
-        self.WIDTH = 1920
-        self.HEIGHT = 1080
+        self.WIDTH = screeninfo.get_monitors()[0].width
+        self.HEIGHT = screeninfo.get_monitors()[0].height
+        self.size_text_b = int(self.WIDTH * 0.01875)
 
         self.button_color = (50, 60, 50)
         pygame.init()
@@ -18,7 +20,10 @@ class Settings:
         self.menu4 = pygame.image.load('resources/images/menu_p4.png').convert()
         self.menu5 = pygame.image.load('resources/images/menu_p5.png').convert()
         self.gif = gif_pygame.load("resources/images/menu_g.gif")
+        gif_pygame.transform.scale(self.gif, (self.WIDTH, self.HEIGHT))
         self.menu_list = [self.menu1, self.menu2, self.menu3, self.menu4, self.menu5]
+        for i in range(len(self.menu_list)):
+            self.menu_list[i] = pygame.transform.scale(self.menu_list[i], (self.WIDTH, self.HEIGHT))
 
         self.graph_dict = {0: False, 1: True, 2: False}
         self.d_dict = {0: False, 1: True, 2: False}

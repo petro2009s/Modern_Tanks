@@ -1,13 +1,13 @@
 import pygame
 
-
 class Button:
-    def __init__(self, x, y, w, h, text, im_inact, im_act, sound=None):
+    def __init__(self, x, y, w, h, text, size_text, im_inact, im_act, sound=None):
         self.x = x
         self.y = y
         self.width = w
         self.height = h
         self.text = text
+        self.size_text = size_text
         self.im_inact = pygame.image.load(im_inact).convert_alpha()
         self.im_inact = pygame.transform.scale(self.im_inact, (w, h)).convert_alpha()
         self.im_act = pygame.image.load(im_act).convert_alpha()
@@ -16,12 +16,12 @@ class Button:
         if sound:
             self.sound = pygame.mixer.Sound(sound)
         self.is_hov = False
-        font = pygame.font.Font('resources/fonts/pixel_font.otf', 36)
+        font = pygame.font.Font('resources/fonts/pixel_font.otf', self.size_text)
         self.text_surface = font.render(self.text, True, (200, 200, 200))
         self.text_rect = self.text_surface.get_rect(center=self.rect.center)
-        font2 = pygame.font.Font('resources/fonts/pixel_font.otf', 36)
+        font2 = pygame.font.Font('resources/fonts/pixel_font.otf', self.size_text)
         self.text_surface2 = font2.render(self.text, True, (0, 0, 0))
-        self.text_rect2 = self.text_surface2.get_rect(center=(self.rect.center[0] + 4, self.rect.center[1] + 4))
+        self.text_rect2 = self.text_surface2.get_rect(center=(self.rect.center[0] + self.size_text * 0.11, self.rect.center[1] + self.size_text * 0.11))
 
     def draw(self, screen):
         current_im = self.im_act if self.is_hov else self.im_inact
@@ -64,24 +64,14 @@ class SelectButton:
             self.sound = pygame.mixer.Sound(sound)
         self.is_hov = False
         self.is_cl = False
-        if self.font_size:
-            font = pygame.font.Font('resources/fonts/pixel_font.otf', self.font_size)
-            self.text_surface = font.render(self.text, True, (200, 200, 200))
-            font2 = pygame.font.Font('resources/fonts/pixel_font.otf', self.font_size)
-            self.text_surface2 = font2.render(self.text, True, (0, 0, 0))
-            self.text_rect = self.text_surface.get_rect(
-                center=(self.width_r // 2 + self.x, self.y + self.height_r // 2 + (self.height_r - self.height) * 0.6))
-            self.text_rect2 = self.text_surface.get_rect(center=(
-                self.width_r // 2 + self.x + 4, self.y + 4 + self.height_r // 2 + (self.height_r - self.height) * 0.6))
-        else:
-            font = pygame.font.Font('resources/fonts/pixel_font.otf', 36)
-            self.text_surface = font.render(self.text, True, (200, 200, 200))
-            font2 = pygame.font.Font('resources/fonts/pixel_font.otf', 36)
-            self.text_surface2 = font2.render(self.text, True, (0, 0, 0))
-            self.text_rect = self.text_surface.get_rect(
-                center=(self.width_r // 2 + self.x, self.y + self.height_r // 2 + (self.height_r - self.height) * 0.6))
-            self.text_rect2 = self.text_surface.get_rect(center=(
-                self.width_r // 2 + self.x + 4, self.y + 4 + self.height_r // 2 + (self.height_r - self.height) * 0.6))
+        font = pygame.font.Font('resources/fonts/pixel_font.otf', self.font_size)
+        self.text_surface = font.render(self.text, True, (200, 200, 200))
+        font2 = pygame.font.Font('resources/fonts/pixel_font.otf', self.font_size)
+        self.text_surface2 = font2.render(self.text, True, (0, 0, 0))
+        self.text_rect = self.text_surface.get_rect(
+            center=(self.width_r // 2 + self.x, self.y + self.height_r // 2 + (self.height_r - self.height) * 0.6))
+        self.text_rect2 = self.text_surface.get_rect(
+            center=(self.width_r // 2 + self.x + self.font_size * 0.11, self.y + self.font_size * 0.11 + self.height_r // 2 + (self.height_r - self.height) * 0.6))
 
     def draw(self, screen):
         if self.is_hov or self.is_cl:
