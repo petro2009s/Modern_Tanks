@@ -337,7 +337,7 @@ class Game:
         tank_list = [tank1_button]
         lvl_list = [guide_button]
 
-        rect = pygame.Rect(round(self.s.WIDTH // 2 * 0.89), round(self.s.HEIGHT * 0.14), 1100, 730)
+        rect = pygame.Rect(round(self.s.WIDTH // 2 * 0.89), round(self.s.HEIGHT * 0.14), self.s.WIDTH * 0.573, self.s.HEIGHT * 0.676)
         button_list = [back_button, tank1_button, guide_button, play_button, plus1, plus2, plus3, minus1, minus2,
                        minus3]
 
