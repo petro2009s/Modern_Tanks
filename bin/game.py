@@ -13,6 +13,7 @@ class Game:
         self.s = Settings()
         pygame.display.set_caption('World of Modern Tanks')
         pygame.display.set_icon(self.s.icon)
+        pygame.mouse.set_visible(False)
 
     def start_game(self):
         show = True
@@ -77,6 +78,9 @@ class Game:
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text_bl.draw(self.s.display)
             fps_count_text.draw(self.s.display)
+
+
+            self.s.display.blit(self.s.cursor, pygame.mouse.get_pos())
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
 
@@ -219,6 +223,7 @@ class Game:
             for i in all_list:
                 i.draw(self.s.display)
 
+            self.s.display.blit(self.s.cursor, pygame.mouse.get_pos())
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
 
@@ -466,5 +471,6 @@ class Game:
             tank_tth.draw(self.s.display)
             lvl_descr.draw(self.s.display)
 
+            self.s.display.blit(self.s.cursor, pygame.mouse.get_pos())
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)

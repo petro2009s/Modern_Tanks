@@ -21,6 +21,8 @@ class Settings:
         self.menu5 = pygame.image.load('resources/images/menu_p5.png').convert()
         self.gif = gif_pygame.load("resources/images/menu_g.gif")
         gif_pygame.transform.scale(self.gif, (self.WIDTH, self.HEIGHT))
+        self.cursor = pygame.image.load('resources/images/cursor.png').convert_alpha()
+        self.cursor = pygame.transform.scale(self.cursor, (self.WIDTH * 0.03125, self.WIDTH * 0.03125))
         self.menu_list = [self.menu1, self.menu2, self.menu3, self.menu4, self.menu5]
         for i in range(len(self.menu_list)):
             self.menu_list[i] = pygame.transform.scale(self.menu_list[i], (self.WIDTH, self.HEIGHT))
