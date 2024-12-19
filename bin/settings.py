@@ -30,6 +30,7 @@ class Settings:
         self.graph_dict = {0: False, 1: True, 2: False}
         self.d_dict = {0: False, 1: True, 2: False}
         self.fps_dict = {0: False, 1: True, 2: False}
+        self.music_menu = pygame.mixer.Sound("resources/sounds/music_menu.mp3")
         self.volume_music = 50
         self.volume_sound = 50
         self.volume_general = 50

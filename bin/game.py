@@ -14,9 +14,8 @@ class Game:
         pygame.display.set_caption('World of Modern Tanks')
         pygame.display.set_icon(self.s.icon)
         pygame.mouse.set_visible(False)
-        self.music_menu = pygame.mixer.Sound("resources/sounds/music_menu.mp3")
-        self.music_menu.play(-1)
-        self.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
+        self.s.music_menu.play(-1)
+        self.s.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
 
     def start_game(self):
         show = True
@@ -261,25 +260,25 @@ class Game:
 
                     if event.button == plus_general:
                         self.s.volume_general += 10 * (self.s.volume_general != 100)
-                        self.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
+                        self.s.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
                         general_text_volume.set_another_text(str(self.s.volume_general))
                         general_text_volume_bl.set_another_text(str(self.s.volume_general))
 
                     if event.button == minus_general:
                         self.s.volume_general -= 10 * (self.s.volume_general != 0)
-                        self.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
+                        self.s.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
                         general_text_volume.set_another_text(str(self.s.volume_general))
                         general_text_volume_bl.set_another_text(str(self.s.volume_general))
 
                     if event.button == plus_music:
                         self.s.volume_music += 10 * (self.s.volume_music != 100)
-                        self.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
+                        self.s.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
                         music_text_volume.set_another_text(str(self.s.volume_music))
                         music_text_volume_bl.set_another_text(str(self.s.volume_music))
 
                     if event.button == minus_music:
                         self.s.volume_music -= 10 * (self.s.volume_music != 0)
-                        self.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
+                        self.s.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
                         music_text_volume.set_another_text(str(self.s.volume_music))
                         music_text_volume_bl.set_another_text(str(self.s.volume_music))
 
