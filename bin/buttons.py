@@ -33,9 +33,10 @@ class Button:
     def check(self, mouse_pos):
         self.is_hov = self.rect.collidepoint(mouse_pos)
 
-    def handle_event(self, event):
+    def handle_event(self, event, volume):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.is_hov:
             if self.sound:
+                self.sound.set_volume(volume / 100)
                 self.sound.play()
             pygame.event.post(pygame.event.Event(pygame.USEREVENT, button=self))
 
@@ -88,9 +89,10 @@ class SelectButton:
     def check(self, mouse_pos):
         self.is_hov = self.rect.collidepoint(mouse_pos)
 
-    def handle_event(self, event):
+    def handle_event(self, event, volume):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.is_hov:
             if self.sound:
+                self.sound.set_volume(volume / 100)
                 self.sound.play()
             pygame.event.post(pygame.event.Event(pygame.USEREVENT, button=self))
             if self.is_cl:

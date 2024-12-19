@@ -30,6 +30,9 @@ class Settings:
         self.graph_dict = {0: False, 1: True, 2: False}
         self.d_dict = {0: False, 1: True, 2: False}
         self.fps_dict = {0: False, 1: True, 2: False}
+        self.volume_music = 50
+        self.volume_sound = 50
+        self.volume_general = 50
 
         self.tank_dict = {0: True}
         self.lvl_dict = {0: True}

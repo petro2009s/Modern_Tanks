@@ -14,6 +14,9 @@ class Game:
         pygame.display.set_caption('World of Modern Tanks')
         pygame.display.set_icon(self.s.icon)
         pygame.mouse.set_visible(False)
+        self.music_menu = pygame.mixer.Sound("resources/sounds/music_menu.mp3")
+        self.music_menu.play(-1)
+        self.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
 
     def start_game(self):
         show = True
@@ -61,9 +64,9 @@ class Game:
                     if event.button == play_button:
                         self.game_menu()
 
-                play_button.handle_event(event)
-                settings_button.handle_event(event)
-                quit_button.handle_event(event)
+                play_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
+                settings_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
+                quit_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
 
            # self.s.display.blit(menu_im, (0, 0))
             self.s.gif.render(self.s.display, (0, 0))
@@ -79,7 +82,6 @@ class Game:
             fps_count_text_bl.draw(self.s.display)
             fps_count_text.draw(self.s.display)
 
-
             self.s.display.blit(self.s.cursor, pygame.mouse.get_pos())
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
@@ -88,36 +90,79 @@ class Game:
         sett = True
         menu_im = self.s.menu_list[random.randint(0, 4)]
 
-        header_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.104, (0, 0, 0), 'Настройки графики', int(self.s.WIDTH * 0.03125))
-        header = Text(self.s.WIDTH // 2, self.s.HEIGHT * 0.1, (200, 200, 200), 'Настройки графики', int(self.s.WIDTH * 0.03125))
+        header_bl = Text(self.s.WIDTH * 0.278, self.s.HEIGHT * 0.104, (0, 0, 0), 'Настройки графики', int(self.s.WIDTH * 0.03125))
+        header = Text(self.s.WIDTH * 0.276, self.s.HEIGHT * 0.1, (200, 200, 200), 'Настройки графики', int(self.s.WIDTH * 0.03125))
 
-        gr_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.204, (0, 0, 0), 'Разрешение рендера', int(self.s.WIDTH * 0.025))
-        gr_text = Text(self.s.WIDTH // 2, self.s.HEIGHT * 0.2, (200, 200, 200), 'Разрешение рендера', int(self.s.WIDTH * 0.025))
+        volume_header_bl = Text(self.s.WIDTH * 0.778, self.s.HEIGHT * 0.104, (0, 0, 0), 'Настройки звука',int(self.s.WIDTH * 0.03125))
+        volume_header = Text(self.s.WIDTH * 0.776, self.s.HEIGHT * 0.1, (200, 200, 200), 'Настройки звука',int(self.s.WIDTH * 0.03125))
 
-        d_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.404, (0, 0, 0), 'Дальность прорисовки', int(self.s.WIDTH * 0.025))
-        d_text = Text(self.s.WIDTH // 2, self.s.HEIGHT * 0.4, (200, 200, 200), 'Дальность прорисовки', int(self.s.WIDTH * 0.025))
+        gr_text_bl = Text(self.s.WIDTH * 0.278, self.s.HEIGHT * 0.204, (0, 0, 0), 'Разрешение рендера', int(self.s.WIDTH * 0.025))
+        gr_text = Text(self.s.WIDTH * 0.276, self.s.HEIGHT * 0.2, (200, 200, 200), 'Разрешение рендера', int(self.s.WIDTH * 0.025))
 
-        fps_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.604, (0, 0, 0), 'Частота кадров', int(self.s.WIDTH * 0.025))
-        fps_text = Text(self.s.WIDTH // 2, self.s.HEIGHT * 0.6, (200, 200, 200), 'Частота кадров', int(self.s.WIDTH * 0.025))
+        d_text_bl = Text(self.s.WIDTH * 0.278, self.s.HEIGHT * 0.404, (0, 0, 0), 'Дальность прорисовки', int(self.s.WIDTH * 0.025))
+        d_text = Text(self.s.WIDTH * 0.276, self.s.HEIGHT * 0.4, (200, 200, 200), 'Дальность прорисовки', int(self.s.WIDTH * 0.025))
+
+        fps_text_bl = Text(self.s.WIDTH * 0.278, self.s.HEIGHT * 0.604, (0, 0, 0), 'Частота кадров', int(self.s.WIDTH * 0.025))
+        fps_text = Text(self.s.WIDTH * 0.276, self.s.HEIGHT * 0.6, (200, 200, 200), 'Частота кадров', int(self.s.WIDTH * 0.025))
+
+        general_text_bl = Text(self.s.WIDTH * 0.778, self.s.HEIGHT * 0.204, (0, 0, 0), 'Общая громкость',int(self.s.WIDTH * 0.025))
+        general_text = Text(self.s.WIDTH * 0.776, self.s.HEIGHT * 0.2, (200, 200, 200), 'Общая громкость',int(self.s.WIDTH * 0.025))
+
+        music_text_bl = Text(self.s.WIDTH * 0.778, self.s.HEIGHT * 0.404, (0, 0, 0), 'Громкость музыки',int(self.s.WIDTH * 0.025))
+        music_text = Text(self.s.WIDTH * 0.776, self.s.HEIGHT * 0.4, (200, 200, 200), 'Громкость музыки',int(self.s.WIDTH * 0.025))
+
+        sound_text_bl = Text(self.s.WIDTH * 0.778, self.s.HEIGHT * 0.604, (0, 0, 0), 'Громкость звуков',int(self.s.WIDTH * 0.025))
+        sound_text = Text(self.s.WIDTH * 0.776, self.s.HEIGHT * 0.6, (200, 200, 200), 'Громкость звуков',int(self.s.WIDTH * 0.025))
+
+        general_text_volume_bl = Text(self.s.WIDTH * 0.778, self.s.HEIGHT * 0.304, (0, 0, 0), str(self.s.volume_general),int(self.s.WIDTH * 0.0417))
+        general_text_volume = Text(self.s.WIDTH * 0.776, self.s.HEIGHT * 0.3, (200, 200, 200), str(self.s.volume_general),int(self.s.WIDTH * 0.0417))
+
+        music_text_volume_bl = Text(self.s.WIDTH * 0.778, self.s.HEIGHT * 0.504, (0, 0, 0), str(self.s.volume_music),int(self.s.WIDTH * 0.0417))
+        music_text_volume = Text(self.s.WIDTH * 0.776, self.s.HEIGHT * 0.5, (200, 200, 200), str(self.s.volume_music),int(self.s.WIDTH * 0.0417))
+
+        sound_text_volume_bl = Text(self.s.WIDTH * 0.778, self.s.HEIGHT * 0.704, (0, 0, 0), str(self.s.volume_sound),int(self.s.WIDTH * 0.0417))
+        sound_text_volume = Text(self.s.WIDTH * 0.776, self.s.HEIGHT * 0.7, (200, 200, 200), str(self.s.volume_sound),int(self.s.WIDTH * 0.0417))
 
         back_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.79, self.s.WIDTH * 0.335, self.s.HEIGHT * 0.0925, 'Назад', self.s.size_text_b, 'resources/images/button_inact.png',
                              'resources/images/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
-        gr_low = SelectButton(self.s.WIDTH * 0.265, self.s.HEIGHT * 0.23, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Низкое', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
-        gr_mid = SelectButton(self.s.WIDTH * 0.42, self.s.HEIGHT * 0.23, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Среднее', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
-        gr_high = SelectButton(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.23, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Высокое', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        gr_low = SelectButton(self.s.WIDTH * 0.041, self.s.HEIGHT * 0.23, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Низкое', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        gr_mid = SelectButton(self.s.WIDTH * 0.198, self.s.HEIGHT * 0.23, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Среднее', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        gr_high = SelectButton(self.s.WIDTH * 0.354, self.s.HEIGHT * 0.23, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Высокое', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
 
-        d_low = SelectButton(self.s.WIDTH * 0.265, self.s.HEIGHT * 0.43, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Низкая', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
-        d_mid = SelectButton(self.s.WIDTH * 0.42, self.s.HEIGHT * 0.43, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Средняя', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
-        d_high = SelectButton(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.43, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Высокая', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        d_low = SelectButton(self.s.WIDTH * 0.041, self.s.HEIGHT * 0.43, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Низкая', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        d_mid = SelectButton(self.s.WIDTH * 0.198, self.s.HEIGHT * 0.43, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Средняя', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        d_high = SelectButton(self.s.WIDTH * 0.354, self.s.HEIGHT * 0.43, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Высокая', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
 
-        fps_low = SelectButton(self.s.WIDTH * 0.265, self.s.HEIGHT * 0.63, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, '30', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
-        fps_mid = SelectButton(self.s.WIDTH * 0.42, self.s.HEIGHT * 0.63, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, '60', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
-        fps_high = SelectButton(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.63, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, '90', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        fps_low = SelectButton(self.s.WIDTH * 0.041, self.s.HEIGHT * 0.63, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, '30', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        fps_mid = SelectButton(self.s.WIDTH * 0.198, self.s.HEIGHT * 0.63, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, '60', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+        fps_high = SelectButton(self.s.WIDTH * 0.354, self.s.HEIGHT * 0.63, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, '90', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
+
+        plus_general = Button(self.s.WIDTH * 0.677, self.s.HEIGHT * 0.263, self.s.WIDTH * 0.0417,
+                            self.s.HEIGHT * 0.074, '', 1, 'resources/images/plus.png',
+                            'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
+        minus_general = Button(self.s.WIDTH * 0.8333, self.s.HEIGHT * 0.263, self.s.WIDTH * 0.0417,
+                             self.s.HEIGHT * 0.074, '', 1, 'resources/images/minus.png',
+                             'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
+
+        plus_music = Button(self.s.WIDTH * 0.677, self.s.HEIGHT * 0.463, self.s.WIDTH * 0.0417,
+                       self.s.HEIGHT * 0.074, '', 1, 'resources/images/plus.png',
+                       'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
+        minus_music = Button(self.s.WIDTH * 0.8333, self.s.HEIGHT * 0.463, self.s.WIDTH * 0.0417,
+                       self.s.HEIGHT * 0.074, '', 1, 'resources/images/minus.png',
+                       'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
+
+        plus_sound = Button(self.s.WIDTH * 0.677, self.s.HEIGHT * 0.663, self.s.WIDTH * 0.0417,
+                             self.s.HEIGHT * 0.074, '', 1, 'resources/images/plus.png',
+                             'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
+        minus_sound = Button(self.s.WIDTH * 0.8333, self.s.HEIGHT * 0.663, self.s.WIDTH * 0.0417,
+                             self.s.HEIGHT * 0.074, '', 1, 'resources/images/minus.png',
+                             'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
 
         gr_list = [gr_low, gr_mid, gr_high]
         d_list = [d_low, d_mid, d_high]
         fps_list = [fps_low, fps_mid, fps_high]
+        sound_list = [plus_music, minus_music, plus_sound, minus_sound, plus_general, minus_general]
 
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
@@ -127,7 +172,12 @@ class Game:
                               is_topleft=True)
 
         all_list = [back_button, gr_high, gr_low, gr_mid, d_high, d_low, d_mid, fps_high, fps_low, fps_mid, gr_text_bl,
-                    gr_text, d_text_bl, d_text, fps_text_bl, fps_text, header_bl, header, fps_count_text_bl, fps_count_text]
+                    gr_text, d_text_bl, d_text, fps_text_bl, fps_text, header_bl, header, fps_count_text_bl, fps_count_text,
+                    plus_music, minus_music, plus_sound, minus_sound, volume_header_bl, volume_header, music_text_bl,
+                    music_text, sound_text_bl, sound_text, music_text_volume_bl, music_text_volume, sound_text_volume_bl,
+                    sound_text_volume, general_text_bl, general_text, general_text_volume_bl, general_text_volume,
+                    plus_general, minus_general]
+
         while sett:
             back_button.check(pygame.mouse.get_pos())
 
@@ -147,6 +197,9 @@ class Game:
                 fps_list[i].is_cl = self.s.fps_dict[i]
 
             for i in fps_list:
+                i.check(pygame.mouse.get_pos())
+
+            for i in sound_list:
                 i.check(pygame.mouse.get_pos())
 
             for event in pygame.event.get():
@@ -206,15 +259,53 @@ class Game:
                         self.s.fps_dict[1] = True
                         self.s.FPS = 60
 
-                back_button.handle_event(event)
+                    if event.button == plus_general:
+                        self.s.volume_general += 10 * (self.s.volume_general != 100)
+                        self.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
+                        general_text_volume.set_another_text(str(self.s.volume_general))
+                        general_text_volume_bl.set_another_text(str(self.s.volume_general))
+
+                    if event.button == minus_general:
+                        self.s.volume_general -= 10 * (self.s.volume_general != 0)
+                        self.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
+                        general_text_volume.set_another_text(str(self.s.volume_general))
+                        general_text_volume_bl.set_another_text(str(self.s.volume_general))
+
+                    if event.button == plus_music:
+                        self.s.volume_music += 10 * (self.s.volume_music != 100)
+                        self.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
+                        music_text_volume.set_another_text(str(self.s.volume_music))
+                        music_text_volume_bl.set_another_text(str(self.s.volume_music))
+
+                    if event.button == minus_music:
+                        self.s.volume_music -= 10 * (self.s.volume_music != 0)
+                        self.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
+                        music_text_volume.set_another_text(str(self.s.volume_music))
+                        music_text_volume_bl.set_another_text(str(self.s.volume_music))
+
+                    if event.button == plus_sound:
+                        self.s.volume_sound += 10 * (self.s.volume_sound != 100)
+                        sound_text_volume.set_another_text(str(self.s.volume_sound))
+                        sound_text_volume_bl.set_another_text(str(self.s.volume_sound))
+
+                    if event.button == minus_sound:
+                        self.s.volume_sound -= 10 * (self.s.volume_sound != 0)
+                        sound_text_volume.set_another_text(str(self.s.volume_sound))
+                        sound_text_volume_bl.set_another_text(str(self.s.volume_sound))
+
+                back_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
+
                 for i in gr_list:
-                    i.handle_event(event)
+                    i.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
 
                 for i in d_list:
-                    i.handle_event(event)
+                    i.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
 
                 for i in fps_list:
-                    i.handle_event(event)
+                    i.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
+
+                for i in sound_list:
+                    i.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
 
             self.s.display.blit(menu_im, (0, 0))
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
@@ -404,6 +495,8 @@ class Game:
                             he_count_txt_bl.set_another_text(str(HE_COUNT))
                             max_ammo_text_bl.set_another_text(f'{str(CURRENT_AMMO)}/{str(AMMO)}')
                             max_ammo_text.set_another_text(f'{str(CURRENT_AMMO)}/{str(AMMO)}')
+
+
                     elif event.button == plus3:
                         if MAX_AMMO > 0:
                             HEAT_COUNT += 1
@@ -449,7 +542,7 @@ class Game:
                         print([i for i, j in self.s.lvl_dict.items() if j][0])
 
                 for i in button_list:
-                    i.handle_event(event)
+                    i.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
 
             for i in button_list:
                 i.draw(self.s.display)
