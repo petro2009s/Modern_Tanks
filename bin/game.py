@@ -122,9 +122,10 @@ class Game:
         sound_text_volume_bl = Text(self.s.WIDTH * 0.778, self.s.HEIGHT * 0.704, (0, 0, 0), str(self.s.volume_sound),int(self.s.WIDTH * 0.0417))
         sound_text_volume = Text(self.s.WIDTH * 0.776, self.s.HEIGHT * 0.7, (200, 200, 200), str(self.s.volume_sound),int(self.s.WIDTH * 0.0417))
 
-        back_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.79, self.s.WIDTH * 0.335, self.s.HEIGHT * 0.0925, 'Назад', self.s.size_text_b, 'resources/images/button_inact.png',
+        back_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.833, self.s.WIDTH * 0.335, self.s.HEIGHT * 0.0925, 'Назад', self.s.size_text_b, 'resources/images/button_inact.png',
                              'resources/images/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
+
         gr_low = SelectButton(self.s.WIDTH * 0.041, self.s.HEIGHT * 0.23, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Низкое', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
         gr_mid = SelectButton(self.s.WIDTH * 0.198, self.s.HEIGHT * 0.23, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Среднее', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)
         gr_high = SelectButton(self.s.WIDTH * 0.354, self.s.HEIGHT * 0.23, int(self.s.WIDTH * 0.15), self.s.HEIGHT * 0.139, 'Высокое', sound='resources/sounds/button_menu_sound.mp3', font_size=self.s.size_text_b)

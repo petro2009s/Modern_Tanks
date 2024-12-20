@@ -1,7 +1,7 @@
 import pygame
 import gif_pygame
 import screeninfo
-from bd import DBController
+from bin.bd import DBController
 
 class Settings:
     def __init__(self):

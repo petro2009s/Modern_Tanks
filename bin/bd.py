@@ -23,7 +23,6 @@ class DBController:
     # Проверка на существование БД и её создание если нету
     def check_db(self):
         if not os.path.exists(self.name):
-            print(1)
             query_table_posts1 = '''
 
 CREATE TABLE d_table (
