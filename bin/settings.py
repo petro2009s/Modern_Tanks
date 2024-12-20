@@ -1,6 +1,7 @@
 import pygame
 import gif_pygame
 import screeninfo
+from bd import DBController
 
 class Settings:
     def __init__(self):
@@ -14,6 +15,8 @@ class Settings:
         self.display = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         self.icon = pygame.image.load('resources/images/icon_test2_p.png').convert()
 
+        self.bd = DBController('resources/ModernTanksDB')
+        # self.bd.clear()
         self.menu1 = pygame.image.load('resources/images/menu_p1.png').convert()
         self.menu2 = pygame.image.load('resources/images/menu_p2.png').convert()
         self.menu3 = pygame.image.load('resources/images/menu_p3.png').convert()
@@ -27,18 +30,18 @@ class Settings:
         for i in range(len(self.menu_list)):
             self.menu_list[i] = pygame.transform.scale(self.menu_list[i], (self.WIDTH, self.HEIGHT))
 
-        self.graph_dict = {0: False, 1: True, 2: False}
-        self.d_dict = {0: False, 1: True, 2: False}
-        self.fps_dict = {0: False, 1: True, 2: False}
         self.music_menu = pygame.mixer.Sound("resources/sounds/music_menu.mp3")
-        self.volume_music = 50
-        self.volume_sound = 50
-        self.volume_general = 50
+
+        self.volume_music = self.bd.select('volume_table', 'volume_music')[0][0]
+        self.volume_sound = self.bd.select('volume_table', 'volume_sound')[0][0]
+        self.volume_general = self.bd.select('volume_table', 'volume_general')[0][0]
 
         self.tank_dict = {0: True}
         self.lvl_dict = {0: True}
         self.clock = pygame.time.Clock()
-        self.FPS = 60
+        fps = self.bd.select('FPS_table', '*')[0]
+        fps_dict = {0: 30, 1: 60, 2: 90}
+        self.FPS = fps_dict[[i for i in range(3) if fps[i] == '1'][0]]
 
         with open('resources/descriptions/ammunition.txt', encoding='utf-8') as f:
             self.ammo = list(map(lambda x: x[:-1], f.readlines()))

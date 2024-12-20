@@ -12,6 +12,7 @@ class Button:
         self.im_inact = pygame.transform.scale(self.im_inact, (w, h)).convert_alpha()
         self.im_act = pygame.image.load(im_act).convert_alpha()
         self.im_act = pygame.transform.scale(self.im_act, (w, h)).convert_alpha()
+        print(self.im_act.size)
         self.rect = self.im_inact.get_rect(topleft=(x, y))
         if sound:
             self.sound = pygame.mixer.Sound(sound)
