@@ -7,44 +7,30 @@ class DBController:
         self.name = name
         self.check_db()
 
-    # Функция исполнения запросов
-    def query(self, query):
-        result = None
-        try:
-            connection = sqlite3.connect(self.name)
-            cur = connection.cursor()
-            result = cur.execute(query).fetchall()
-            connection.commit()
-            connection.close()
-        except Exception as e:
-            print(e)
-        return result
-
-    # Проверка на существование БД и её создание если нету
     def check_db(self):
         if not os.path.exists(self.name):
             query_table_posts1 = '''
 
 CREATE TABLE d_table (
-    low  TEXT DEFAULT (False),
-    mid  TEXT DEFAULT (True),
-    high TEXT DEFAULT (False) 
+    low  INTEGER DEFAULT (False),
+    mid  INTEGER DEFAULT (True),
+    high INTEGER DEFAULT (False) 
             );'''
             self.query(query_table_posts1)
 
             query_table_posts2 = '''
         CREATE TABLE graph_table (
-    low  TEXT DEFAULT (False),
-    mid  TEXT DEFAULT (True),
-    high TEXT DEFAULT (False) 
+    low  INTEGER DEFAULT (False),
+    mid  INTEGER DEFAULT (True),
+    high INTEGER DEFAULT (False) 
             );'''
             self.query(query_table_posts2)
 
             query_table_posts3 = '''
         CREATE TABLE FPS_table (
-    low  TEXT DEFAULT (False),
-    mid  TEXT DEFAULT (True),
-    high TEXT DEFAULT (False) 
+    low  INTEGER DEFAULT (False),
+    mid  INTEGER DEFAULT (True),
+    high INTEGER DEFAULT (False) 
             );'''
             self.query(query_table_posts3)
 
@@ -58,37 +44,33 @@ CREATE TABLE volume_table (
 
             self.clear()
 
+    # Функция исполнения запросов
+    def query(self, query):
+        result = None
+        try:
+            connection = sqlite3.connect(self.name)
+            cur = connection.cursor()
+            result = cur.execute(query).fetchall()
+            connection.commit()
+            connection.close()
+        except Exception as e:
+            print(e)
+        return result
 
-    # Функция для изменения таблицы доходов
-    def update_graph(self, values):
-        query = f"""
-                    DELETE FROM graph_table
-            """
-        query2 = f'''INSERT INTO graph_table (low, mid, high) VALUES {values};'''
-        self.query(query)
-        return self.query(query2)
 
-    def update_d(self, values):
+    def update_to_db(self, table, title, value, where_title="", where_value=""):
         query = f"""
-                    DELETE FROM d_table
-            """
-        query2 = f'''INSERT INTO d_table (low, mid, high) VALUES {values};'''
-        self.query(query)
-        return self.query(query2)
+                UPDATE {table}
+                SET {title} = {value}
+                """
+        if where_title != "":
+            query += f"\nWHERE {where_title} = {where_value}"
+        return self.query(query)
 
-    def update_fps(self, values):
+    def insert_to_db(self, table, value, title=""):
         query = f"""
-                    DELETE FROM FPS_table
-            """
-        query2 = f'''INSERT INTO FPS_table (low, mid, high) VALUES {values};'''
-        self.query(query)
-        return self.query(query2)
-    def update_volume(self, titles, values, where_title, where_value):
-        query = f"""
-                    UPDATE volume_table
-            SET {titles} = {values}
-            WHERE {where_title} = {where_value}
-            """
+                INSERT INTO {table}{title} VALUES {value}
+                """
         return self.query(query)
 
     # Функция для очистки БД

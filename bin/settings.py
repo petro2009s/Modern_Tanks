@@ -32,16 +32,19 @@ class Settings:
 
         self.music_menu = pygame.mixer.Sound("resources/sounds/music_menu.mp3")
 
+        self.graph_dict = [self.bd.select('graph_table', 'low')[0][0], self.bd.select('graph_table', 'mid')[0][0], self.bd.select('graph_table', 'high')[0][0]]
+        self.d_dict = [self.bd.select('d_table', 'low')[0][0], self.bd.select('d_table', 'mid')[0][0], self.bd.select('d_table', 'high')[0][0]]
+        self.fps_dict = [self.bd.select('FPS_table', 'low')[0][0], self.bd.select('FPS_table', 'mid')[0][0], self.bd.select('FPS_table', 'high')[0][0]]
+        self.volume_general = self.bd.select('volume_table', 'volume_general')[0][0]
         self.volume_music = self.bd.select('volume_table', 'volume_music')[0][0]
         self.volume_sound = self.bd.select('volume_table', 'volume_sound')[0][0]
-        self.volume_general = self.bd.select('volume_table', 'volume_general')[0][0]
 
         self.tank_dict = {0: True}
         self.lvl_dict = {0: True}
         self.clock = pygame.time.Clock()
         fps = self.bd.select('FPS_table', '*')[0]
         fps_dict = {0: 30, 1: 60, 2: 90}
-        self.FPS = fps_dict[[i for i in range(3) if fps[i] == '1'][0]]
+        self.FPS = fps_dict[[i for i in range(3) if fps[i] == 1][0]]
 
         with open('resources/descriptions/ammunition.txt', encoding='utf-8') as f:
             self.ammo = list(map(lambda x: x[:-1], f.readlines()))
@@ -56,3 +59,9 @@ class Settings:
         self.APFSDS_COUNT = 0
         self.HE_COUNT = 0
         self.HEAT_COUNT = 0
+
+    def update_db(self):
+        self.bd.update_to_db("graph_table", "(low, mid, high)", f"({self.graph_dict[0]}, {self.graph_dict[1]}, {self.graph_dict[2]})")
+        self.bd.update_to_db("d_table", "(low, mid, high)", f"({self.d_dict[0]}, {self.d_dict[1]}, {self.d_dict[2]})")
+        self.bd.update_to_db("FPS_table", "(low, mid, high)", f"({self.fps_dict[0]}, {self.fps_dict[1]}, {self.fps_dict[2]})")
+        self.bd.update_to_db("volume_table", "(volume_music, volume_sound, volume_general)", f"({self.volume_music}, {self.volume_sound}, {self.volume_general})")

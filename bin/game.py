@@ -51,11 +51,13 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    self.s.update_db()
                     pygame.quit()
                     sys.exit()
 
                 if event.type == pygame.USEREVENT:
                     if event.button == quit_button:
+                        self.s.update_db()
                         pygame.quit()
                         sys.exit()
                     if event.button == settings_button:
@@ -183,19 +185,19 @@ class Game:
             back_button.check(pygame.mouse.get_pos())
 
             for i in range(3):
-                gr_list[i].is_cl = v[self.s.bd.select('graph_table', set_list[i])[0][0]]
+                gr_list[i].is_cl = self.s.graph_dict[i]
 
             for i in gr_list:
                 i.check(pygame.mouse.get_pos())
 
             for i in range(3):
-                d_list[i].is_cl = v[self.s.bd.select('d_table', set_list[i])[0][0]]
+                d_list[i].is_cl = self.s.d_dict[i]
 
             for i in d_list:
                 i.check(pygame.mouse.get_pos())
 
             for i in range(3):
-                fps_list[i].is_cl = v[self.s.bd.select('FPS_table', set_list[i])[0][0]]
+                fps_list[i].is_cl = self.s.fps_dict[i]
 
             for i in fps_list:
                 i.check(pygame.mouse.get_pos())
@@ -205,6 +207,7 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    self.s.update_db()
                     pygame.quit()
                     sys.exit()
 
@@ -213,88 +216,84 @@ class Game:
                         sett = False
 
                     if event.button == gr_high:
-                        self.s.bd.update_graph('(False, False, True)')
+                        self.s.graph_dict[1] = False
+                        self.s.graph_dict[0] = False
+                        self.s.graph_dict[2] = True
 
                     if event.button == gr_low:
-                        self.s.bd.update_graph('(True, False, False)')
+                        self.s.graph_dict[1] = False
+                        self.s.graph_dict[2] = False
+                        self.s.graph_dict[0] = True
 
                     if event.button == gr_mid:
-                        self.s.bd.update_graph('(False, True, False)')
+                        self.s.graph_dict[0] = False
+                        self.s.graph_dict[2] = False
+                        self.s.graph_dict[1] = True
 
                     if event.button == d_high:
-                        self.s.bd.update_d('(False, False, True)')
+                        self.s.d_dict[1] = False
+                        self.s.d_dict[0] = False
+                        self.s.d_dict[2] = True
 
                     if event.button == d_low:
-                        self.s.bd.update_d('(True, False, False)')
+                        self.s.d_dict[1] = False
+                        self.s.d_dict[2] = False
+                        self.s.d_dict[0] = True
 
                     if event.button == d_mid:
-                        self.s.bd.update_d('(False, True, False)')
+                        self.s.d_dict[0] = False
+                        self.s.d_dict[2] = False
+                        self.s.d_dict[1] = True
 
                     if event.button == fps_high:
-                        self.s.bd.update_fps('(False, False, True)')
+                        self.s.fps_dict[1] = False
+                        self.s.fps_dict[0] = False
+                        self.s.fps_dict[2] = True
                         self.s.FPS = 90
 
                     if event.button == fps_low:
-                        self.s.bd.update_fps('(True, False, False)')
+                        self.s.fps_dict[1] = False
+                        self.s.fps_dict[2] = False
+                        self.s.fps_dict[0] = True
                         self.s.FPS = 30
 
                     if event.button == fps_mid:
-                        self.s.bd.update_fps('(False, True, False)')
+                        self.s.fps_dict[0] = False
+                        self.s.fps_dict[2] = False
+                        self.s.fps_dict[1] = True
                         self.s.FPS = 60
 
                     if event.button == plus_general:
-                        temp = self.s.volume_general + 10 * (self.s.volume_general != 100)
-                        self.s.bd.update_volume('volume_general', str(temp), 'volume_general', self.s.volume_general)
-                        self.s.volume_general = self.s.bd.select('volume_table', 'volume_general')[0][0]
-
+                        self.s.volume_general += 10 * (self.s.volume_general != 100)
                         self.s.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
-
                         general_text_volume.set_another_text(str(self.s.volume_general))
                         general_text_volume_bl.set_another_text(str(self.s.volume_general))
 
                     if event.button == minus_general:
-                        temp = self.s.volume_general - 10 * (self.s.volume_general != 0)
-                        self.s.bd.update_volume('volume_general', str(temp), 'volume_general', self.s.volume_general)
-                        self.s.volume_general = self.s.bd.select('volume_table', 'volume_general')[0][0]
-
+                        self.s.volume_general -= 10 * (self.s.volume_general != 0)
                         self.s.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
-
                         general_text_volume.set_another_text(str(self.s.volume_general))
                         general_text_volume_bl.set_another_text(str(self.s.volume_general))
 
                     if event.button == plus_music:
-                        temp = self.s.volume_music + 10 * (self.s.volume_music != 100)
-                        self.s.bd.update_volume('volume_music', str(temp), 'volume_music', self.s.volume_music)
-                        self.s.volume_music = self.s.bd.select('volume_table', 'volume_music')[0][0]
-
+                        self.s.volume_music += 10 * (self.s.volume_music != 100)
                         self.s.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
-
                         music_text_volume.set_another_text(str(self.s.volume_music))
                         music_text_volume_bl.set_another_text(str(self.s.volume_music))
 
                     if event.button == minus_music:
-                        temp = self.s.volume_music - 10 * (self.s.volume_music != 0)
-                        self.s.bd.update_volume('volume_music', str(temp), 'volume_music', self.s.volume_music)
-                        self.s.volume_music = self.s.bd.select('volume_table', 'volume_music')[0][0]
-
+                        self.s.volume_music -= 10 * (self.s.volume_music != 0)
                         self.s.music_menu.set_volume((self.s.volume_music / 100) * (self.s.volume_general / 100))
-
                         music_text_volume.set_another_text(str(self.s.volume_music))
                         music_text_volume_bl.set_another_text(str(self.s.volume_music))
 
                     if event.button == plus_sound:
-                        temp = self.s.volume_sound + 10 * (self.s.volume_sound != 100)
-                        self.s.bd.update_volume('volume_sound', str(temp), 'volume_sound', self.s.volume_sound)
-                        self.s.volume_sound = self.s.bd.select('volume_table', 'volume_sound')[0][0]
-
+                        self.s.volume_sound += 10 * (self.s.volume_sound != 100)
                         sound_text_volume.set_another_text(str(self.s.volume_sound))
                         sound_text_volume_bl.set_another_text(str(self.s.volume_sound))
 
                     if event.button == minus_sound:
-                        temp = self.s.volume_sound - 10 * (self.s.volume_sound != 0)
-                        self.s.bd.update_volume('volume_sound', str(temp), 'volume_sound', self.s.volume_sound)
-                        self.s.volume_sound = self.s.bd.select('volume_table', 'volume_sound')[0][0]
-
+                        self.s.volume_sound -= 10 * (self.s.volume_sound != 0)
                         sound_text_volume.set_another_text(str(self.s.volume_sound))
                         sound_text_volume_bl.set_another_text(str(self.s.volume_sound))
 
@@ -475,6 +474,7 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    self.s.update_db()
                     pygame.quit()
                     sys.exit()
 
