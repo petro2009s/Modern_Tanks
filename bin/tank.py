@@ -27,7 +27,7 @@ class Tank:
                     sys.exit()
             self.s.display.fill((50, 100, 255))
             self.movement()
-            pygame.draw.circle(self.s.display, (255, 0, 00), self.pos(), 12)
+            pygame.draw.circle(self.s.display, (255, 0, 00), self.pos(), int(self.s.WIDTH * 0.006))
             pygame.draw.line(self.s.display, (255, 0, 0), self.pos(),
                              (self.x + self.v * 0.5 * math.sin(self.movement_angle * 3.14 / 180),
                               self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)))
