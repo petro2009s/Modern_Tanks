@@ -5,6 +5,7 @@ import pygame
 import random
 from bin.text import Text
 from bin.settings import Settings
+from bin.tank import Tank
 
 
 class Game:
@@ -546,6 +547,7 @@ class Game:
                         print(APFSDS_COUNT, HE_COUNT, HEAT_COUNT)
                         print([i for i, j in self.s.tank_dict.items() if j][0])
                         print([i for i, j in self.s.lvl_dict.items() if j][0])
+                        self.play()
 
                 for i in button_list:
                     i.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
@@ -573,3 +575,8 @@ class Game:
             self.s.display.blit(self.s.cursor, pygame.mouse.get_pos())
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
+
+    def play(self):
+        tank = Tank(self.s, 100, 100, 0)
+        tank.start()
+

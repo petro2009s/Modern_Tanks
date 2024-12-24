@@ -11,7 +11,6 @@ class Settings:
 
         self.button_color = (50, 60, 50)
         pygame.init()
-
         self.display = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         self.icon = pygame.image.load('resources/images/icon_test2_p.png').convert()
 
@@ -60,8 +59,63 @@ class Settings:
         self.HE_COUNT = 0
         self.HEAT_COUNT = 0
 
+        self.a_w = self.WIDTH * 0.15
+        self.a_s = -self.WIDTH * 0.3
+        self.a_stop = self.WIDTH * 0.3
+        self.max_speed_w = self.WIDTH * 0.5
+        self.max_speed_s = -self.WIDTH * 0.06
+        self.map = ['OOOOOOOOOO',
+                    'O........O',
+                    'O........O',
+                    'O...O....O',
+                    'O........O',
+                    'O..O.....O',
+                    'O........O',
+                    'O........O',
+                    'O........O',
+                    'OOOOOOOOOO'
+        ]
+        self.world_map = set()
+        self.tile_w = self.WIDTH * 0.1
+        self.tile_h = self.HEIGHT * 0.1
+        for j, row in enumerate(self.map):
+            for i, char in enumerate(row):
+                if char == 'O':
+                    self.world_map.add((i * self.tile_w, j * self.tile_h))
+
     def update_db(self):
         self.bd.update_to_db("graph_table", "(low, mid, high)", f"({self.graph_dict[0]}, {self.graph_dict[1]}, {self.graph_dict[2]})")
         self.bd.update_to_db("d_table", "(low, mid, high)", f"({self.d_dict[0]}, {self.d_dict[1]}, {self.d_dict[2]})")
         self.bd.update_to_db("FPS_table", "(low, mid, high)", f"({self.fps_dict[0]}, {self.fps_dict[1]}, {self.fps_dict[2]})")
         self.bd.update_to_db("volume_table", "(volume_music, volume_sound, volume_general)", f"({self.volume_music}, {self.volume_sound}, {self.volume_general})")
+
+
+
+class TankSettings():
+    def __init__(self):
+        pygame.init()
+        self.display = pygame.display.set_mode((1000, 1000))
+        self.a_w = 150
+        self.a_s = -300
+        self.a_stop = 300
+        self.max_speed_w = 500
+        self.max_speed_s = -60
+        self.FPS = 60
+        self.clock = pygame.time.Clock()
+        self.map = ['OOOOOOOOOO',
+                    'O........O',
+                    'O........O',
+                    'O...O....O',
+                    'O........O',
+                    'O..O.....O',
+                    'O........O',
+                    'O........O',
+                    'O........O',
+                    'OOOOOOOOOO'
+        ]
+        self.world_map = set()
+        for j, row in enumerate(self.map):
+            for i, char in enumerate(row):
+                if char == 'O':
+                    self.world_map.add((i * 100, j * 100))
+
