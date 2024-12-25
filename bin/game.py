@@ -577,6 +577,6 @@ class Game:
             self.s.clock.tick(self.s.FPS)
 
     def play(self):
-        tank = Tank(self.s, 100, 100, 0)
+        tank = Tank(self.s, 300, 200, 0)
         tank.start()
 

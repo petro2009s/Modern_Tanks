@@ -2,7 +2,7 @@ import pygame
 import gif_pygame
 import screeninfo
 from bin.bd import DBController
-
+from bin.map import Map
 class Settings:
     def __init__(self):
         self.WIDTH = screeninfo.get_monitors()[0].width
@@ -59,13 +59,14 @@ class Settings:
         self.HE_COUNT = 0
         self.HEAT_COUNT = 0
 
-        self.a_w = self.WIDTH * 0.15
-        self.a_s = -self.WIDTH * 0.3
-        self.a_stop = self.WIDTH * 0.3
-        self.max_speed_w = self.WIDTH * 0.5
-        self.max_speed_s = -self.WIDTH * 0.06
-        self.map = ['OOOOOOOOOO',
-                    'O........O',
+        self.a_w = self.WIDTH * 0.12 * (self.FPS / 60)
+        self.a_s = -self.WIDTH * 0.4 * (self.FPS / 60)
+        self.a_stop = self.WIDTH * 0.4 * (self.FPS / 60)
+        self.max_speed_w = self.WIDTH * 0.5 * (self.FPS / 60)
+        self.max_speed_s = -self.WIDTH * 0.03 * (self.FPS / 60)
+        self.min_speed_ad = self.WIDTH * 0.5 * (self.FPS / 60) * 5 / 60
+        world_map = ['OOOOOOOOOO',
+                    'O .......O',
                     'O........O',
                     'O...O....O',
                     'O........O',
@@ -75,13 +76,9 @@ class Settings:
                     'O........O',
                     'OOOOOOOOOO'
         ]
-        self.world_map = set()
         self.tile_w = self.WIDTH * 0.1
         self.tile_h = self.HEIGHT * 0.1
-        for j, row in enumerate(self.map):
-            for i, char in enumerate(row):
-                if char == 'O':
-                    self.world_map.add((i * self.tile_w, j * self.tile_h))
+        self.map = Map(world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
 
     def update_db(self):
         self.bd.update_to_db("graph_table", "(low, mid, high)", f"({self.graph_dict[0]}, {self.graph_dict[1]}, {self.graph_dict[2]})")
@@ -91,31 +88,4 @@ class Settings:
 
 
 
-class TankSettings():
-    def __init__(self):
-        pygame.init()
-        self.display = pygame.display.set_mode((1000, 1000))
-        self.a_w = 150
-        self.a_s = -300
-        self.a_stop = 300
-        self.max_speed_w = 500
-        self.max_speed_s = -60
-        self.FPS = 60
-        self.clock = pygame.time.Clock()
-        self.map = ['OOOOOOOOOO',
-                    'O........O',
-                    'O........O',
-                    'O...O....O',
-                    'O........O',
-                    'O..O.....O',
-                    'O........O',
-                    'O........O',
-                    'O........O',
-                    'OOOOOOOOOO'
-        ]
-        self.world_map = set()
-        for j, row in enumerate(self.map):
-            for i, char in enumerate(row):
-                if char == 'O':
-                    self.world_map.add((i * 100, j * 100))
 
