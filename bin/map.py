@@ -12,12 +12,17 @@ class Map:
         self.collision_walls = []
         for j, row in enumerate(self.mini_map):
             for i, char in enumerate(row):
-                if char == 'O':
+                if char == '0':
                     self.world_map.add((i, j))
                     self.collision_walls.append(pygame.Rect(i * self.tile_w, j * self.tile_h, self.tile_w, self.tile_h))
 
-
-    def draw(self, display):
+    def draw(self, display, x0, y0, k=1, floor=None, walls=None):
+        if floor:
+            display.blit(floor, (x0, y0))
         for x, y in self.world_map:
-            pygame.draw.rect(display, self.color, (x * self.tile_w, y * self.tile_h, self.tile_w, self.tile_h),
-                             int(self.width))
+            if walls:
+                display.blit(walls, (x0 + x * self.tile_w // k, y0 + y * self.tile_h // k))
+            else:
+                pygame.draw.rect(display, self.color,
+                             (x0 + x * self.tile_w // k, y0 + y * self.tile_h // k, self.tile_w // k, self.tile_h // k),
+                             max(int(self.width) // k, 1))

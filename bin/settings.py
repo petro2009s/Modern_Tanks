@@ -4,8 +4,11 @@ import os
 import screeninfo
 from bin.bd import DBController
 from bin.map import Map
+
+
 class Settings:
     def __init__(self):
+
         self.bd = DBController('resources/ModernTanksDB')
         # self.bd.clear()
         self.width_m = screeninfo.get_monitors()[0].width
@@ -24,7 +27,6 @@ class Settings:
         pygame.init()
         self.display = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         self.icon = pygame.image.load('resources/images/icon_test2_p.png').convert()
-
         os.environ['SDL_VIDEO_CENTERED'] = '1'
         if self.bd.select('full_table', '[on]')[0][0]:
             pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.FULLSCREEN)
@@ -34,6 +36,7 @@ class Settings:
             else:
                 pygame.display.set_mode((self.WIDTH, self.HEIGHT))
 
+        print(self.WIDTH, self.HEIGHT)
         self.menu1 = pygame.image.load('resources/images/menu_p1.png').convert()
         self.menu2 = pygame.image.load('resources/images/menu_p2.png').convert()
         self.menu3 = pygame.image.load('resources/images/menu_p3.png').convert()
@@ -49,10 +52,14 @@ class Settings:
 
         self.music_menu = pygame.mixer.Sound("resources/sounds/music_menu.mp3")
 
-        self.graph_dict = [self.bd.select('graph_table', 'low')[0][0], self.bd.select('graph_table', 'mid')[0][0], self.bd.select('graph_table', 'high')[0][0]]
-        self.d_dict = [self.bd.select('d_table', 'low')[0][0], self.bd.select('d_table', 'mid')[0][0], self.bd.select('d_table', 'high')[0][0]]
-        self.fps_dict = [self.bd.select('FPS_table', 'low')[0][0], self.bd.select('FPS_table', 'mid')[0][0], self.bd.select('FPS_table', 'high')[0][0]]
-        self.full_dict = [bool(self.display.get_flags() & pygame.FULLSCREEN), not bool(self.display.get_flags() & pygame.FULLSCREEN)]
+        self.graph_dict = [self.bd.select('graph_table', 'low')[0][0], self.bd.select('graph_table', 'mid')[0][0],
+                           self.bd.select('graph_table', 'high')[0][0]]
+        self.d_dict = [self.bd.select('d_table', 'low')[0][0], self.bd.select('d_table', 'mid')[0][0],
+                       self.bd.select('d_table', 'high')[0][0]]
+        self.fps_dict = [self.bd.select('FPS_table', 'low')[0][0], self.bd.select('FPS_table', 'mid')[0][0],
+                         self.bd.select('FPS_table', 'high')[0][0]]
+        self.full_dict = [bool(self.display.get_flags() & pygame.FULLSCREEN),
+                          not bool(self.display.get_flags() & pygame.FULLSCREEN)]
         self.volume_general = self.bd.select('volume_table', 'volume_general')[0][0]
         self.volume_music = self.bd.select('volume_table', 'volume_music')[0][0]
         self.volume_sound = self.bd.select('volume_table', 'volume_sound')[0][0]
@@ -63,6 +70,7 @@ class Settings:
         fps = self.bd.select('FPS_table', '*')[0]
         fps_dict = {0: 30, 1: 60, 2: 90}
         self.FPS = fps_dict[[i for i in range(3) if fps[i] == 1][0]]
+        # self.FPS = 10000
 
         with open('resources/descriptions/ammunition.txt', encoding='utf-8') as f:
             self.ammo = list(map(lambda x: x[:-1], f.readlines()))
@@ -83,30 +91,43 @@ class Settings:
         self.a_stop = self.WIDTH * 0.4 * (self.FPS / 60)
         self.max_speed_w = self.WIDTH * 0.5 * (self.FPS / 60)
         self.max_speed_s = -self.WIDTH * 0.03 * (self.FPS / 60)
-        self.min_speed_ad = self.WIDTH * 0.5 * (self.FPS / 60) * 5 / 60
-        world_map = ['OOOOOOOOOO',
-                    'O .......O',
-                    'O........O',
-                    'O...O....O',
-                    'O........O',
-                    'O..O.....O',
-                    'O........O',
-                    'O........O',
-                    'O........O',
-                    'OOOOOOOOOO'
-        ]
-        self.tile_w = self.WIDTH * 0.1
-        self.tile_h = self.HEIGHT * 0.1
-        self.map = Map(world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
+        self.min_speed_ad = self.WIDTH * 0.03 * (self.FPS / 60) * 10 / 60
+
+        self.minimap_k = 2
+        self.world_map = ['00000000',
+                          '0......0',
+                          '0......0',
+                          '0...0..0',
+                          '0......0',
+                          '0..0.0.0',
+                          '0......0',
+                          '0...0..0',
+                          '0......0',
+                          '00000000'
+                          ]
+        self.tile_w = (self.WIDTH // len(self.world_map[0]))
+        self.tile_h = (self.HEIGHT // len(self.world_map))
+        self.map = Map(self.world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
+        self.minimap_tank_base = pygame.image.load('resources/images/tank_minimap.png').convert_alpha()
+        self.minimap_tank = pygame.transform.scale(self.minimap_tank_base, (self.WIDTH * 0.0625 // self.minimap_k, self.WIDTH * 0.0625 // self.minimap_k))
+        self.floor_base = pygame.image.load('resources/images/floor.png').convert()
+        self.floor = pygame.transform.scale(self.floor_base, (self.tile_w * len(self.world_map[0]) // self.minimap_k, self.tile_h * len(self.world_map) // self.minimap_k))
+
+        self.wall_base = pygame.image.load('resources/images/wall.png').convert()
+        self.wall = pygame.transform.scale(self.wall_base,
+                                           (self.tile_w // self.minimap_k, self.tile_h // self.minimap_k))
+
 
     def update_db(self):
-        self.bd.update_to_db("graph_table", "(low, mid, high)", f"({self.graph_dict[0]}, {self.graph_dict[1]}, {self.graph_dict[2]})")
+        self.bd.update_to_db("graph_table", "(low, mid, high)",
+                             f"({self.graph_dict[0]}, {self.graph_dict[1]}, {self.graph_dict[2]})")
         self.bd.update_to_db("d_table", "(low, mid, high)", f"({self.d_dict[0]}, {self.d_dict[1]}, {self.d_dict[2]})")
-        self.bd.update_to_db("FPS_table", "(low, mid, high)", f"({self.fps_dict[0]}, {self.fps_dict[1]}, {self.fps_dict[2]})")
-        self.bd.update_to_db("volume_table", "(volume_music, volume_sound, volume_general)", f"({self.volume_music}, {self.volume_sound}, {self.volume_general})")
-        self.bd.update_to_db("full_table", "([on], off)",f"({self.full_dict[0]}, {self.full_dict[1]})")
+        self.bd.update_to_db("FPS_table", "(low, mid, high)",
+                             f"({self.fps_dict[0]}, {self.fps_dict[1]}, {self.fps_dict[2]})")
+        self.bd.update_to_db("volume_table", "(volume_music, volume_sound, volume_general)",
+                             f"({self.volume_music}, {self.volume_sound}, {self.volume_general})")
+        self.bd.update_to_db("full_table", "([on], off)", f"({self.full_dict[0]}, {self.full_dict[1]})")
         self.bd.update_to_db("size_table", "(width, height)", f"({self.WIDTH}, {self.HEIGHT})")
-
 
     def update_size(self):
         gif_pygame.transform.scale(self.gif, (self.WIDTH, self.HEIGHT))
@@ -114,3 +135,20 @@ class Settings:
             self.menu_list[i] = pygame.transform.scale(self.menu_list[i], (self.WIDTH, self.HEIGHT))
         self.cursor = pygame.transform.scale(self.cursor_base, (self.WIDTH * 0.03125, self.WIDTH * 0.03125))
         self.size_text_b = int(self.WIDTH * 0.01875)
+
+        self.a_w = self.WIDTH * 0.12 * (self.FPS / 60)
+        self.a_s = -self.WIDTH * 0.4 * (self.FPS / 60)
+        self.a_stop = self.WIDTH * 0.4 * (self.FPS / 60)
+        self.max_speed_w = self.WIDTH * 0.5 * (self.FPS / 60)
+        self.max_speed_s = -self.WIDTH * 0.03 * (self.FPS / 60)
+        self.min_speed_ad = self.WIDTH * 0.03 * (self.FPS / 60) * 10 / 60
+
+        self.tile_w = (self.WIDTH // len(self.world_map[0]))
+        self.tile_h = (self.HEIGHT // len(self.world_map))
+        self.map = Map(self.world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
+        self.floor = pygame.transform.scale(self.floor_base,
+                                            (self.tile_w * len(self.world_map[0]) // self.minimap_k, self.tile_h * len(self.world_map) // self.minimap_k))
+        self.wall = pygame.transform.scale(self.wall_base,
+                                           (self.tile_w // self.minimap_k, self.tile_h // self.minimap_k))
+
+        self.minimap_tank = pygame.transform.scale(self.minimap_tank_base, (self.WIDTH * 0.0625 // self.minimap_k, self.WIDTH * 0.0625 // self.minimap_k))
