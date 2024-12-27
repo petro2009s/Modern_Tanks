@@ -203,6 +203,6 @@ class Tank:
         return (self.x, self.y)
 
 
-s = TankSettings()
-ex = Tank(s, 150, 150, 0)
-ex.start()
+# s = TankSettings()
+# ex = Tank(s, 150, 150, 0)
+# ex.start()

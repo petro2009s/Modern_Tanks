@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import screeninfo
 
 
 class DBController:
@@ -41,6 +42,20 @@ CREATE TABLE volume_table (
     volume_general INTEGER DEFAULT (50) 
 );'''
             self.query(query_table_posts4)
+
+            query_table_posts5 = '''
+CREATE TABLE full_table (
+    [on] INTEGER DEFAULT (True),
+    off  INTEGER DEFAULT (False)
+);'''
+            self.query(query_table_posts5)
+
+            query_table_posts6 = f'''
+CREATE TABLE size_table (
+    width  INTEGER DEFAULT ({screeninfo.get_monitors()[0].width}),
+    height INTEGER DEFAULT ({screeninfo.get_monitors()[0].height})
+);'''
+            self.query(query_table_posts6)
 
             self.clear()
 
@@ -84,16 +99,29 @@ CREATE TABLE volume_table (
         query_2 = f"""
         DELETE FROM FPS_table
         """
+        query_3 = f"""
+        DELETE FROM full_table
+        """
+        query_4 = f"""
+        DELETE FROM size_table
+        """
 
         query2 = '''INSERT INTO d_table (low, mid, high) VALUES (False, True, False);'''
         query3 = '''INSERT INTO graph_table (low, mid, high) VALUES (False, True, False);'''
         query4 = '''INSERT INTO FPS_table (low, mid, high) VALUES (False, True, False);'''
+        query5 = '''INSERT INTO full_table ([on], off) VALUES (True, False);'''
+        query6 = f'''INSERT INTO size_table (width, height) VALUES ({screeninfo.get_monitors()[0].width}, {screeninfo.get_monitors()[0].height});'''
+
         self.query(query)
         self.query(query_2)
         self.query(query_1)
         self.query(query2)
         self.query(query3)
         self.query(query4)
+        self.query(query_3)
+        self.query(query5)
+        self.query(query_4)
+        self.query(query6)
 
         query = f"""
         DELETE FROM volume_table
