@@ -3,7 +3,6 @@ import sys
 from bin.buttons import *
 import pygame
 import random
-import os
 from bin.text import Text
 from bin.settings import Settings
 from bin.tank import Tank
@@ -19,7 +18,9 @@ class Game:
         self.s.music_menu.play(-1)
         self.s.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
 
-    def start_game(self):
+    def start_game(self, apply_sett=""):
+        if apply_sett:
+            self.settings_menu()
         show = True
 
         # menu_im = self.s.menu_list[random.randint(0, 4)]
@@ -427,7 +428,7 @@ class Game:
                             self.s.full_dict = full_dict_temp
                             sett = False
                             self.s.update_size()
-                            self.start_game()
+                            self.start_game("apply_set")
 
                 back_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
 

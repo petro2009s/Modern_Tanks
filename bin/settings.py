@@ -36,7 +36,6 @@ class Settings:
             else:
                 pygame.display.set_mode((self.WIDTH, self.HEIGHT))
 
-        print(self.WIDTH, self.HEIGHT)
         self.menu1 = pygame.image.load('resources/images/menu_p1.png').convert()
         self.menu2 = pygame.image.load('resources/images/menu_p2.png').convert()
         self.menu3 = pygame.image.load('resources/images/menu_p3.png').convert()
