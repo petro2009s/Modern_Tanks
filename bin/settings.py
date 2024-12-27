@@ -25,11 +25,14 @@ class Settings:
         self.display = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         self.icon = pygame.image.load('resources/images/icon_test2_p.png').convert()
 
+        os.environ['SDL_VIDEO_CENTERED'] = '1'
         if self.bd.select('full_table', '[on]')[0][0]:
             pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.FULLSCREEN)
         else:
-            pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-        os.environ['SDL_VIDEO_CENTERED'] = '1'
+            if self.width_m == self.WIDTH and self.height_m == self.HEIGHT:
+                pygame.display.set_mode((self.WIDTH, self.HEIGHT - 40))
+            else:
+                pygame.display.set_mode((self.WIDTH, self.HEIGHT))
 
         self.menu1 = pygame.image.load('resources/images/menu_p1.png').convert()
         self.menu2 = pygame.image.load('resources/images/menu_p2.png').convert()
@@ -111,5 +114,3 @@ class Settings:
             self.menu_list[i] = pygame.transform.scale(self.menu_list[i], (self.WIDTH, self.HEIGHT))
         self.cursor = pygame.transform.scale(self.cursor_base, (self.WIDTH * 0.03125, self.WIDTH * 0.03125))
         self.size_text_b = int(self.WIDTH * 0.01875)
-
-

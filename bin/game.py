@@ -360,9 +360,11 @@ class Game:
                             if full_dict_temp[0]:
                                 pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), pygame.FULLSCREEN)
                             else:
-                                pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT))
+                                if self.s.width_m == self.s.WIDTH and self.s.height_m == self.s.HEIGHT:
+                                    pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT - 40))
+                                else:
+                                    pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT))
                             self.s.full_dict = full_dict_temp
-                            os.environ['SDL_VIDEO_CENTERED'] = '1'
                             sett = False
                             self.s.update_size()
                             self.start_game()
