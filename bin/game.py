@@ -4,7 +4,6 @@ from bin.buttons import *
 import pygame
 import random
 import os
-import screeninfo
 from bin.text import Text
 from bin.settings import Settings
 from bin.tank import Tank
@@ -93,6 +92,7 @@ class Game:
     def settings_menu(self):
         sett = True
         menu_im = self.s.menu_list[random.randint(0, 4)]
+        full_dict_temp = self.s.full_dict.copy()
 
         header_bl = Text(self.s.WIDTH * 0.354, self.s.HEIGHT * 0.104, (0, 0, 0), 'Настройки графики', int(self.s.WIDTH * 0.03125))
         header = Text(self.s.WIDTH * 0.352, self.s.HEIGHT * 0.1, (200, 200, 200), 'Настройки графики', int(self.s.WIDTH * 0.03125))
@@ -124,8 +124,9 @@ class Game:
         sound_text_bl = Text(self.s.WIDTH * 0.778, self.s.HEIGHT * 0.604, (0, 0, 0), 'Громкость звуков',int(self.s.WIDTH * 0.025))
         sound_text = Text(self.s.WIDTH * 0.776, self.s.HEIGHT * 0.6, (200, 200, 200), 'Громкость звуков',int(self.s.WIDTH * 0.025))
 
-        size_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.304, (0, 0, 0), "*".join(list(map(str, self.s.size))), int(self.s.WIDTH * 0.03125))
-        size_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.3, (200, 200, 200), "*".join(list(map(str, self.s.size))), int(self.s.WIDTH * 0.03125))
+        self.s.size_on_text = [self.s.WIDTH, self.s.HEIGHT]
+        size_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.304, (0, 0, 0), "*".join(list(map(str, self.s.size_on_text))), int(self.s.WIDTH * 0.03125))
+        size_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.3, (200, 200, 200), "*".join(list(map(str, self.s.size_on_text))), int(self.s.WIDTH * 0.03125))
 
         general_text_volume_bl = Text(self.s.WIDTH * 0.778, self.s.HEIGHT * 0.304, (0, 0, 0), str(self.s.volume_general),int(self.s.WIDTH * 0.0417))
         general_text_volume = Text(self.s.WIDTH * 0.776, self.s.HEIGHT * 0.3, (200, 200, 200), str(self.s.volume_general),int(self.s.WIDTH * 0.0417))
@@ -233,7 +234,7 @@ class Game:
                 i.check(pygame.mouse.get_pos())
 
             for i in range(2):
-                full_list[i].is_cl = self.s.full_dict[i]
+                full_list[i].is_cl = full_dict_temp[i]
 
             for i in fps_list:
                 i.check(pygame.mouse.get_pos())
@@ -300,24 +301,24 @@ class Game:
                         self.s.FPS = 60
 
                     if event.button == full_on:
-                        self.s.full_dict[0] = True
-                        self.s.full_dict[1] = False
+                        full_dict_temp[0] = True
+                        full_dict_temp[1] = False
 
                     if event.button == full_off:
-                        self.s.full_dict[0] = False
-                        self.s.full_dict[1] = True
+                        full_dict_temp[0] = False
+                        full_dict_temp[1] = True
 
                     if event.button == plus_screen:
-                        if self.s.size_list.index(tuple(self.s.size)) != 0:
-                            self.s.size = list(self.s.size_list[self.s.size_list.index(tuple(self.s.size)) - 1])
-                            size_text.set_another_text("*".join(list(map(str, self.s.size))))
-                            size_text_bl.set_another_text("*".join(list(map(str, self.s.size))))
+                        if self.s.size_list.index(tuple(self.s.size_on_text)) != 0:
+                            self.s.size_on_text = list(self.s.size_list[self.s.size_list.index(tuple(self.s.size_on_text)) - 1])
+                            size_text.set_another_text("*".join(list(map(str, self.s.size_on_text))))
+                            size_text_bl.set_another_text("*".join(list(map(str, self.s.size_on_text))))
 
                     if event.button == minus_screen:
-                        if self.s.size_list.index(tuple(self.s.size)) + 1 != len(self.s.size_list):
-                            self.s.size = list(self.s.size_list[self.s.size_list.index(tuple(self.s.size)) + 1])
-                            size_text.set_another_text("*".join(list(map(str, self.s.size))))
-                            size_text_bl.set_another_text("*".join(list(map(str, self.s.size))))
+                        if self.s.size_list.index(tuple(self.s.size_on_text)) + 1 != len(self.s.size_list):
+                            self.s.size_on_text = list(self.s.size_list[self.s.size_list.index(tuple(self.s.size_on_text)) + 1])
+                            size_text.set_another_text("*".join(list(map(str, self.s.size_on_text))))
+                            size_text_bl.set_another_text("*".join(list(map(str, self.s.size_on_text))))
 
                     if event.button == plus_general:
                         self.s.volume_general += 10 * (self.s.volume_general != 100)
@@ -354,12 +355,13 @@ class Game:
                         sound_text_volume_bl.set_another_text(str(self.s.volume_sound))
 
                     if event.button == apply_button:
-                        if not((self.s.width_m < self.s.size[0] or self.s.height_m < self.s.size[1]) and self.s.full_dict[1]):
-                            self.s.WIDTH, self.s.HEIGHT = self.s.size
-                            if self.s.full_dict[0]:
+                        if not((self.s.width_m < self.s.size_on_text[0] or self.s.height_m < self.s.size_on_text[1]) and full_dict_temp[1]):
+                            self.s.WIDTH, self.s.HEIGHT = self.s.size_on_text
+                            if full_dict_temp[0]:
                                 pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), pygame.FULLSCREEN)
                             else:
                                 pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT))
+                            self.s.full_dict = full_dict_temp
                             os.environ['SDL_VIDEO_CENTERED'] = '1'
                             sett = False
                             self.s.update_size()

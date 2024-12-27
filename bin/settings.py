@@ -18,12 +18,18 @@ class Settings:
             self.bd.update_to_db("size_table", "(width, height)", f"({self.WIDTH}, {self.HEIGHT})")
         self.size_text_b = int(self.WIDTH * 0.01875)
         self.size_list = pygame.display.list_modes()
-        self.size = [self.WIDTH, self.HEIGHT]
+        self.size_on_text = [self.WIDTH, self.HEIGHT]
 
         self.button_color = (50, 60, 50)
         pygame.init()
         self.display = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         self.icon = pygame.image.load('resources/images/icon_test2_p.png').convert()
+
+        if self.bd.select('full_table', '[on]')[0][0]:
+            pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.FULLSCREEN)
+        else:
+            pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        os.environ['SDL_VIDEO_CENTERED'] = '1'
 
         self.menu1 = pygame.image.load('resources/images/menu_p1.png').convert()
         self.menu2 = pygame.image.load('resources/images/menu_p2.png').convert()
@@ -43,16 +49,10 @@ class Settings:
         self.graph_dict = [self.bd.select('graph_table', 'low')[0][0], self.bd.select('graph_table', 'mid')[0][0], self.bd.select('graph_table', 'high')[0][0]]
         self.d_dict = [self.bd.select('d_table', 'low')[0][0], self.bd.select('d_table', 'mid')[0][0], self.bd.select('d_table', 'high')[0][0]]
         self.fps_dict = [self.bd.select('FPS_table', 'low')[0][0], self.bd.select('FPS_table', 'mid')[0][0], self.bd.select('FPS_table', 'high')[0][0]]
-        self.full_dict = [self.bd.select('full_table', '[on]')[0][0], self.bd.select('full_table', 'off')[0][0]]
+        self.full_dict = [bool(self.display.get_flags() & pygame.FULLSCREEN), not bool(self.display.get_flags() & pygame.FULLSCREEN)]
         self.volume_general = self.bd.select('volume_table', 'volume_general')[0][0]
         self.volume_music = self.bd.select('volume_table', 'volume_music')[0][0]
         self.volume_sound = self.bd.select('volume_table', 'volume_sound')[0][0]
-
-        if self.full_dict[0]:
-            pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.FULLSCREEN)
-        else:
-            pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-        os.environ['SDL_VIDEO_CENTERED'] = '1'
 
         self.tank_dict = {0: True}
         self.lvl_dict = {0: True}
