@@ -4,7 +4,7 @@ import os
 import screeninfo
 from bin.bd import DBController
 from bin.map import Map
-
+import math
 
 class Settings:
     def __init__(self):
@@ -92,7 +92,7 @@ class Settings:
         self.max_speed_s = -self.WIDTH * 0.03 * (self.FPS / 60)
         self.min_speed_ad = self.WIDTH * 0.03 * (self.FPS / 60) * 10 / 60
 
-        self.minimap_k = 2
+        self.minimap_k = 5
         self.world_map = ['00000000',
                           '0......0',
                           '0......0',
@@ -115,8 +115,15 @@ class Settings:
         self.wall_base = pygame.image.load('resources/images/wall.png').convert()
         self.wall = pygame.transform.scale(self.wall_base,
                                            (self.tile_w // self.minimap_k, self.tile_h // self.minimap_k))
-
-
+        self.tower_v = 20
+        self.optic_scope_width = self.HEIGHT
+        self.FOV = 12
+        self.HALF_FOV = self.FOV // 2
+        self.NUM_RAYS = 100
+        self.DELTA_ANGLE = self.FOV / self.NUM_RAYS
+        self.DIST = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV * 3.14 / 180))
+        self.PROJ_COEFF = 3 * self.DIST * self.tile_w
+        self.SCALE = self.optic_scope_width // self.NUM_RAYS
     def update_db(self):
         self.bd.update_to_db("graph_table", "(low, mid, high)",
                              f"({self.graph_dict[0]}, {self.graph_dict[1]}, {self.graph_dict[2]})")

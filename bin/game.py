@@ -747,5 +747,5 @@ class Game:
             self.s.clock.tick(self.s.FPS)
 
     def play(self):
-        tank = Tank(self.s, self.s.WIDTH // 2, self.s.HEIGHT // 2, 0, self.s.minimap_k, 0, self.s.HEIGHT // 4)
+        tank = Tank(self.s, self.s.WIDTH // 2, self.s.HEIGHT // 2, 90, self.s.minimap_k, 0, 0)
         tank.start()

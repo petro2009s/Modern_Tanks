@@ -1,3 +1,5 @@
+import math
+
 import pygame
 from bin.map import Map
 
@@ -14,6 +16,7 @@ class TankSettings():
         self.max_speed_w = 500
         self.max_speed_s = -300
         self.FPS = 60
+        self.tower_v = 30
         self.tile_w = 100
         self.tile_h = 100
         self.min_speed_ad = 200 * 10 / 60
@@ -21,16 +24,16 @@ class TankSettings():
         world_map = ['0000000000',
                      '0........0',
                      '0........0',
-                     '0...0....0',
+                     '0..0000..0',
                      '0........0',
-                     '0..0..0..0',
+                     '0...00...0',
                      '0........0',
-                     '0...0....0',
+                     '0........0',
                      '0........0',
                      '0000000000'
                      ]
-        self.tile_w = self.WIDTH * 0.1
-        self.tile_h = self.HEIGHT * 0.1
+        self.tile_w = int(self.WIDTH * 0.1)
+        self.tile_h = int(self.HEIGHT * 0.1)
         self.map = Map(world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
         self.minimap_tank_base = pygame.image.load('resources/images/tank_minimap.png').convert_alpha()
         self.floor_base = pygame.image.load('resources/images/floor.png').convert()
@@ -40,4 +43,14 @@ class TankSettings():
         self.wall = pygame.transform.scale(self.wall_base,
                                             (self.tile_w, self.tile_h))
 
+
+
         self.minimap_tank = pygame.transform.scale(self.minimap_tank_base, (self.WIDTH * 0.03125, self.WIDTH * 0.03365))
+
+        self.FOV = 12
+        self.HALF_FOV = self.FOV // 2
+        self.NUM_RAYS = 100
+        self.DELTA_ANGLE = self.FOV / self.NUM_RAYS
+        self.DIST = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV * 3.14 / 180))
+        self.PROJ_COEFF = 1 * self.DIST * self.tile_w
+        self.SCALE = self.WIDTH // self.NUM_RAYS

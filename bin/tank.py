@@ -10,6 +10,7 @@ class Tank:
         self.s = settings
         self.x = x
         self.y = y
+        self.stab = True
         self.x_minimap = x_minimap
         self.y_minimap = y_minimap
         self.minimap_k = minimap_k
@@ -18,7 +19,7 @@ class Tank:
         self.angle_of_view = 0
         print(self.s.map.world_map, sep='\n')
         self.stuck = False
-        self.side = int(self.s.WIDTH * 0.016)
+        self.side = int(self.s.WIDTH * 0.018)
         print(self.side)
 
         self.tank_rect = pygame.Rect(x, y, self.side, self.side)
@@ -38,8 +39,11 @@ class Tank:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-            self.s.display.fill((0, 0, 0))
+            self.s.display.fill((200, 200, 200))
             self.movement()
+            self.guidance()
+            self.ray_casting()
+            #  self.ray_casting2()
             self.draw_minimap(self.minimap_k, self.x_minimap, self.y_minimap)
 
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
@@ -51,7 +55,7 @@ class Tank:
             self.s.clock.tick(self.s.FPS)
 
     def draw_minimap(self, minimap_k, x, y):
-        self.s.map.draw(self.s.display, x, y, k=minimap_k, floor=self.s.floor, walls=self.s.wall)
+        self.s.map.draw(self.s.display, x, y, k=minimap_k)
         pygame.draw.circle(self.s.display, (255, 0, 00), (x + self.pos(k=minimap_k)[0], y + self.pos(k=minimap_k)[1]),
                            int(self.s.WIDTH * 0.006) // minimap_k)
 
@@ -62,8 +66,8 @@ class Tank:
                          (x + (self.x + self.v * 0.5 * math.sin(self.movement_angle * 3.14 / 180)) // minimap_k,
                           y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // minimap_k))
         pygame.draw.line(self.s.display, (0, 0, 255), (x + self.pos(k=minimap_k)[0], y + self.pos(k=minimap_k)[1]),
-                         (x + (self.x + self.s.WIDTH * 0.05 * math.sin(self.angle_of_view * 3.14 / 180)) // minimap_k,
-                          y + (self.y - self.s.WIDTH * 0.05 * math.cos(self.angle_of_view * 3.14 / 180)) // minimap_k))
+                         (x + (self.x // minimap_k + self.s.WIDTH * 0.05 * math.cos(self.angle_of_view * 3.14 / 180)),
+                          y + (self.y // minimap_k - self.s.WIDTH * 0.05 * -math.sin(self.angle_of_view * 3.14 / 180))))
         pygame.draw.line(self.s.display, (0, 255, 0), (x + self.pos(k=minimap_k)[0], y + self.pos(k=minimap_k)[1]),
                          (x + (self.x + self.s.WIDTH * 0.05 * math.sin(self.movement_angle * 3.14 / 180)) // minimap_k,
                           y + (self.y - self.s.WIDTH * 0.05 * math.cos(self.movement_angle * 3.14 / 180)) // minimap_k))
@@ -76,6 +80,7 @@ class Tank:
 
     def movement(self):
         keys = pygame.key.get_pressed()
+
         self.tank_rect.center = self.x, self.y
         t = 1 / self.s.FPS
         cos_a = math.cos(self.movement_angle * 3.14 / 180)
@@ -96,11 +101,11 @@ class Tank:
             elif self.v < 0:
                 v = min(self.v + self.s.a_stop * t, 0)
                 a_cur = self.s.a_stop
-        s = round(self.v * t + (a_cur * (t ** 2)) / 2)
+        s = (self.v * t + (a_cur * (t ** 2)) / 2)
         self.sq = s
         dx = s * sin_a
         dy = s * cos_a
-
+        print(self.x, self.y)
         # self.check_collisions(dx, dy)
         if dx != 0 or dy != 0:
             self.collisions(dx, dy)
@@ -114,56 +119,78 @@ class Tank:
 
         if self.v > self.s.min_speed_ad or self.v < 0:
             if keys[pygame.K_d]:
-                self.movement_angle += min(self.v * 0.008, 7)
+                temp = min(self.v * 0.008, 7)
+                self.movement_angle += temp
                 self.v = self.v * 0.97
-
+                if self.stab is False:
+                    self.angle_of_view += temp
             elif keys[pygame.K_a]:
-                self.movement_angle -= min(self.v * 0.008, 7)
+                temp = min(self.v * 0.008, 7)
+                self.movement_angle -= temp
                 self.v = self.v * 0.97
+                if self.stab is False:
+                    self.angle_of_view -= temp
 
-    def check_collisions(self, dx, dy):
-        self.stuck = False
-        next_rect = self.tank_rect.copy()
-        next_rect.move_ip(dx, dy)
-        hits = next_rect.collidelistall(self.s.map.collision_walls)
-        delta_x = 0
-        delta_y = 0
-        ty = 0
-        if dy != 0:
-            ty = self.side // 2 * abs(dy) / dy
-        tx = 0
-        if dx != 0:
-            tx = self.side // 2 * abs(dx) / dx
-        if len(hits) > 0:
-            print(dx, dy)
-            for i in hits:
-                hit = self.s.map.collision_walls[i]
-                if dx > 0:
-                    delta_x += next_rect.right - hit.left
-                else:
-                    delta_x += hit.right - next_rect.left
-                if dy > 0:
-                    delta_y -= next_rect.top - hit.bottom
-                else:
-                    delta_y -= hit.top - next_rect.bottom
-            # print(delta_y)
-            if abs(delta_x - delta_y) < 10:
-                dx = 0
-                dy = 0
-            elif delta_x > delta_y:
-                dy = -delta_y
-                dx = 0
-                print(1, delta_x, delta_y)
-                self.stuck = True
-            elif delta_y > delta_x:
-                print(2, delta_x, delta_y)
-                dx = delta_x
-                dy = 0
-                self.stuck = True
+    def guidance(self):
+        keys = pygame.key.get_pressed()
+        t = 1 / self.s.FPS
 
-                # self.stuck = True
-        self.x += dx
-        self.y -= dy
+        if keys[pygame.K_RIGHT]:
+            self.angle_of_view += self.s.tower_v * t
+
+        elif keys[pygame.K_LEFT]:
+            self.angle_of_view -= self.s.tower_v * t
+
+    def mapping(self, a, b):
+        return (a // self.s.tile_w) * self.s.tile_w, (b // self.s.tile_h) * self.s.tile_h
+
+    def ray_casting(self):
+        x0, y0 = self.x, self.y
+        xm, ym = self.mapping(x0, y0)
+        print(xm, ym)
+        cur_angle = self.angle_of_view - self.s.HALF_FOV + 0.00001
+        sin_a = math.sin(cur_angle * 3.14 / 180)
+        cos_a = math.cos(cur_angle * 3.14 / 180)
+        print(cur_angle, cos_a, sin_a)
+        for i in range(self.s.NUM_RAYS):
+            sin_a = math.sin(cur_angle * 3.14 / 180)
+            cos_a = math.cos(cur_angle * 3.14 / 180)
+            if cos_a >= 0:
+                x = xm + self.s.tile_w
+                dx = 1
+            else:
+                x = xm
+                dx = -1
+            for j in range(0, self.s.WIDTH, self.s.tile_w):
+                depth_v = (x - x0) / cos_a
+                y = y0 + depth_v * sin_a
+                if (self.mapping(x + dx, y)[0] // 100, self.mapping(x + dx, y)[1] // 100) in self.s.map.world_map:
+                    print(1)
+                    break
+                x += dx * self.s.tile_w
+
+            if sin_a >= 0:
+                y = ym + self.s.tile_h
+                dy = 1
+            else:
+                y = ym
+                dy = -1
+            for j in range(0, self.s.HEIGHT, self.s.tile_h):
+                depth_h = (y - y0) / sin_a
+                x = x0 + depth_h * cos_a
+                if (self.mapping(x, y + dy)[0] // 100, self.mapping(x, y + dy)[1] // 100) in self.s.map.world_map:
+                    break
+                y += dy * self.s.tile_h
+
+            depth = depth_v if depth_v < depth_h else depth_h
+            print(depth_v)
+            depth *= math.cos((self.angle_of_view - cur_angle) * 3.14 / 180)
+            proj_height = self.s.PROJ_COEFF / depth
+            c = 255 / (1 + depth * depth * 0.0004)
+            color = (int(c), int(c), int(c))
+            pygame.draw.rect(self.s.display, color,
+                             (i * self.s.SCALE, self.s.HEIGHT // 2 - proj_height // 2, self.s.SCALE, proj_height))
+            cur_angle += self.s.DELTA_ANGLE
 
     def check_wall(self, x, y):
         return (int(x), int(y)) in self.s.map.world_map
@@ -202,6 +229,6 @@ class Tank:
 
 
 # #
-# s = TankSettings()
-# ex = Tank(s, 150, 150, 0, 1, 0, 0)
-# ex.start()
+s = TankSettings()
+ex = Tank(s, 150, 150, 90, 1, 0, 0)
+ex.start()
