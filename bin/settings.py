@@ -93,19 +93,29 @@ class Settings:
         self.min_speed_ad = self.WIDTH * 0.03 * (self.FPS / 60) * 10 / 60
 
         self.minimap_k = 5
-        self.world_map = ['00000000',
-                          '0......0',
-                          '0......0',
-                          '0...0..0',
-                          '0......0',
-                          '0..0.0.0',
-                          '0......0',
-                          '0...0..0',
-                          '0......0',
-                          '00000000'
+        self.world_map = ['000000000000000000000000000000000000000000000000000000000000000000000',
+                          '0...................................................................0',
+                          '0...................................................................0',
+                          '0...0...............................................................0',
+                          '0...................................................................0',
+                          '0..0.................................0..............................0',
+                          '0...................................................................0',
+                          '0...0...............................................................0',
+                          '0...................................................................0',
+                          '0...................................................................0',
+                          '0...................................................................0',
+                          '0...................................................................0',
+                          '0...................................................................0',
+                          '0...................................................................0',
+                          '0...................................................................0',
+                          '0...................................................................0',
+                          '0...................................................................0',
+                          '000000000000000000000000000000000000000000000000000000000000000000000'
                           ]
         self.tile_w = (self.WIDTH // len(self.world_map[0]))
         self.tile_h = (self.HEIGHT // len(self.world_map))
+        self.map_width = self.tile_w * len(self.world_map[0])
+        self.map_height = self.tile_h * len(self.world_map)
         self.map = Map(self.world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
         self.minimap_tank_base = pygame.image.load('resources/images/tank_minimap.png').convert_alpha()
         self.minimap_tank = pygame.transform.scale(self.minimap_tank_base, (self.WIDTH * 0.0625 // self.minimap_k, self.WIDTH * 0.0625 // self.minimap_k))
@@ -115,7 +125,7 @@ class Settings:
         self.wall_base = pygame.image.load('resources/images/wall.png').convert()
         self.wall = pygame.transform.scale(self.wall_base,
                                            (self.tile_w // self.minimap_k, self.tile_h // self.minimap_k))
-        self.tower_v = 20
+        self.tower_v = 30
         self.optic_scope_width = self.HEIGHT
         self.FOV = 12
         self.HALF_FOV = self.FOV // 2
@@ -124,6 +134,9 @@ class Settings:
         self.DIST = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV * 3.14 / 180))
         self.PROJ_COEFF = 3 * self.DIST * self.tile_w
         self.SCALE = self.optic_scope_width // self.NUM_RAYS
+        self.optic_sight_base = pygame.image.load('resources/images/sosna-u_optic.png').convert_alpha()
+        self.optic_sight = pygame.transform.scale(self.optic_sight_base,
+                                           (self.HEIGHT, self.HEIGHT))
     def update_db(self):
         self.bd.update_to_db("graph_table", "(low, mid, high)",
                              f"({self.graph_dict[0]}, {self.graph_dict[1]}, {self.graph_dict[2]})")
@@ -150,7 +163,7 @@ class Settings:
         self.min_speed_ad = self.WIDTH * 0.03 * (self.FPS / 60) * 10 / 60
 
         self.tile_w = (self.WIDTH // len(self.world_map[0]))
-        self.tile_h = (self.HEIGHT // len(self.world_map))
+        self.tile_h = (self.WIDTH // len(self.world_map[0]))
         self.map = Map(self.world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
         self.floor = pygame.transform.scale(self.floor_base,
                                             (self.tile_w * len(self.world_map[0]) // self.minimap_k, self.tile_h * len(self.world_map) // self.minimap_k))
@@ -158,3 +171,10 @@ class Settings:
                                            (self.tile_w // self.minimap_k, self.tile_h // self.minimap_k))
 
         self.minimap_tank = pygame.transform.scale(self.minimap_tank_base, (self.WIDTH * 0.0625 // self.minimap_k, self.WIDTH * 0.0625 // self.minimap_k))
+
+        self.optic_scope_width = self.HEIGHT
+        self.SCALE = self.optic_scope_width // self.NUM_RAYS
+        self.optic_sight = pygame.transform.scale(self.optic_sight_base,
+                                           (self.HEIGHT, self.HEIGHT))
+        self.map_width = self.tile_w * len(self.world_map[0])
+        self.map_height = self.tile_h * len(self.world_map)

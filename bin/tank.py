@@ -18,6 +18,7 @@ class Tank:
         self.v = 0
         self.angle_of_view = 0
         print(self.s.map.world_map, sep='\n')
+        print(self.x, self.y)
         self.stuck = False
         self.side = int(self.s.WIDTH * 0.018)
         print(self.side)
@@ -39,10 +40,11 @@ class Tank:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-            self.s.display.fill((200, 200, 200))
+            self.s.display.fill((0, 0, 0))
             self.movement()
             self.guidance()
-            self.ray_casting()
+
+            self.ray_casting((self.s.WIDTH - self.s.HEIGHT) // 2, 0)
             #  self.ray_casting2()
             self.draw_minimap(self.minimap_k, self.x_minimap, self.y_minimap)
 
@@ -67,7 +69,7 @@ class Tank:
                           y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // minimap_k))
         pygame.draw.line(self.s.display, (0, 0, 255), (x + self.pos(k=minimap_k)[0], y + self.pos(k=minimap_k)[1]),
                          (x + (self.x // minimap_k + self.s.WIDTH * 0.05 * math.cos(self.angle_of_view * 3.14 / 180)),
-                          y + (self.y // minimap_k - self.s.WIDTH * 0.05 * -math.sin(self.angle_of_view * 3.14 / 180))))
+                          y + (self.y // minimap_k + self.s.WIDTH * 0.05 * math.sin(self.angle_of_view * 3.14 / 180))))
         pygame.draw.line(self.s.display, (0, 255, 0), (x + self.pos(k=minimap_k)[0], y + self.pos(k=minimap_k)[1]),
                          (x + (self.x + self.s.WIDTH * 0.05 * math.sin(self.movement_angle * 3.14 / 180)) // minimap_k,
                           y + (self.y - self.s.WIDTH * 0.05 * math.cos(self.movement_angle * 3.14 / 180)) // minimap_k))
@@ -144,7 +146,8 @@ class Tank:
     def mapping(self, a, b):
         return (a // self.s.tile_w) * self.s.tile_w, (b // self.s.tile_h) * self.s.tile_h
 
-    def ray_casting(self):
+    def ray_casting(self, dr_x=0, dr_y=0):
+        print(self.x, self.y, self.s.tile_w)
         x0, y0 = self.x, self.y
         xm, ym = self.mapping(x0, y0)
         print(xm, ym)
@@ -164,7 +167,7 @@ class Tank:
             for j in range(0, self.s.WIDTH, self.s.tile_w):
                 depth_v = (x - x0) / cos_a
                 y = y0 + depth_v * sin_a
-                if (self.mapping(x + dx, y)[0] // 100, self.mapping(x + dx, y)[1] // 100) in self.s.map.world_map:
+                if (self.mapping(x + dx, y)[0] // self.s.tile_w, self.mapping(x + dx, y)[1] // self.s.tile_h) in self.s.map.world_map:
                     print(1)
                     break
                 x += dx * self.s.tile_w
@@ -178,20 +181,20 @@ class Tank:
             for j in range(0, self.s.HEIGHT, self.s.tile_h):
                 depth_h = (y - y0) / sin_a
                 x = x0 + depth_h * cos_a
-                if (self.mapping(x, y + dy)[0] // 100, self.mapping(x, y + dy)[1] // 100) in self.s.map.world_map:
+                if (self.mapping(x, y + dy)[0] // self.s.tile_w, self.mapping(x, y + dy)[1] // self.s.tile_h) in self.s.map.world_map:
                     break
                 y += dy * self.s.tile_h
 
             depth = depth_v if depth_v < depth_h else depth_h
-            print(depth_v)
+            # print(depth_v, depth_h)
             depth *= math.cos((self.angle_of_view - cur_angle) * 3.14 / 180)
             proj_height = self.s.PROJ_COEFF / depth
-            c = 255 / (1 + depth * depth * 0.0004)
-            color = (int(c), int(c), int(c))
+            c = min(depth * 0.2, 255)
+            color = (int(c), int(c) // 2, int(c) // 3)
             pygame.draw.rect(self.s.display, color,
-                             (i * self.s.SCALE, self.s.HEIGHT // 2 - proj_height // 2, self.s.SCALE, proj_height))
+                             (dr_x + i * self.s.SCALE, dr_y + self.s.HEIGHT // 2 - proj_height // 2, self.s.SCALE, proj_height))
             cur_angle += self.s.DELTA_ANGLE
-
+        self.s.display.blit(self.s.optic_sight, ((self.s.WIDTH - self.s.HEIGHT) // 2, 0))
     def check_wall(self, x, y):
         return (int(x), int(y)) in self.s.map.world_map
 
@@ -229,6 +232,6 @@ class Tank:
 
 
 # #
-s = TankSettings()
-ex = Tank(s, 150, 150, 90, 1, 0, 0)
-ex.start()
+# s = TankSettings()
+# ex = Tank(s, 500, 500, 90, 4, 0, 0)
+# ex.start()
