@@ -58,13 +58,13 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.s.update_db()
+                    # self.s.update_db()
                     pygame.quit()
                     sys.exit()
 
                 if event.type == pygame.USEREVENT:
                     if event.button == quit_button:
-                        self.s.update_db()
+                        # self.s.update_db()
                         pygame.quit()
                         sys.exit()
                     if event.button == settings_button:
@@ -302,7 +302,7 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.s.update_db()
+                    # self.s.update_db()
                     pygame.quit()
                     sys.exit()
 
@@ -458,7 +458,7 @@ class Game:
                 self.s.display.blit(self.s.cursor, pygame.mouse.get_pos())
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
-
+        self.s.update_db()
     def game_menu(self):
         gm = True
 

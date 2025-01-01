@@ -6,6 +6,7 @@ from bin.bd import DBController
 from bin.map import Map
 import math
 
+
 class Settings:
     def __init__(self):
 
@@ -85,20 +86,20 @@ class Settings:
         self.HE_COUNT = 0
         self.HEAT_COUNT = 0
 
-        self.a_w = self.WIDTH * 0.12 * (self.FPS / 60)
-        self.a_s = -self.WIDTH * 0.4 * (self.FPS / 60)
-        self.a_stop = self.WIDTH * 0.4 * (self.FPS / 60)
-        self.max_speed_w = self.WIDTH * 0.5 * (self.FPS / 60)
-        self.max_speed_s = -self.WIDTH * 0.03 * (self.FPS / 60)
-        self.min_speed_ad = self.WIDTH * 0.03 * (self.FPS / 60) * 10 / 60
+        self.a_w = self.WIDTH * 0.05 * (self.FPS / 60)
+        self.a_s = -self.WIDTH * 0.1 * (self.FPS / 60)
+        self.a_stop = self.WIDTH * 0.1 * (self.FPS / 60)
+        self.max_speed_w = self.WIDTH * 0.2 * (self.FPS / 60)
+        self.max_speed_s = -self.WIDTH * 0.01 * (self.FPS / 60)
+        self.min_speed_ad = self.WIDTH * 0.01 * (self.FPS / 60) * 10 / 60
 
         self.minimap_k = 5
         self.world_map = ['000000000000000000000000000000000000000000000000000000000000000000000',
                           '0...................................................................0',
-                          '0...................................................................0',
-                          '0...0...............................................................0',
-                          '0...................................................................0',
-                          '0..0.................................0..............................0',
+                          '0.....................................0.............................0',
+                          '0...0................................00.............................0',
+                          '0...................................0000............................0',
+                          '0..0.................................00.............................0',
                           '0...................................................................0',
                           '0...0...............................................................0',
                           '0...................................................................0',
@@ -113,14 +114,16 @@ class Settings:
                           '000000000000000000000000000000000000000000000000000000000000000000000'
                           ]
         self.tile_w = (self.WIDTH // len(self.world_map[0]))
-        self.tile_h = (self.HEIGHT // len(self.world_map))
+        self.tile_h = (self.WIDTH // len(self.world_map[0]))
         self.map_width = self.tile_w * len(self.world_map[0])
         self.map_height = self.tile_h * len(self.world_map)
         self.map = Map(self.world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
         self.minimap_tank_base = pygame.image.load('resources/images/tank_minimap.png').convert_alpha()
-        self.minimap_tank = pygame.transform.scale(self.minimap_tank_base, (self.WIDTH * 0.0625 // self.minimap_k, self.WIDTH * 0.0625 // self.minimap_k))
+        self.minimap_tank = pygame.transform.scale(self.minimap_tank_base, (
+        self.WIDTH * 0.0625 // self.minimap_k, self.WIDTH * 0.0625 // self.minimap_k))
         self.floor_base = pygame.image.load('resources/images/floor.png').convert()
-        self.floor = pygame.transform.scale(self.floor_base, (self.tile_w * len(self.world_map[0]) // self.minimap_k, self.tile_h * len(self.world_map) // self.minimap_k))
+        self.floor = pygame.transform.scale(self.floor_base, (
+        self.tile_w * len(self.world_map[0]) // self.minimap_k, self.tile_h * len(self.world_map) // self.minimap_k))
 
         self.wall_base = pygame.image.load('resources/images/wall.png').convert()
         self.wall = pygame.transform.scale(self.wall_base,
@@ -132,11 +135,19 @@ class Settings:
         self.NUM_RAYS = 100
         self.DELTA_ANGLE = self.FOV / self.NUM_RAYS
         self.DIST = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV * 3.14 / 180))
-        self.PROJ_COEFF = 3 * self.DIST * self.tile_w
+        self.PROJ_COEFF = 0.7 * self.DIST * self.HEIGHT
         self.SCALE = self.optic_scope_width // self.NUM_RAYS
         self.optic_sight_base = pygame.image.load('resources/images/sosna-u_optic.png').convert_alpha()
         self.optic_sight = pygame.transform.scale(self.optic_sight_base,
-                                           (self.HEIGHT, self.HEIGHT))
+                                                  (self.HEIGHT, self.HEIGHT))
+        self.gunner_site_base = pygame.image.load('resources/images/gunner_site.png').convert_alpha()
+        self.gunner_site = pygame.transform.scale(self.gunner_site_base,
+                                                  (self.WIDTH, self.HEIGHT))
+        self.optic_sight_x = 0.5 * self.WIDTH
+        self.optic_sight_y = 0.1 * self.WIDTH
+        self.optic_sight_w_r = 0.2 * self.WIDTH
+        self.optic_sight_h_r = 0.2 * self.WIDTH
+
     def update_db(self):
         self.bd.update_to_db("graph_table", "(low, mid, high)",
                              f"({self.graph_dict[0]}, {self.graph_dict[1]}, {self.graph_dict[2]})")
@@ -155,26 +166,34 @@ class Settings:
         self.cursor = pygame.transform.scale(self.cursor_base, (self.WIDTH * 0.03125, self.WIDTH * 0.03125))
         self.size_text_b = int(self.WIDTH * 0.01875)
 
-        self.a_w = self.WIDTH * 0.12 * (self.FPS / 60)
-        self.a_s = -self.WIDTH * 0.4 * (self.FPS / 60)
-        self.a_stop = self.WIDTH * 0.4 * (self.FPS / 60)
-        self.max_speed_w = self.WIDTH * 0.5 * (self.FPS / 60)
-        self.max_speed_s = -self.WIDTH * 0.03 * (self.FPS / 60)
-        self.min_speed_ad = self.WIDTH * 0.03 * (self.FPS / 60) * 10 / 60
+        self.a_w = self.WIDTH * 0.05 * (self.FPS / 60)
+        self.a_s = -self.WIDTH * 0.1 * (self.FPS / 60)
+        self.a_stop = self.WIDTH * 0.1 * (self.FPS / 60)
+        self.max_speed_w = self.WIDTH * 0.2 * (self.FPS / 60)
+        self.max_speed_s = -self.WIDTH * 0.01 * (self.FPS / 60)
+        self.min_speed_ad = self.WIDTH * 0.01 * (self.FPS / 60) * 10 / 60
 
         self.tile_w = (self.WIDTH // len(self.world_map[0]))
         self.tile_h = (self.WIDTH // len(self.world_map[0]))
         self.map = Map(self.world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
         self.floor = pygame.transform.scale(self.floor_base,
-                                            (self.tile_w * len(self.world_map[0]) // self.minimap_k, self.tile_h * len(self.world_map) // self.minimap_k))
+                                            (self.tile_w * len(self.world_map[0]) // self.minimap_k,
+                                             self.tile_h * len(self.world_map) // self.minimap_k))
         self.wall = pygame.transform.scale(self.wall_base,
                                            (self.tile_w // self.minimap_k, self.tile_h // self.minimap_k))
 
-        self.minimap_tank = pygame.transform.scale(self.minimap_tank_base, (self.WIDTH * 0.0625 // self.minimap_k, self.WIDTH * 0.0625 // self.minimap_k))
+        self.minimap_tank = pygame.transform.scale(self.minimap_tank_base, (
+        self.WIDTH * 0.0625 // self.minimap_k, self.WIDTH * 0.0625 // self.minimap_k))
 
         self.optic_scope_width = self.HEIGHT
         self.SCALE = self.optic_scope_width // self.NUM_RAYS
         self.optic_sight = pygame.transform.scale(self.optic_sight_base,
-                                           (self.HEIGHT, self.HEIGHT))
+                                                  (self.HEIGHT, self.HEIGHT))
         self.map_width = self.tile_w * len(self.world_map[0])
         self.map_height = self.tile_h * len(self.world_map)
+        self.gunner_site = pygame.transform.scale(self.gunner_site_base,
+                                                  (self.WIDTH, self.HEIGHT))
+        self.optic_sight_x = 0.6 * self.WIDTH
+        self.optic_sight_y = 0.2 * self.WIDTH
+        self.optic_sight_w_r = 0.1 * self.WIDTH
+        self.optic_sight_h_r = 0.1 * self.WIDTH

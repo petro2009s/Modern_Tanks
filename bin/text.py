@@ -2,8 +2,8 @@ import pygame
 
 
 class Text:
-    def __init__(self, x, y, color, text, size, bg_color=None, is_topleft=False):
-        self.font = pygame.font.Font('resources/fonts/pixel_font.otf', size)
+    def __init__(self, x, y, color, text, size, bg_color=None, is_topleft=False, font_name='resources/fonts/pixel_font.otf'):
+        self.font = pygame.font.Font(font_name, size)
         self.color = color
         self.size = size
         self.coord = (x, y)

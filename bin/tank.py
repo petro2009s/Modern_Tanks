@@ -3,8 +3,7 @@ import sys
 import math
 from bin.text import Text
 from bin.test_settings import TankSettings
-
-
+from bin.buttons import SelectButton
 class Tank:
     def __init__(self, settings, x, y, movement_angle, minimap_k, x_minimap, y_minimap):
         self.s = settings
@@ -16,6 +15,7 @@ class Tank:
         self.minimap_k = minimap_k
         self.sq = 0
         self.v = 0
+        self.depth = '0000'
         self.angle_of_view = 0
         print(self.s.map.world_map, sep='\n')
         print(self.x, self.y)
@@ -34,50 +34,58 @@ class Tank:
         fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200),
                               str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                               is_topleft=True)
+        optic_sight_button = SelectButton(self.s.optic_sight_x, self.s.optic_sight_y, self.s.optic_sight_w_r, self.s.optic_sight_h_r, 'прицел', font_size=20)
         while show:
-
+            optic_sight_button.check(pygame.mouse.get_pos())
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-            self.s.display.fill((0, 0, 0))
+                if event.type == pygame.USEREVENT:
+                    if event.button == optic_sight_button:
+                        self.optic_sight()
+                        print(1)
+                    if event.type == pygame.K_ESCAPE:
+                        print('escape')
+                        show = False
+                optic_sight_button.handle_event(event)
             self.movement()
             self.guidance()
-
-            self.ray_casting((self.s.WIDTH - self.s.HEIGHT) // 2, 0)
-            #  self.ray_casting2()
-            self.draw_minimap(self.minimap_k, self.x_minimap, self.y_minimap)
+            self.s.display.blit(self.s.gunner_site, (0, 0))
+            optic_sight_button.draw(self.s.display)
+            self.draw_minimap(self.x_minimap, self.y_minimap)
 
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text_bl.draw(self.s.display)
             fps_count_text.draw(self.s.display)
-
+            if pygame.mouse.get_focused():
+                self.s.display.blit(self.s.cursor, pygame.mouse.get_pos())
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
 
-    def draw_minimap(self, minimap_k, x, y):
-        self.s.map.draw(self.s.display, x, y, k=minimap_k)
-        pygame.draw.circle(self.s.display, (255, 0, 00), (x + self.pos(k=minimap_k)[0], y + self.pos(k=minimap_k)[1]),
-                           int(self.s.WIDTH * 0.006) // minimap_k)
+    def draw_minimap(self, x, y):
+        self.s.map.draw(self.s.display, x, y, k=self.s.minimap_k)
+        pygame.draw.circle(self.s.display, (255, 0, 00), (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+                           int(self.s.WIDTH * 0.006) // self.s.minimap_k)
 
-        pygame.draw.line(self.s.display, (255, 0, 0), (x + self.pos(k=minimap_k)[0], y + self.pos(k=minimap_k)[1]),
-                         (x + (self.x + self.sq * math.sin(self.movement_angle * 3.14 / 180)) // minimap_k,
-                          y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // minimap_k))
-        pygame.draw.line(self.s.display, (255, 255, 255), (x + self.pos(k=minimap_k)[0], y + self.pos(k=minimap_k)[1]),
-                         (x + (self.x + self.v * 0.5 * math.sin(self.movement_angle * 3.14 / 180)) // minimap_k,
-                          y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // minimap_k))
-        pygame.draw.line(self.s.display, (0, 0, 255), (x + self.pos(k=minimap_k)[0], y + self.pos(k=minimap_k)[1]),
-                         (x + (self.x // minimap_k + self.s.WIDTH * 0.05 * math.cos(self.angle_of_view * 3.14 / 180)),
-                          y + (self.y // minimap_k + self.s.WIDTH * 0.05 * math.sin(self.angle_of_view * 3.14 / 180))))
-        pygame.draw.line(self.s.display, (0, 255, 0), (x + self.pos(k=minimap_k)[0], y + self.pos(k=minimap_k)[1]),
-                         (x + (self.x + self.s.WIDTH * 0.05 * math.sin(self.movement_angle * 3.14 / 180)) // minimap_k,
-                          y + (self.y - self.s.WIDTH * 0.05 * math.cos(self.movement_angle * 3.14 / 180)) // minimap_k))
+        pygame.draw.line(self.s.display, (255, 0, 0), (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+                         (x + (self.x + self.sq * math.sin(self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
+                          y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
+        pygame.draw.line(self.s.display, (255, 255, 255), (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+                         (x + (self.x + self.v * 0.5 * math.sin(self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
+                          y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
+        pygame.draw.line(self.s.display, (0, 0, 255), (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+                         (x + (self.x // self.s.minimap_k + self.s.WIDTH * 0.05 * math.cos(self.angle_of_view * 3.14 / 180)),
+                          y + (self.y // self.s.minimap_k + self.s.WIDTH * 0.05 * math.sin(self.angle_of_view * 3.14 / 180))))
+        pygame.draw.line(self.s.display, (0, 255, 0), (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+                         (x + (self.x + self.s.WIDTH * 0.05 * math.sin(self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
+                          y + (self.y - self.s.WIDTH * 0.05 * math.cos(self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
 
         image = pygame.transform.rotate(self.s.minimap_tank, -self.movement_angle)
         rect = image.get_rect()
-        rect.center = (x + self.pos(k=minimap_k)[0],
-                       y + self.pos(k=minimap_k)[1])
+        rect.center = (x + self.pos(k=self.s.minimap_k)[0],
+                       y + self.pos(k=self.s.minimap_k)[1])
         self.s.display.blit(image, rect)
 
     def movement(self):
@@ -146,55 +154,95 @@ class Tank:
     def mapping(self, a, b):
         return (a // self.s.tile_w) * self.s.tile_w, (b // self.s.tile_h) * self.s.tile_h
 
-    def ray_casting(self, dr_x=0, dr_y=0):
-        print(self.x, self.y, self.s.tile_w)
-        x0, y0 = self.x, self.y
-        xm, ym = self.mapping(x0, y0)
-        print(xm, ym)
-        cur_angle = self.angle_of_view - self.s.HALF_FOV + 0.00001
-        sin_a = math.sin(cur_angle * 3.14 / 180)
-        cos_a = math.cos(cur_angle * 3.14 / 180)
-        print(cur_angle, cos_a, sin_a)
-        for i in range(self.s.NUM_RAYS):
+    def ray_casting(self, dr_x=0, dr_y=0, sight_type='1'):
+        if sight_type == '1':
+            # print(self.x, self.y, self.s.tile_w)
+            x0, y0 = self.x, self.y
+            xm, ym = self.mapping(x0, y0)
+            # print(xm, ym)
+            cur_angle = self.angle_of_view - self.s.HALF_FOV + 0.00001
             sin_a = math.sin(cur_angle * 3.14 / 180)
             cos_a = math.cos(cur_angle * 3.14 / 180)
-            if cos_a >= 0:
-                x = xm + self.s.tile_w
-                dx = 1
-            else:
-                x = xm
-                dx = -1
-            for j in range(0, self.s.WIDTH, self.s.tile_w):
-                depth_v = (x - x0) / cos_a
-                y = y0 + depth_v * sin_a
-                if (self.mapping(x + dx, y)[0] // self.s.tile_w, self.mapping(x + dx, y)[1] // self.s.tile_h) in self.s.map.world_map:
-                    print(1)
-                    break
-                x += dx * self.s.tile_w
+            # print(cur_angle, cos_a, sin_a)
+            for i in range(self.s.NUM_RAYS):
+                sin_a = math.sin(cur_angle * 3.14 / 180)
+                cos_a = math.cos(cur_angle * 3.14 / 180)
+                if cos_a >= 0:
+                    x = xm + self.s.tile_w
+                    dx = 1
+                else:
+                    x = xm
+                    dx = -1
+                for j in range(0, self.s.WIDTH, self.s.tile_w):
+                    depth_v = (x - x0) / cos_a
+                    y = y0 + depth_v * sin_a
+                    if (self.mapping(x + dx, y)[0] // self.s.tile_w, self.mapping(x + dx, y)[1] // self.s.tile_h) in self.s.map.world_map:
+                        break
+                    x += dx * self.s.tile_w
 
-            if sin_a >= 0:
-                y = ym + self.s.tile_h
-                dy = 1
-            else:
-                y = ym
-                dy = -1
-            for j in range(0, self.s.HEIGHT, self.s.tile_h):
-                depth_h = (y - y0) / sin_a
-                x = x0 + depth_h * cos_a
-                if (self.mapping(x, y + dy)[0] // self.s.tile_w, self.mapping(x, y + dy)[1] // self.s.tile_h) in self.s.map.world_map:
-                    break
-                y += dy * self.s.tile_h
+                if sin_a >= 0:
+                    y = ym + self.s.tile_h
+                    dy = 1
+                else:
+                    y = ym
+                    dy = -1
+                for j in range(0, self.s.HEIGHT, self.s.tile_h):
+                    depth_h = (y - y0) / sin_a
+                    x = x0 + depth_h * cos_a
+                    if (self.mapping(x, y + dy)[0] // self.s.tile_w, self.mapping(x, y + dy)[1] // self.s.tile_h) in self.s.map.world_map:
+                        break
+                    y += dy * self.s.tile_h
 
-            depth = depth_v if depth_v < depth_h else depth_h
-            # print(depth_v, depth_h)
-            depth *= math.cos((self.angle_of_view - cur_angle) * 3.14 / 180)
-            proj_height = self.s.PROJ_COEFF / depth
-            c = min(depth * 0.2, 255)
-            color = (int(c), int(c) // 2, int(c) // 3)
-            pygame.draw.rect(self.s.display, color,
-                             (dr_x + i * self.s.SCALE, dr_y + self.s.HEIGHT // 2 - proj_height // 2, self.s.SCALE, proj_height))
-            cur_angle += self.s.DELTA_ANGLE
-        self.s.display.blit(self.s.optic_sight, ((self.s.WIDTH - self.s.HEIGHT) // 2, 0))
+                depth = depth_v if depth_v < depth_h else depth_h
+                # print(depth_v, depth_h)
+                depth *= math.cos((self.angle_of_view - cur_angle) * 3.14 / 180)
+                proj_height = self.s.PROJ_COEFF / depth
+                c = min(depth * 0.2, 255)
+                color = (int(c), int(c) // 2, int(c) // 3)
+                pygame.draw.rect(self.s.display, color,
+                                 (dr_x + i * self.s.SCALE, dr_y + self.s.HEIGHT // 2 - proj_height // 2, self.s.SCALE, proj_height))
+                if int(cur_angle) == int(self.angle_of_view):
+                    self.depth = str(depth)
+                    print(2353445)
+                cur_angle += self.s.DELTA_ANGLE
+            self.s.display.blit(self.s.optic_sight, (dr_x, dr_y))
+
+    def optic_sight(self):
+        show = True
+        fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
+                                 str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
+                                 is_topleft=True)
+        fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200),
+                              str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
+                              is_topleft=True)
+        depth_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.92, (255, 0, 0),
+                              self.depth, int(self.s.WIDTH * 0.03), font_name='resources/fonts/lcd_font.otf'
+                              )
+        while show:
+            self.s.display.fill((0, 0, 0))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.USEREVENT:
+
+                    if event.type == pygame.K_ESCAPE:
+                        print('escape')
+                        show = False
+            self.movement()
+            self.guidance()
+            self.ray_casting(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, sight_type='1')
+            self.draw_minimap(self.x_minimap, self.y_minimap)
+            fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
+            fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
+            depth_text.set_another_text(self.depth[:5])
+            fps_count_text_bl.draw(self.s.display)
+            fps_count_text.draw(self.s.display)
+            depth_text.draw(self.s.display)
+
+            pygame.display.flip()
+            self.s.clock.tick(self.s.FPS)
+
     def check_wall(self, x, y):
         return (int(x), int(y)) in self.s.map.world_map
 

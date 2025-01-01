@@ -1,17 +1,19 @@
 import pygame
 
 class Button:
-    def __init__(self, x, y, w, h, text, size_text, im_inact, im_act, sound=None):
+    def __init__(self, x, y, w, h, text, size_text, im_inact=None, im_act=None, sound=None):
         self.x = x
         self.y = y
         self.width = w
         self.height = h
         self.text = text
         self.size_text = size_text
-        self.im_inact = pygame.image.load(im_inact).convert_alpha()
-        self.im_inact = pygame.transform.scale(self.im_inact, (w, h)).convert_alpha()
-        self.im_act = pygame.image.load(im_act).convert_alpha()
-        self.im_act = pygame.transform.scale(self.im_act, (w, h)).convert_alpha()
+        if im_inact:
+            self.im_inact = pygame.image.load(im_inact).convert_alpha()
+            self.im_inact = pygame.transform.scale(self.im_inact, (w, h)).convert_alpha()
+        if im_act:
+            self.im_act = pygame.image.load(im_act).convert_alpha()
+            self.im_act = pygame.transform.scale(self.im_act, (w, h)).convert_alpha()
         self.rect = self.im_inact.get_rect(topleft=(x, y))
         if sound:
             self.sound = pygame.mixer.Sound(sound)
@@ -24,6 +26,7 @@ class Button:
         self.text_rect2 = self.text_surface2.get_rect(center=(self.rect.center[0] + self.size_text * 0.11, self.rect.center[1] + self.size_text * 0.11))
 
     def draw(self, screen):
+
         current_im = self.im_act if self.is_hov else self.im_inact
         screen.blit(current_im, (self.x, self.y))
 
@@ -78,7 +81,7 @@ class SelectButton:
         if self.is_hov or self.is_cl:
             pygame.draw.rect(screen, (50, 60, 50), self.rect)
         else:
-            pygame.draw.rect(screen, (50, 60, 50), self.rect, self.border)
+            pygame.draw.rect(screen, (50, 60, 50), self.rect, int(self.border))
 
         if self.im:
             screen.blit(self.im, (self.x + (self.width_r - self.width) // 2, self.y))
@@ -89,7 +92,7 @@ class SelectButton:
     def check(self, mouse_pos):
         self.is_hov = self.rect.collidepoint(mouse_pos)
 
-    def handle_event(self, event, volume):
+    def handle_event(self, event, volume=None):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.is_hov:
             if self.sound:
                 self.sound.set_volume(volume / 100)
