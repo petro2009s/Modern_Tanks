@@ -1,21 +1,21 @@
 import pygame
-
-
 class Map:
     def __init__(self, mini_map, tile_w, tile_h, width=0, color=(50, 60, 50)):
         self.mini_map = mini_map
         self.world_map = set()
+        self.world_map_dict = {}
         self.tile_w = tile_w
         self.tile_h = tile_h
         self.width = width
         self.color = color
-        self.collision_walls = []
         for j, row in enumerate(self.mini_map):
             for i, char in enumerate(row):
-                if char == '0':
+                if char != '.':
                     self.world_map.add((i, j))
-                    self.collision_walls.append(pygame.Rect(i * self.tile_w, j * self.tile_h, self.tile_w, self.tile_h))
-
+                if char == '1':
+                    self.world_map_dict[(i, j)] = '1'
+                elif char == '0':
+                    self.world_map_dict[(i, j)] = '0'
     def draw(self, display, x0, y0, k=1, floor=None, walls=None):
         if floor:
             display.blit(floor, (x0, y0))

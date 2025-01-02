@@ -4,25 +4,31 @@ import math
 from bin.text import Text
 from bin.test_settings import TankSettings
 from bin.buttons import SelectButton
+
+
 class Tank:
     def __init__(self, settings, x, y, movement_angle, minimap_k, x_minimap, y_minimap):
         self.s = settings
         self.x = x
         self.y = y
         self.stab = True
+        self.optic = False
         self.x_minimap = x_minimap
         self.y_minimap = y_minimap
         self.minimap_k = minimap_k
         self.sq = 0
         self.v = 0
         self.depth = '0000'
+        self.depth_m = '0000'
         self.angle_of_view = 0
+        self.horizontal = 0
         print(self.s.map.world_map, sep='\n')
         print(self.x, self.y)
         self.stuck = False
-        self.side = int(self.s.WIDTH * 0.018)
+        self.side = min(int(self.s.WIDTH * 0.02), int(self.s.tile_w * 0.8))
         print(self.side)
-
+        self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                               self.horizontal + self.s.HEIGHT // 2)
         self.tank_rect = pygame.Rect(x, y, self.side, self.side)
         self.movement_angle = movement_angle
 
@@ -34,7 +40,8 @@ class Tank:
         fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200),
                               str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                               is_topleft=True)
-        optic_sight_button = SelectButton(self.s.optic_sight_x, self.s.optic_sight_y, self.s.optic_sight_w_r, self.s.optic_sight_h_r, 'прицел', font_size=20)
+        optic_sight_button = SelectButton(self.s.optic_sight_x, self.s.optic_sight_y, self.s.optic_sight_w_r,
+                                          self.s.optic_sight_h_r, 'прицел', font_size=20)
         while show:
             optic_sight_button.check(pygame.mouse.get_pos())
             for event in pygame.event.get():
@@ -45,7 +52,8 @@ class Tank:
                     if event.button == optic_sight_button:
                         self.optic_sight()
                         print(1)
-                    if event.type == pygame.K_ESCAPE:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
                         print('escape')
                         show = False
                 optic_sight_button.handle_event(event)
@@ -66,27 +74,41 @@ class Tank:
 
     def draw_minimap(self, x, y):
         self.s.map.draw(self.s.display, x, y, k=self.s.minimap_k)
-        pygame.draw.circle(self.s.display, (255, 0, 00), (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+        pygame.draw.circle(self.s.display, (255, 0, 00),
+                           (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
                            int(self.s.WIDTH * 0.006) // self.s.minimap_k)
 
-        pygame.draw.line(self.s.display, (255, 0, 0), (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+        pygame.draw.line(self.s.display, (255, 0, 0),
+                         (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
                          (x + (self.x + self.sq * math.sin(self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
                           y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
-        pygame.draw.line(self.s.display, (255, 255, 255), (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+        pygame.draw.line(self.s.display, (255, 255, 255),
+                         (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
                          (x + (self.x + self.v * 0.5 * math.sin(self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
                           y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
-        pygame.draw.line(self.s.display, (0, 0, 255), (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
-                         (x + (self.x // self.s.minimap_k + self.s.WIDTH * 0.05 * math.cos(self.angle_of_view * 3.14 / 180)),
-                          y + (self.y // self.s.minimap_k + self.s.WIDTH * 0.05 * math.sin(self.angle_of_view * 3.14 / 180))))
-        pygame.draw.line(self.s.display, (0, 255, 0), (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
-                         (x + (self.x + self.s.WIDTH * 0.05 * math.sin(self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
-                          y + (self.y - self.s.WIDTH * 0.05 * math.cos(self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
+        pygame.draw.line(self.s.display, (0, 0, 255),
+                         (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+                         (x + (self.x // self.s.minimap_k + self.s.WIDTH * 0.05 * math.cos(
+                             self.angle_of_view * 3.14 / 180)),
+                          y + (self.y // self.s.minimap_k + self.s.WIDTH * 0.05 * math.sin(
+                              self.angle_of_view * 3.14 / 180))))
+        pygame.draw.line(self.s.display, (0, 255, 0),
+                         (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+                         (x + (self.x + self.s.WIDTH * 0.05 * math.sin(
+                             self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
+                          y + (self.y - self.s.WIDTH * 0.05 * math.cos(
+                              self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
 
-        image = pygame.transform.rotate(self.s.minimap_tank, -self.movement_angle)
+        image = pygame.transform.rotate(self.s.minimap_tank_b, -self.movement_angle)
         rect = image.get_rect()
         rect.center = (x + self.pos(k=self.s.minimap_k)[0],
                        y + self.pos(k=self.s.minimap_k)[1])
         self.s.display.blit(image, rect)
+        image = pygame.transform.rotate(self.s.minimap_tank_tower, 270 - self.angle_of_view)
+        rect2 = image.get_rect()
+        rect2.center = (x + self.pos(k=self.s.minimap_k)[0],
+                        y + self.pos(k=self.s.minimap_k)[1])
+        self.s.display.blit(image, rect2)
 
     def movement(self):
         keys = pygame.key.get_pressed()
@@ -151,19 +173,27 @@ class Tank:
         elif keys[pygame.K_LEFT]:
             self.angle_of_view -= self.s.tower_v * t
 
+        elif keys[pygame.K_UP]:
+            self.horizontal += self.s.vertical_v * t
+            self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                   self.horizontal + self.s.HEIGHT // 2)
+        elif keys[pygame.K_DOWN]:
+            self.horizontal -= self.s.vertical_v * t
+
+            self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                   self.horizontal + self.s.HEIGHT // 2)
+
     def mapping(self, a, b):
         return (a // self.s.tile_w) * self.s.tile_w, (b // self.s.tile_h) * self.s.tile_h
 
+    def mapping_in_map(self, a, b):
+        return (a // self.s.tile_w), (b // self.s.tile_h)
+
     def ray_casting(self, dr_x=0, dr_y=0, sight_type='1'):
         if sight_type == '1':
-            # print(self.x, self.y, self.s.tile_w)
             x0, y0 = self.x, self.y
             xm, ym = self.mapping(x0, y0)
-            # print(xm, ym)
             cur_angle = self.angle_of_view - self.s.HALF_FOV + 0.00001
-            sin_a = math.sin(cur_angle * 3.14 / 180)
-            cos_a = math.cos(cur_angle * 3.14 / 180)
-            # print(cur_angle, cos_a, sin_a)
             for i in range(self.s.NUM_RAYS):
                 sin_a = math.sin(cur_angle * 3.14 / 180)
                 cos_a = math.cos(cur_angle * 3.14 / 180)
@@ -175,8 +205,10 @@ class Tank:
                     dx = -1
                 for j in range(0, self.s.WIDTH, self.s.tile_w):
                     depth_v = (x - x0) / cos_a
-                    y = y0 + depth_v * sin_a
-                    if (self.mapping(x + dx, y)[0] // self.s.tile_w, self.mapping(x + dx, y)[1] // self.s.tile_h) in self.s.map.world_map:
+                    yv = y0 + depth_v * sin_a
+                    temp = self.mapping_in_map(x + dx, yv)
+                    if temp in self.s.map.world_map:
+                        texture_v = self.s.map.world_map_dict[temp]
                         break
                     x += dx * self.s.tile_w
 
@@ -188,22 +220,27 @@ class Tank:
                     dy = -1
                 for j in range(0, self.s.HEIGHT, self.s.tile_h):
                     depth_h = (y - y0) / sin_a
-                    x = x0 + depth_h * cos_a
-                    if (self.mapping(x, y + dy)[0] // self.s.tile_w, self.mapping(x, y + dy)[1] // self.s.tile_h) in self.s.map.world_map:
+                    xh = x0 + depth_h * cos_a
+                    temp2 = self.mapping_in_map(xh, y + dy)
+                    if temp2 in self.s.map.world_map:
+                        print(temp2)
+                        texture_h = self.s.map.world_map_dict[temp2]
                         break
                     y += dy * self.s.tile_h
 
-                depth = depth_v if depth_v < depth_h else depth_h
-                # print(depth_v, depth_h)
+                depth, offset, texture = (depth_v, yv, texture_v) if depth_v < depth_h else (depth_h, xh, texture_h)
+                offset = int(offset) % self.s.tile_w
                 depth *= math.cos((self.angle_of_view - cur_angle) * 3.14 / 180)
-                proj_height = self.s.PROJ_COEFF / depth
-                c = min(depth * 0.2, 255)
-                color = (int(c), int(c) // 2, int(c) // 3)
-                pygame.draw.rect(self.s.display, color,
-                                 (dr_x + i * self.s.SCALE, dr_y + self.s.HEIGHT // 2 - proj_height // 2, self.s.SCALE, proj_height))
+                proj_height = min(int(self.s.PROJ_COEFF / depth), 3 * self.s.HEIGHT)
+                wall_column = self.s.textures[texture].subsurface(offset * self.s.texture_scale, 0,
+                                                                  self.s.texture_scale, self.s.texture_h)
+                wall_column = pygame.transform.scale(wall_column, (self.s.SCALE, proj_height))
+                self.s.display.blit(wall_column,
+                                    (dr_x + i * self.s.SCALE,
+                                     self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2))
+
                 if int(cur_angle) == int(self.angle_of_view):
                     self.depth = str(depth)
-                    print(2353445)
                 cur_angle += self.s.DELTA_ANGLE
             self.s.display.blit(self.s.optic_sight, (dr_x, dr_y))
 
@@ -215,33 +252,47 @@ class Tank:
         fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200),
                               str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                               is_topleft=True)
-        depth_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.92, (255, 0, 0),
-                              self.depth, int(self.s.WIDTH * 0.03), font_name='resources/fonts/lcd_font.otf'
-                              )
+        depth_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.922, (255, 0, 0),
+                          self.depth_m, int(self.s.WIDTH * 0.04), font_name='resources/fonts/lcd_font.otf'
+                          )
+        black = pygame.Rect(self.s.WIDTH // 2 + self.s.HEIGHT // 2, 0, self.s.HEIGHT // 2,
+                            self.s.HEIGHT)
+        self.optic = True
         while show:
             self.s.display.fill((0, 0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if event.type == pygame.USEREVENT:
-
-                    if event.type == pygame.K_ESCAPE:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
                         print('escape')
                         show = False
+                    if event.key == pygame.K_e:
+                        depth_text.set_another_text(self.rangefinder())
             self.movement()
             self.guidance()
+            pygame.draw.rect(self.s.display, (135, 206, 235), self.sky)
+
             self.ray_casting(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, sight_type='1')
+            pygame.draw.rect(self.s.display, (0, 0, 0), black)
             self.draw_minimap(self.x_minimap, self.y_minimap)
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
-            depth_text.set_another_text(self.depth[:5])
             fps_count_text_bl.draw(self.s.display)
             fps_count_text.draw(self.s.display)
             depth_text.draw(self.s.display)
 
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
+        self.optic = False
+
+    def rangefinder(self):
+        depth = str(min(int(float(self.depth) * (7 / self.side)), 9999))
+        depth = '0' * (4 - len(depth)) + depth
+        self.depth_m = depth
+        return depth
+
 
     def check_wall(self, x, y):
         return (int(x), int(y)) in self.s.map.world_map
@@ -277,7 +328,6 @@ class Tank:
 
     def pos(self, k=1):
         return (self.x // k, self.y // k)
-
 
 # #
 # s = TankSettings()
