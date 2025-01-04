@@ -166,6 +166,18 @@ class Settings:
                           '0...................................................................................................0',
                           '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
                           ]
+        self.world_map2 = ['0000000000000000',
+                          '0..............0',
+                          '0.......0000...0',
+                          '0...0.....11...0',
+                          '0..............0',
+                          '0..............0',
+                          '0.....11.......0',
+                          '0..............0',
+                          '0..............0',
+                          '0000000000000000']
+
+
         self.tile_w = (self.WIDTH // len(self.world_map[0]))
         self.tile_h = (self.WIDTH // len(self.world_map[0]))
         self.map_width = self.tile_w * len(self.world_map[0])
@@ -177,22 +189,39 @@ class Settings:
                                                      (self.WIDTH * 0.0625 // self.minimap_k, self.WIDTH * 0.0625 // self.minimap_k))
         self.minimap_tank_tower = pygame.transform.scale(self.minimap_tank_tower_base,
                                                          (self.WIDTH * 0.0625 // self.minimap_k, self.WIDTH * 0.0625 // self.minimap_k))
-        self.tower_v = 30
+        self.tower_v = 20
         self.vertical_v = 30
+
         self.optic_scope_width = self.HEIGHT
-        self.FOV = 12
-        self.HALF_FOV = self.FOV // 2
+        self.FOV_optic = 12
+        self.HALF_FOV_optic = self.FOV_optic // 2
         self.NUM_RAYS = 150
-        self.DELTA_ANGLE = self.FOV / self.NUM_RAYS
-        self.DIST = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV * 3.14 / 180))
-        self.PROJ_COEFF = 0.3 * self.DIST * self.HEIGHT
+        self.DELTA_ANGLE_optic = self.FOV_optic / self.NUM_RAYS
+        self.DIST_optic = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_optic * 3.14 / 180))
+        self.PROJ_COEFF_optic = 70 * self.HEIGHT
+
         if self.optic_scope_width % self.NUM_RAYS == 0:
-            self.SCALE = self.optic_scope_width // self.NUM_RAYS
+            self.SCALE_optic = self.optic_scope_width // self.NUM_RAYS
         else:
-            self.SCALE = int(self.optic_scope_width / self.NUM_RAYS) + 1
+            self.SCALE_optic = int(self.optic_scope_width / self.NUM_RAYS) + 1
+
+        self.FOV_optic_zoom = 4
+        self.HALF_FOV_optic_zoom = self.FOV_optic_zoom // 2
+        self.DELTA_ANGLE_optic_zoom = self.FOV_optic_zoom / self.NUM_RAYS
+        self.DIST_optic_zoom = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_optic_zoom * 3.14 / 180))
+        self.PROJ_COEFF_optic_zoom = 210 * self.HEIGHT
+        print(self.PROJ_COEFF_optic_zoom)
+        if self.optic_scope_width % self.NUM_RAYS == 0:
+            self.SCALE_optic_zoom = self.optic_scope_width // self.NUM_RAYS
+        else:
+            self.SCALE_optic_zoom = int(self.optic_scope_width / self.NUM_RAYS) + 1
 
         self.optic_sight_base = pygame.image.load('resources/images/sosna-u_optic.png').convert_alpha()
         self.optic_sight = pygame.transform.scale(self.optic_sight_base,
+                                                  (self.HEIGHT, self.HEIGHT))
+
+        self.optic_sight_zoom_base = pygame.image.load('resources/images/sosna-u_optic_zoom.png').convert_alpha()
+        self.optic_sight_zoom = pygame.transform.scale(self.optic_sight_zoom_base,
                                                   (self.HEIGHT, self.HEIGHT))
         self.gunner_site_base = pygame.image.load('resources/images/gunner_site.png').convert_alpha()
         self.gunner_site = pygame.transform.scale(self.gunner_site_base,
@@ -245,15 +274,7 @@ class Settings:
         self.minimap_tank_tower = pygame.transform.scale(self.minimap_tank_tower_base,
                                                          (self.WIDTH * 0.0625 // self.minimap_k,
                                                           self.WIDTH * 0.0625 // self.minimap_k))
-        self.optic_scope_width = self.HEIGHT
-        if self.optic_scope_width % self.NUM_RAYS == 0:
-            self.SCALE = self.optic_scope_width // self.NUM_RAYS
-        else:
-            self.SCALE = int(self.optic_scope_width / self.NUM_RAYS) + 1
-        self.PROJ_COEFF = 0.3 * self.DIST * self.HEIGHT
-        self.optic_sight = pygame.transform.scale(self.optic_sight_base,
-                                                  (self.HEIGHT, self.HEIGHT))
-        print(self.SCALE, self.NUM_RAYS, self.optic_scope_width)
+
         self.map_width = self.tile_w * len(self.world_map[0])
         self.map_height = self.tile_h * len(self.world_map)
         self.gunner_site = pygame.transform.scale(self.gunner_site_base,
@@ -269,3 +290,23 @@ class Settings:
         self.optic_sight_y = 0.1 * self.WIDTH
         self.optic_sight_w_r = 0.2 * self.WIDTH
         self.optic_sight_h_r = 0.2 * self.WIDTH
+
+        self.optic_scope_width = self.HEIGHT
+        self.PROJ_COEFF_optic = 70 * self.HEIGHT
+
+        if self.optic_scope_width % self.NUM_RAYS == 0:
+            self.SCALE_optic = self.optic_scope_width // self.NUM_RAYS
+        else:
+            self.SCALE_optic = int(self.optic_scope_width / self.NUM_RAYS) + 1
+
+        self.PROJ_COEFF_optic_zoom = 210 * self.HEIGHT
+        if self.optic_scope_width % self.NUM_RAYS == 0:
+            self.SCALE_optic_zoom = self.optic_scope_width // self.NUM_RAYS
+        else:
+            self.SCALE_optic_zoom = int(self.optic_scope_width / self.NUM_RAYS) + 1
+
+        self.optic_sight = pygame.transform.scale(self.optic_sight_base,
+                                                  (self.HEIGHT, self.HEIGHT))
+
+        self.optic_sight_zoom = pygame.transform.scale(self.optic_sight_zoom_base,
+                                                  (self.HEIGHT, self.HEIGHT))

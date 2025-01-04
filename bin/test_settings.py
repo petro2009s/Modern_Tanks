@@ -111,3 +111,5 @@ class TankSettings():
         self.optic_sight_h_r = 100
 
         self.vertical_v = 30
+        self.map_width = self.tile_w * len(world_map[0])
+        self.map_height = self.tile_h * len(world_map)

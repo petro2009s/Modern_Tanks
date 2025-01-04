@@ -9,14 +9,18 @@ from bin.buttons import SelectButton
 class Tank:
     def __init__(self, settings, x, y, movement_angle, minimap_k, x_minimap, y_minimap):
         self.s = settings
+
         self.x = x
         self.y = y
+
         self.stab = True
         self.optic = False
+        self.zoom = False
+
         self.x_minimap = x_minimap
         self.y_minimap = y_minimap
         self.minimap_k = minimap_k
-        self.sq = 0
+
         self.v = 0
         self.depth = '0000'
         self.depth_m = '0000'
@@ -24,15 +28,19 @@ class Tank:
         self.horizontal = 0
         print(self.s.map.world_map, sep='\n')
         print(self.x, self.y)
+
         self.stuck = False
         self.side = min(int(self.s.WIDTH * 0.02), int(self.s.tile_w * 0.8))
         print(self.side)
+
         self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                self.horizontal + self.s.HEIGHT // 2)
+
         self.tank_rect = pygame.Rect(x, y, self.side, self.side)
         self.movement_angle = movement_angle
 
     def start(self):
+        print(sorted(self.s.map.world_map))
         show = True
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
@@ -46,8 +54,10 @@ class Tank:
             optic_sight_button.check(pygame.mouse.get_pos())
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    print(self.s.map.world_map, self.s.map.world_map_dict)
                     pygame.quit()
                     sys.exit()
+
                 if event.type == pygame.USEREVENT:
                     if event.button == optic_sight_button:
                         self.optic_sight()
@@ -137,7 +147,6 @@ class Tank:
         self.sq = s
         dx = s * sin_a
         dy = s * cos_a
-        print(self.x, self.y)
         # self.check_collisions(dx, dy)
         if dx != 0 or dy != 0:
             self.collisions(dx, dy)
@@ -175,14 +184,20 @@ class Tank:
 
         elif keys[pygame.K_UP]:
             self.horizontal += self.s.vertical_v * t
-            self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+            if not self.zoom:
+                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                    self.horizontal + self.s.HEIGHT // 2)
+            else:
+                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                       3 * self.horizontal + self.s.HEIGHT // 2)
         elif keys[pygame.K_DOWN]:
             self.horizontal -= self.s.vertical_v * t
-
-            self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+            if not self.zoom:
+                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                    self.horizontal + self.s.HEIGHT // 2)
-
+            else:
+                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                       3 * self.horizontal + self.s.HEIGHT // 2)
     def mapping(self, a, b):
         return (a // self.s.tile_w) * self.s.tile_w, (b // self.s.tile_h) * self.s.tile_h
 
@@ -193,7 +208,7 @@ class Tank:
         if sight_type == '1':
             x0, y0 = self.x, self.y
             xm, ym = self.mapping(x0, y0)
-            cur_angle = self.angle_of_view - self.s.HALF_FOV + 0.00001
+            cur_angle = self.angle_of_view - self.s.HALF_FOV_optic + 0.00001
             for i in range(self.s.NUM_RAYS):
                 sin_a = math.sin(cur_angle * 3.14 / 180)
                 cos_a = math.cos(cur_angle * 3.14 / 180)
@@ -203,12 +218,19 @@ class Tank:
                 else:
                     x = xm
                     dx = -1
-                for j in range(0, self.s.WIDTH, self.s.tile_w):
+                for j in range(0, self.s.map_width, self.s.tile_w):
                     depth_v = (x - x0) / cos_a
                     yv = y0 + depth_v * sin_a
                     temp = self.mapping_in_map(x + dx, yv)
+                    # print(x + dx, yv)
+
                     if temp in self.s.map.world_map:
                         texture_v = self.s.map.world_map_dict[temp]
+
+                        break
+                    if x > self.s.map_width:
+                        print(1)
+                        texture_v = None
                         break
                     x += dx * self.s.tile_w
 
@@ -218,31 +240,94 @@ class Tank:
                 else:
                     y = ym
                     dy = -1
-                for j in range(0, self.s.HEIGHT, self.s.tile_h):
+                for j in range(0, self.s.map_height, self.s.tile_h):
                     depth_h = (y - y0) / sin_a
                     xh = x0 + depth_h * cos_a
                     temp2 = self.mapping_in_map(xh, y + dy)
                     if temp2 in self.s.map.world_map:
-                        print(temp2)
                         texture_h = self.s.map.world_map_dict[temp2]
                         break
+                    if y > self.s.map_height:
+                        texture_h = None
+                        break
                     y += dy * self.s.tile_h
-
                 depth, offset, texture = (depth_v, yv, texture_v) if depth_v < depth_h else (depth_h, xh, texture_h)
                 offset = int(offset) % self.s.tile_w
                 depth *= math.cos((self.angle_of_view - cur_angle) * 3.14 / 180)
-                proj_height = min(int(self.s.PROJ_COEFF / depth), 3 * self.s.HEIGHT)
+                proj_height = min(int(self.s.PROJ_COEFF_optic / depth), 5 * self.s.HEIGHT)
                 wall_column = self.s.textures[texture].subsurface(offset * self.s.texture_scale, 0,
                                                                   self.s.texture_scale, self.s.texture_h)
-                wall_column = pygame.transform.scale(wall_column, (self.s.SCALE, proj_height))
+                wall_column = pygame.transform.scale(wall_column, (self.s.SCALE_optic, proj_height))
                 self.s.display.blit(wall_column,
-                                    (dr_x + i * self.s.SCALE,
+                                    (dr_x + i * self.s.SCALE_optic,
                                      self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2))
 
                 if int(cur_angle) == int(self.angle_of_view):
                     self.depth = str(depth)
-                cur_angle += self.s.DELTA_ANGLE
+                cur_angle += self.s.DELTA_ANGLE_optic
             self.s.display.blit(self.s.optic_sight, (dr_x, dr_y))
+        elif sight_type == '2':
+            x0, y0 = self.x, self.y
+            xm, ym = self.mapping(x0, y0)
+            cur_angle = self.angle_of_view - self.s.HALF_FOV_optic_zoom + 0.00001
+            for i in range(self.s.NUM_RAYS):
+                sin_a = math.sin(cur_angle * 3.14 / 180)
+                cos_a = math.cos(cur_angle * 3.14 / 180)
+                if cos_a >= 0:
+                    x = xm + self.s.tile_w
+                    dx = 1
+                else:
+                    x = xm
+                    dx = -1
+                for j in range(0, self.s.map_width, self.s.tile_w):
+                    depth_v = (x - x0) / cos_a
+                    yv = y0 + depth_v * sin_a
+                    temp = self.mapping_in_map(x + dx, yv)
+                    # print(x + dx, yv)
+
+                    if temp in self.s.map.world_map:
+                        texture_v = self.s.map.world_map_dict[temp]
+
+                        break
+                    if x > self.s.map_width:
+                        print(1)
+                        texture_v = None
+                        break
+                    x += dx * self.s.tile_w
+
+                if sin_a >= 0:
+                    y = ym + self.s.tile_h
+                    dy = 1
+                else:
+                    y = ym
+                    dy = -1
+                for j in range(0, self.s.map_height, self.s.tile_h):
+                    depth_h = (y - y0) / sin_a
+                    xh = x0 + depth_h * cos_a
+                    temp2 = self.mapping_in_map(xh, y + dy)
+                    if temp2 in self.s.map.world_map:
+                        texture_h = self.s.map.world_map_dict[temp2]
+                        break
+                    if y > self.s.map_height:
+                        print(2)
+                        texture_h = None
+                        break
+                    y += dy * self.s.tile_h
+                depth, offset, texture = (depth_v, yv, texture_v) if depth_v < depth_h else (depth_h, xh, texture_h)
+                offset = int(offset) % self.s.tile_w
+                depth *= math.cos((self.angle_of_view - cur_angle) * 3.14 / 180)
+                proj_height = min(int(self.s.PROJ_COEFF_optic_zoom / depth), 5 * self.s.HEIGHT)
+                wall_column = self.s.textures[texture].subsurface(offset * self.s.texture_scale, 0,
+                                                                  self.s.texture_scale, self.s.texture_h)
+                wall_column = pygame.transform.scale(wall_column, (self.s.SCALE_optic_zoom, proj_height))
+                self.s.display.blit(wall_column,
+                                    (dr_x + i * self.s.SCALE_optic_zoom,
+                                     3 * self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2))
+
+                if int(cur_angle) == int(self.angle_of_view):
+                    self.depth = str(depth)
+                cur_angle += self.s.DELTA_ANGLE_optic_zoom
+            self.s.display.blit(self.s.optic_sight_zoom, (dr_x, dr_y))
 
     def optic_sight(self):
         show = True
@@ -252,8 +337,8 @@ class Tank:
         fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200),
                               str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                               is_topleft=True)
-        depth_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.922, (255, 0, 0),
-                          self.depth_m, int(self.s.WIDTH * 0.04), font_name='resources/fonts/lcd_font.otf'
+        depth_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.916, (255, 0, 0),
+                          self.depth_m, int(self.s.WIDTH * 0.033), font_name='resources/fonts/lcd_font.otf'
                           )
         black = pygame.Rect(self.s.WIDTH // 2 + self.s.HEIGHT // 2, 0, self.s.HEIGHT // 2,
                             self.s.HEIGHT)
@@ -270,11 +355,21 @@ class Tank:
                         show = False
                     if event.key == pygame.K_e:
                         depth_text.set_another_text(self.rangefinder())
+                    if event.key == pygame.K_z:
+                        self.zoom = True if self.zoom is False else False
+                        if self.zoom:
+                            self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                                   3 * self.horizontal + self.s.HEIGHT // 2)
+                        else:
+                            self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                                   self.horizontal + self.s.HEIGHT // 2)
             self.movement()
             self.guidance()
             pygame.draw.rect(self.s.display, (135, 206, 235), self.sky)
-
-            self.ray_casting(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, sight_type='1')
+            if not self.zoom:
+                self.ray_casting(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, sight_type='1')
+            else:
+                self.ray_casting(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, sight_type='2')
             pygame.draw.rect(self.s.display, (0, 0, 0), black)
             self.draw_minimap(self.x_minimap, self.y_minimap)
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
@@ -292,7 +387,6 @@ class Tank:
         depth = '0' * (4 - len(depth)) + depth
         self.depth_m = depth
         return depth
-
 
     def check_wall(self, x, y):
         return (int(x), int(y)) in self.s.map.world_map

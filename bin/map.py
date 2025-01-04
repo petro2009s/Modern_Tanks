@@ -16,6 +16,7 @@ class Map:
                     self.world_map_dict[(i, j)] = '1'
                 elif char == '0':
                     self.world_map_dict[(i, j)] = '0'
+        print(sorted(self.world_map))
     def draw(self, display, x0, y0, k=1, floor=None, walls=None):
         if floor:
             display.blit(floor, (x0, y0))
