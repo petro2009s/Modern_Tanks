@@ -86,12 +86,6 @@ class Settings:
         self.HE_COUNT = 0
         self.HEAT_COUNT = 0
 
-        self.a_w = self.WIDTH * 0.05 * (self.FPS / 60)
-        self.a_s = -self.WIDTH * 0.1 * (self.FPS / 60)
-        self.a_stop = self.WIDTH * 0.1 * (self.FPS / 60)
-        self.max_speed_w = self.WIDTH * 0.2 * (self.FPS / 60)
-        self.max_speed_s = -self.WIDTH * 0.01 * (self.FPS / 60)
-        self.min_speed_ad = self.WIDTH * 0.01 * (self.FPS / 60) * 10 / 60
 
         self.minimap_k = 5
         self.world_map = ['00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
@@ -189,6 +183,15 @@ class Settings:
                                                      (self.WIDTH * 0.0625 // self.minimap_k, self.WIDTH * 0.0625 // self.minimap_k))
         self.minimap_tank_tower = pygame.transform.scale(self.minimap_tank_tower_base,
                                                          (self.WIDTH * 0.0625 // self.minimap_k, self.WIDTH * 0.0625 // self.minimap_k))
+
+        self.side = min(int(self.WIDTH * 0.02), int(self.tile_w * 0.8))
+        self.a_w = self.WIDTH * 0.05 * (self.FPS / 60) * (7 / self.side)
+        self.a_s = -self.WIDTH * 0.1 * (self.FPS / 60) * (7 / self.side)
+        self.a_stop = self.WIDTH * 0.1 * (self.FPS / 60) * (7 / self.side)
+        self.max_speed_w = self.WIDTH * 0.2 * (self.FPS / 60) * (7 / self.side)
+        self.max_speed_s = -self.WIDTH * 0.01 * (self.FPS / 60) * (7 / self.side)
+        self.min_speed_ad = self.WIDTH * 0.01 * (self.FPS / 60) * 10 / 60 * (7 / self.side)
+
         self.tower_v = 20
         self.vertical_v = 30
 
@@ -235,6 +238,12 @@ class Settings:
                                                      (self.texture_w, self.texture_h)),
                          '1': pygame.transform.scale(self.texture_2_base,
                                                      (self.texture_w, self.texture_h))}
+        self.thermal_textures = {'0': (pygame.transform.scale(self.texture_1_base,
+                                                              (self.texture_w, self.texture_h)), 30),
+                                 '1': (pygame.transform.scale(self.texture_2_base,
+                                                              (self.texture_w, self.texture_h)), 20)}
+        for i, j in self.thermal_textures.items():
+            thermal_texture(j[0], 20, 50)
         self.optic_sight_x = 0.5 * self.WIDTH
         self.optic_sight_y = 0.1 * self.WIDTH
         self.optic_sight_w_r = 0.2 * self.WIDTH
@@ -258,15 +267,17 @@ class Settings:
         self.cursor = pygame.transform.scale(self.cursor_base, (self.WIDTH * 0.03125, self.WIDTH * 0.03125))
         self.size_text_b = int(self.WIDTH * 0.01875)
 
-        self.a_w = self.WIDTH * 0.05 * (self.FPS / 60)
-        self.a_s = -self.WIDTH * 0.1 * (self.FPS / 60)
-        self.a_stop = self.WIDTH * 0.1 * (self.FPS / 60)
-        self.max_speed_w = self.WIDTH * 0.2 * (self.FPS / 60)
-        self.max_speed_s = -self.WIDTH * 0.01 * (self.FPS / 60)
-        self.min_speed_ad = self.WIDTH * 0.01 * (self.FPS / 60) * 10 / 60
-
         self.tile_w = (self.WIDTH // len(self.world_map[0]))
         self.tile_h = (self.WIDTH // len(self.world_map[0]))
+        self.side = min(int(self.WIDTH * 0.02), int(self.tile_w * 0.8))
+        self.a_w = self.WIDTH * 0.05 * (self.FPS / 60) * (7 / self.side)
+        self.a_s = -self.WIDTH * 0.1 * (self.FPS / 60) * (7 / self.side)
+        self.a_stop = self.WIDTH * 0.1 * (self.FPS / 60) * (7 / self.side)
+        self.max_speed_w = self.WIDTH * 0.2 * (self.FPS / 60) * (7 / self.side)
+        self.max_speed_s = -self.WIDTH * 0.01 * (self.FPS / 60) * (7 / self.side)
+        self.min_speed_ad = self.WIDTH * 0.01 * (self.FPS / 60) * 10 / 60 * (7 / self.side)
+
+
         self.map = Map(self.world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
         self.minimap_tank_b = pygame.transform.scale(self.minimap_tank_base,
                                                      (self.WIDTH * 0.0625 // self.minimap_k,
@@ -310,3 +321,15 @@ class Settings:
 
         self.optic_sight_zoom = pygame.transform.scale(self.optic_sight_zoom_base,
                                                   (self.HEIGHT, self.HEIGHT))
+
+
+def thermal_texture(surface, t, max_t):
+    w, h = surface.get_size()
+    for x in range(w):
+        for y in range(h):
+            a = surface.get_at((x, y))[3]
+            r, g, b = surface.get_at((x, y))[0:3]
+            color = min(r, g, b)
+            color *= abs(t / max_t)
+            color = max(max(color, 0), 5)
+            surface.set_at((x, y), pygame.Color(color, color, color, a))

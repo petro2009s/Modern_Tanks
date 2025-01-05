@@ -424,6 +424,4 @@ class Tank:
         return (self.x // k, self.y // k)
 
 # #
-# s = TankSettings()
-# ex = Tank(s, 500, 500, 90, 4, 0, 0)
-# ex.start()
+

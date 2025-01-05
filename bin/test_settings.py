@@ -105,6 +105,12 @@ class TankSettings():
                                                      (self.texture_w, self.texture_h)),
                          '1': pygame.transform.scale(self.texture_2_base,
                                                      (self.texture_w, self.texture_h))}
+        self.thermal_textures = {'0': (pygame.transform.scale(self.texture_1_base,
+                                                     (self.texture_w, self.texture_h)), 30),
+                         '1': (pygame.transform.scale(self.texture_2_base,
+                                                     (self.texture_w, self.texture_h)), 20)}
+        for i, j in self.thermal_textures.items():
+            thermal_texture(j[0], 20, 50)
         self.optic_sight_x = 200
         self.optic_sight_y = 200
         self.optic_sight_w_r = 100
@@ -113,3 +119,42 @@ class TankSettings():
         self.vertical_v = 30
         self.map_width = self.tile_w * len(world_map[0])
         self.map_height = self.tile_h * len(world_map)
+
+        self.optic_scope_width = self.HEIGHT
+        self.FOV_optic = 12
+        self.HALF_FOV_optic = self.FOV_optic // 2
+        self.NUM_RAYS = 150
+        self.DELTA_ANGLE_optic = self.FOV_optic / self.NUM_RAYS
+        self.DIST_optic = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_optic * 3.14 / 180))
+        self.PROJ_COEFF_optic = 70 * self.HEIGHT
+
+        if self.optic_scope_width % self.NUM_RAYS == 0:
+            self.SCALE_optic = self.optic_scope_width // self.NUM_RAYS
+        else:
+            self.SCALE_optic = int(self.optic_scope_width / self.NUM_RAYS) + 1
+
+        self.FOV_optic_zoom = 4
+        self.HALF_FOV_optic_zoom = self.FOV_optic_zoom // 2
+        self.DELTA_ANGLE_optic_zoom = self.FOV_optic_zoom / self.NUM_RAYS
+        self.DIST_optic_zoom = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_optic_zoom * 3.14 / 180))
+        self.PROJ_COEFF_optic_zoom = 210 * self.HEIGHT
+        print(self.PROJ_COEFF_optic_zoom)
+        if self.optic_scope_width % self.NUM_RAYS == 0:
+            self.SCALE_optic_zoom = self.optic_scope_width // self.NUM_RAYS
+        else:
+            self.SCALE_optic_zoom = int(self.optic_scope_width / self.NUM_RAYS) + 1
+        self.optic_sight_zoom_base = pygame.image.load('resources/images/sosna-u_optic_zoom.png').convert_alpha()
+        self.optic_sight_zoom = pygame.transform.scale(self.optic_sight_zoom_base,
+                                                      (self.HEIGHT, self.HEIGHT))
+
+
+def thermal_texture(surface, t, max_t):
+    w, h = surface.get_size()
+    for x in range(w):
+        for y in range(h):
+            a = surface.get_at((x, y))[3]
+            r, g, b = surface.get_at((x, y))[0:3]
+            color = min(r, g, b)
+            color *= abs(t / max_t)
+            color = max(max(color, 0), 5)
+            surface.set_at((x, y), pygame.Color(color, color, color, a))
