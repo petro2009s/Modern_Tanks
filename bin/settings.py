@@ -16,7 +16,7 @@ class Settings:
         self.height_m = screeninfo.get_monitors()[0].height
         self.WIDTH = self.bd.select('size_table', 'width')[0][0]
         self.HEIGHT = self.bd.select('size_table', 'height')[0][0]
-        if self.width_m < self.WIDTH or self.height_m < self.HEIGHT:
+        if (self.width_m < self.WIDTH or self.height_m < self.HEIGHT) and self.bd.select('full_table', 'off')[0][0]:
             self.WIDTH = self.width_m
             self.HEIGHT = self.height_m
             self.bd.update_to_db("size_table", "(width, height)", f"({self.WIDTH}, {self.HEIGHT})")
@@ -232,8 +232,8 @@ class Settings:
         self.texture_w = self.WIDTH * 0.6
         self.texture_h = self.WIDTH * 0.6
         self.texture_scale = self.texture_w // self.tile_w
-        self.texture_1_base = pygame.image.load('resources/images/wall.png').convert_alpha()
-        self.texture_2_base = pygame.image.load('resources/images/floor.png').convert_alpha()
+        self.texture_1_base = pygame.image.load('resources/images/forest.png').convert_alpha()
+        self.texture_2_base = pygame.image.load('resources/images/building.png').convert_alpha()
         self.textures = {'0': pygame.transform.scale(self.texture_1_base,
                                                      (self.texture_w, self.texture_h)),
                          '1': pygame.transform.scale(self.texture_2_base,

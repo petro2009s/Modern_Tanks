@@ -54,6 +54,7 @@ class Tank:
             optic_sight_button.check(pygame.mouse.get_pos())
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    self.s.update_db()
                     print(self.s.map.world_map, self.s.map.world_map_dict)
                     pygame.quit()
                     sys.exit()
@@ -347,6 +348,7 @@ class Tank:
             self.s.display.fill((0, 0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    self.s.update_db()
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
