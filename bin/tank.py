@@ -15,6 +15,7 @@ class Tank:
 
         self.stab = True
         self.optic = False
+        self.thermal = False
         self.zoom = False
 
         self.x_minimap = x_minimap
@@ -35,6 +36,9 @@ class Tank:
 
         self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                self.horizontal + self.s.HEIGHT // 2)
+        self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2, self.s.thermal_y, self.s.thermal_width,
+                               self.horizontal + self.s.thermal_height // 2)
+        self.sky_thermal_color = (135 * (20 / self.s.max_t), 135 * (20 / self.s.max_t), 135 * (20 / self.s.max_t))
 
         self.tank_rect = pygame.Rect(x, y, self.side, self.side)
         self.movement_angle = movement_angle
@@ -50,11 +54,13 @@ class Tank:
                               is_topleft=True)
         optic_sight_button = SelectButton(self.s.optic_sight_x, self.s.optic_sight_y, self.s.optic_sight_w_r,
                                           self.s.optic_sight_h_r, 'прицел', font_size=20)
+        thermal_sight_button = SelectButton(self.s.thermal_sight_x, self.s.thermal_sight_y, self.s.thermal_sight_w_r,
+                                          self.s.thermal_sight_h_r, 'прицел', font_size=20)
         while show:
             optic_sight_button.check(pygame.mouse.get_pos())
+            thermal_sight_button.check(pygame.mouse.get_pos())
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.s.update_db()
                     print(self.s.map.world_map, self.s.map.world_map_dict)
                     pygame.quit()
                     sys.exit()
@@ -63,15 +69,20 @@ class Tank:
                     if event.button == optic_sight_button:
                         self.optic_sight()
                         print(1)
+                    elif event.button == thermal_sight_button:
+                        self.thermal_sight()
+                        print(2)
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         print('escape')
                         show = False
                 optic_sight_button.handle_event(event)
+                thermal_sight_button.handle_event(event)
             self.movement()
             self.guidance()
             self.s.display.blit(self.s.gunner_site, (0, 0))
             optic_sight_button.draw(self.s.display)
+            thermal_sight_button.draw(self.s.display)
             self.draw_minimap(self.x_minimap, self.y_minimap)
 
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
@@ -188,17 +199,29 @@ class Tank:
             if not self.zoom:
                 self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                    self.horizontal + self.s.HEIGHT // 2)
+                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                               self.s.thermal_y, self.s.thermal_width,
+                                               self.horizontal + self.s.thermal_height // 2 )
             else:
                 self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                        3 * self.horizontal + self.s.HEIGHT // 2)
+                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                               self.s.thermal_y, self.s.thermal_width,
+                                                self.s.thermal_height // 2 + self.horizontal)
         elif keys[pygame.K_DOWN]:
             self.horizontal -= self.s.vertical_v * t
             if not self.zoom:
                 self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                    self.horizontal + self.s.HEIGHT // 2)
+                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                               self.s.thermal_y, self.s.thermal_width,
+                                               self.s.thermal_height // 2 + self.horizontal)
             else:
                 self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                        3 * self.horizontal + self.s.HEIGHT // 2)
+                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                               self.s.thermal_y, self.s.thermal_width,
+                                               self.s.thermal_height // 2 + self.horizontal)
     def mapping(self, a, b):
         return (a // self.s.tile_w) * self.s.tile_w, (b // self.s.tile_h) * self.s.tile_h
 
@@ -330,6 +353,69 @@ class Tank:
                 cur_angle += self.s.DELTA_ANGLE_optic_zoom
             self.s.display.blit(self.s.optic_sight_zoom, (dr_x, dr_y))
 
+        elif sight_type == '3':
+            x0, y0 = self.x, self.y
+            xm, ym = self.mapping(x0, y0)
+            cur_angle = self.angle_of_view - self.s.HALF_FOV_thermal + 0.00001
+            for i in range(self.s.NUM_RAYS):
+                sin_a = math.sin(cur_angle * 3.14 / 180)
+                cos_a = math.cos(cur_angle * 3.14 / 180)
+                if cos_a >= 0:
+                    x = xm + self.s.tile_w
+                    dx = 1
+                else:
+                    x = xm
+                    dx = -1
+                for j in range(0, self.s.map_width, self.s.tile_w):
+                    depth_v = (x - x0) / cos_a
+                    yv = y0 + depth_v * sin_a
+                    temp = self.mapping_in_map(x + dx, yv)
+                    # print(x + dx, yv)
+
+                    if temp in self.s.map.world_map:
+                        texture_v = self.s.map.world_map_dict[temp]
+
+                        break
+                    if x > self.s.map_width:
+                        print(1)
+                        texture_v = None
+                        break
+                    x += dx * self.s.tile_w
+
+                if sin_a >= 0:
+                    y = ym + self.s.tile_h
+                    dy = 1
+                else:
+                    y = ym
+                    dy = -1
+                for j in range(0, self.s.map_height, self.s.tile_h):
+                    depth_h = (y - y0) / sin_a
+                    xh = x0 + depth_h * cos_a
+                    temp2 = self.mapping_in_map(xh, y + dy)
+                    if temp2 in self.s.map.world_map:
+                        texture_h = self.s.map.world_map_dict[temp2]
+                        break
+                    if y > self.s.map_height:
+                        print(2)
+                        texture_h = None
+                        break
+                    y += dy * self.s.tile_h
+                depth, offset, texture = (depth_v, yv, texture_v) if depth_v < depth_h else (depth_h, xh, texture_h)
+                offset = int(offset) % self.s.tile_w
+                depth *= math.cos((self.angle_of_view - cur_angle) * 3.14 / 180)
+                proj_height = min(int(self.s.PROJ_COEFF_thermal / depth), 5 * self.s.thermal_height)
+                wall_column = self.s.thermal_textures[texture][0].subsurface(offset * self.s.texture_scale, 0,
+                                                                  self.s.texture_scale, self.s.texture_h)
+                wall_column = pygame.transform.scale(wall_column, (self.s.SCALE_thermal, proj_height))
+                self.s.display.blit(wall_column,
+                                    (dr_x + i * self.s.SCALE_thermal,
+                                     self.horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2))
+
+                if int(cur_angle) == int(self.angle_of_view):
+                    self.depth = str(depth)
+                cur_angle += self.s.DELTA_ANGLE_thermal
+
+
     def optic_sight(self):
         show = True
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
@@ -348,7 +434,6 @@ class Tank:
             self.s.display.fill((0, 0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.s.update_db()
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
@@ -383,6 +468,66 @@ class Tank:
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
         self.optic = False
+
+    def thermal_sight(self):
+        show = True
+        fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
+                                 str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
+                                 is_topleft=True)
+        fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200),
+                              str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
+                              is_topleft=True)
+        depth_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.916, (255, 0, 0),
+                          self.depth_m, int(self.s.WIDTH * 0.033), font_name='resources/fonts/lcd_font.otf'
+                          )
+        floor = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2, 0, self.s.thermal_width,
+                            self.s.HEIGHT)
+        z = pygame.Rect(self.s.thermal_x + self.s.thermal_base_width * 1.1, 0, self.s.WIDTH - self.s.thermal_x - self.s.thermal_base_width,
+                            self.s.HEIGHT)
+        self.thermal = True
+        while show:
+            self.s.display.fill((150, 150, 150))
+            pygame.draw.rect(self.s.display, (10, 10, 10), floor)
+            pygame.draw.rect(self.s.display, self.sky_thermal_color, self.sky_thermal)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        show = False
+                    # if event.key == pygame.K_e:
+                    #     # depth_text.set_another_text(self.rangefinder())
+                    # if event.key == pygame.K_z:
+                    #     self.zoom = True if self.zoom is False else False
+                    #     if self.zoom:
+                    #         self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                    #                                3 * self.horizontal + self.s.HEIGHT // 2)
+                    #     else:
+                    #         self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                    #                                self.horizontal + self.s.HEIGHT // 2)
+            self.movement()
+            self.guidance()
+            if not self.zoom:
+                self.ray_casting(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2, self.s.thermal_y, sight_type='3')
+            else:
+                self.ray_casting(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2, self.s.thermal_y, sight_type='3')
+            # pygame.draw.rect(self.s.display, (135, 206, 235), self.sky)
+            # pygame.draw.rect(self.s.display, (0, 0, 0), black)
+            pygame.draw.rect(self.s.display, (150, 150, 150), z)
+            self.s.display.blit(self.s.thermal_image, ((self.s.WIDTH - self.s.thermal_base_width) // 2, 0))
+
+            self.draw_minimap(self.x_minimap, self.y_minimap)
+            fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
+            fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
+            fps_count_text_bl.draw(self.s.display)
+            fps_count_text.draw(self.s.display)
+            # depth_text.draw(self.s.display)
+
+            pygame.display.flip()
+            self.s.clock.tick(self.s.FPS)
+        self.thermal = False
 
     def rangefinder(self):
         depth = str(min(int(float(self.depth) * (7 / self.side)), 9999))
@@ -425,5 +570,7 @@ class Tank:
     def pos(self, k=1):
         return (self.x // k, self.y // k)
 
-# #
-
+#
+# s = TankSettings()
+# ex = Tank(s, 120, 120, 0, 5, 0, 0)
+# ex.start()

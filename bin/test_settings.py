@@ -146,7 +146,27 @@ class TankSettings():
         self.optic_sight_zoom_base = pygame.image.load('resources/images/sosna-u_optic_zoom.png').convert_alpha()
         self.optic_sight_zoom = pygame.transform.scale(self.optic_sight_zoom_base,
                                                       (self.HEIGHT, self.HEIGHT))
+        self.thermal_sight_h_r = 100
+        self.thermal_sight_w_r = 100
+        self.thermal_sight_x = 0
+        self.thermal_sight_y = 0
 
+        self.thermal_base = pygame.image.load('resources/images/sosna-thermal_base.png').convert_alpha()
+        self.thermal_image = pygame.transform.scale(self.thermal_base,
+                                                  (self.HEIGHT, self.HEIGHT))
+        self.thermal_base_width = self.HEIGHT
+        self.thermal_width = self.HEIGHT / 13.4 * 11
+        self.thermal_x = self.HEIGHT / 13.4 * 1.2
+
+        self.FOV_thermal = 4
+        self.HALF_FOV_thermal = self.FOV_thermal // 2
+        self.DELTA_ANGLE_thermal = self.FOV_thermal / self.NUM_RAYS
+        self.DIST_thermal = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_thermal * 3.14 / 180))
+        self.PROJ_COEFF_thermal = 210 * self.HEIGHT
+        if self.thermal_width % self.NUM_RAYS == 0:
+            self.SCALE_thermal = self.thermal_width // self.NUM_RAYS
+        else:
+            self.SCALE_thermal = int(self.thermal_width // self.NUM_RAYS) + 1
 
 def thermal_texture(surface, t, max_t):
     w, h = surface.get_size()

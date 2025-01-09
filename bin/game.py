@@ -306,6 +306,10 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        sett = False
+
                 if event.type == pygame.USEREVENT:
                     if event.button == back_button:
                         sett = False
@@ -647,6 +651,10 @@ class Game:
                     self.s.update_db()
                     pygame.quit()
                     sys.exit()
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        gm = False
 
                 if event.type == pygame.USEREVENT:
                     if event.button == back_button:
