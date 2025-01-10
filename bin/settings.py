@@ -385,8 +385,7 @@ class Settings:
         self.thermal_width = self.HEIGHT * 1.225 / 13.4 * 11.15
         self.thermal_height = self.HEIGHT / 14.2 * 11
 
-        self.DIST_thermal = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_thermal * 3.14 / 180))
-        self.PROJ_COEFF_thermal = 35 * self.thermal_height
+        self.PROJ_COEFF_thermal = 95 * self.thermal_height
         if self.thermal_width % self.NUM_RAYS == 0:
             self.SCALE_thermal = self.thermal_width // self.NUM_RAYS
         else:
