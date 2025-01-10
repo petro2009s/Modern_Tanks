@@ -231,9 +231,11 @@ class Settings:
         self.gunner_site = pygame.transform.scale(self.gunner_site_base,
                                                   (self.WIDTH, self.HEIGHT))
         self.max_t = 50
-        self.texture_w = self.WIDTH * 0.6
+        self.texture_w = self.WIDTH * 0.6 * 1.44
         self.texture_h = self.WIDTH * 0.6
-        self.texture_scale = self.texture_w // self.tile_w
+
+        self.texture_scale = self.texture_w // self.tile_w if self.texture_w % self.tile_w == 0 else self.texture_w // self.tile_w + 1
+
         self.texture_1_base = pygame.image.load('resources/images/forest.png').convert_alpha()
         self.texture_2_base = pygame.image.load('resources/images/building.png').convert_alpha()
         self.textures = {'0': pygame.transform.scale(self.texture_1_base,
@@ -259,22 +261,41 @@ class Settings:
         self.thermal_base = pygame.image.load('resources/images/sosna-thermal_base.png').convert_alpha()
         self.thermal_image = pygame.transform.scale(self.thermal_base,
                                                   (self.HEIGHT * 1.225, self.HEIGHT))
+
+
         self.thermal_base_width = self.HEIGHT * 1.225
+
         self.thermal_width = self.HEIGHT * 1.225 / 13.4 * 11.15
         self.thermal_height = self.HEIGHT / 14.2 * 11
-        self.FOV_thermal = 24
+        self.FOV_thermal = 9
         self.HALF_FOV_thermal = self.FOV_thermal // 2
         self.DELTA_ANGLE_thermal = self.FOV_thermal / self.NUM_RAYS
         self.DIST_thermal = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_thermal * 3.14 / 180))
-        self.PROJ_COEFF_thermal = 35 * self.thermal_height
+        self.PROJ_COEFF_thermal = 95 * self.thermal_height
         if self.thermal_width % self.NUM_RAYS == 0:
             self.SCALE_thermal = self.thermal_width // self.NUM_RAYS
             print('scale int')
         else:
             self.SCALE_thermal = int(self.thermal_width // self.NUM_RAYS) + 1
             print('not')
+
         self.thermal_x = self.HEIGHT / 13.4 * 1.4
         self.thermal_y = self.HEIGHT / 14.2 * 1.57
+
+        self.FOV_thermal_zoom = 3
+        self.HALF_FOV_thermal_zoom = self.FOV_thermal_zoom // 2
+        self.DELTA_ANGLE_thermal_zoom = self.FOV_thermal_zoom / self.NUM_RAYS
+        self.DIST_thermal_zoom = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_thermal_zoom * 3.14 / 180))
+        self.PROJ_COEFF_thermal_zoom = 285 * self.thermal_height
+
+        self.thermal_sight_base = pygame.image.load('resources/images/sosna_u_thermal.png').convert_alpha()
+        self.thermal_sight = pygame.transform.scale(self.thermal_sight_base,
+                                                    (self.thermal_width, self.thermal_height))
+        self.thermal_sight_zoom_base = pygame.image.load('resources/images/sosna-u_thermal_zoom.png').convert_alpha()
+        self.thermal_sight_zoom = pygame.transform.scale(self.thermal_sight_zoom_base,
+                                                    (self.thermal_width, self.thermal_height))
+
+
     def update_db(self):
         self.bd.update_to_db("graph_table", "(low, mid, high)",
                              f"({self.graph_dict[0]}, {self.graph_dict[1]}, {self.graph_dict[2]})")
@@ -315,7 +336,7 @@ class Settings:
         self.map_height = self.tile_h * len(self.world_map)
         self.gunner_site = pygame.transform.scale(self.gunner_site_base,
                                                   (self.WIDTH, self.HEIGHT))
-        self.texture_w = self.WIDTH * 0.6
+        self.texture_w = self.WIDTH * 0.6 * 1.44
         self.texture_h = self.WIDTH * 0.6
         self.texture_scale = self.texture_w // self.tile_w
         self.textures = {'0': pygame.transform.scale(self.texture_1_base,
@@ -372,6 +393,12 @@ class Settings:
             self.SCALE_thermal = int(self.thermal_width // self.NUM_RAYS) + 1
         self.thermal_x = self.HEIGHT / 13.4 * 1.4
         self.thermal_y = self.HEIGHT / 14.2 * 1.57
+
+        self.PROJ_COEFF_thermal_zoom = 285 * self.thermal_height
+        self.thermal_sight = pygame.transform.scale(self.thermal_sight_base,
+                                                    (self.thermal_width, self.thermal_height))
+        self.thermal_sight_zoom = pygame.transform.scale(self.thermal_sight_zoom_base,
+                                                    (self.thermal_width, self.thermal_height))
 
 def thermal_texture(surface, t, max_t):
     w, h = surface.get_size()
