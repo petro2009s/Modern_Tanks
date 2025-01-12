@@ -756,5 +756,5 @@ class Game:
 
     def play(self):
         print(self.s.WIDTH // 2, self.s.HEIGHT // 2)
-        tank = Tank(self.s, self.s.map_width // 2, self.s.map_height // 2, 90, self.s.minimap_k, 0, 0)
+        tank = Tank(self.s, self.s.map_width // 2, self.s.map_height // 2, 0, self.s.minimap_k, 0, 0)
         tank.start()
