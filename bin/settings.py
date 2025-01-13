@@ -309,6 +309,29 @@ class Settings:
         self.suo_w_r = self.WIDTH * 0.14
         self.suo_h_r = self.WIDTH * 0.1
 
+        self.thermal_width_d = self.WIDTH * 5 / 37
+        self.thermal_height_d = self.HEIGHT * 0.8 / 20.5
+        print(self.thermal_width_d, 'gfhfd')
+
+        self.PROJ_COEFF_thermal_d = 30 * self.thermal_height
+        self.PROJ_COEFF_thermal_zoom_extra_d = 180 * self.thermal_height
+        self.PROJ_COEFF_thermal_zoom_d = 90 * self.thermal_height
+        if self.thermal_width_d % self.NUM_RAYS == 0:
+            self.SCALE_thermal_d = self.thermal_width_d // self.NUM_RAYS
+            print(11241232)
+        else:
+            print(2432342)
+            self.SCALE_thermal_d = int(self.thermal_width_d // self.NUM_RAYS) + 1
+        self.thermal_x_d = self.WIDTH * 9.1 / 37
+        self.thermal_y_d = self.HEIGHT * 11 / 20.5
+        self.thermal_y_d_2 = self.HEIGHT * 9.4 / 20.5
+        self.thermal_sight_d = pygame.transform.scale(self.thermal_sight_base,
+                                                    (self.thermal_width / 4, self.thermal_height / 4))
+        self.thermal_sight_zoom_d = pygame.transform.scale(self.thermal_sight_zoom_base,
+                                                      (self.thermal_width / 4, self.thermal_height / 4))
+        self.gunner_site_base2 = pygame.image.load('resources/images/gunner_site2.png').convert_alpha()
+        self.gunner_site2 = pygame.transform.scale(self.gunner_site_base2,
+                                                  (self.WIDTH, self.HEIGHT))
     def update_db(self):
         self.bd.update_to_db("graph_table", "(low, mid, high)",
                              f"({self.graph_dict[0]}, {self.graph_dict[1]}, {self.graph_dict[2]})")
@@ -412,6 +435,7 @@ class Settings:
         self.thermal_x = self.HEIGHT / 13.4 * 1.4
         self.thermal_y = self.HEIGHT / 14.2 * 1.57
 
+
         self.PROJ_COEFF_thermal_zoom = 285 * self.thermal_height
         self.thermal_sight = pygame.transform.scale(self.thermal_sight_base,
                                                     (self.thermal_width, self.thermal_height))
@@ -420,10 +444,36 @@ class Settings:
 
         self.DIST_thermal_zoom_extra = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_thermal_zoom_extra * 3.14 / 180))
         self.PROJ_COEFF_thermal_zoom_extra = 570 * self.thermal_height
+
         self.suo_x = self.WIDTH * 0.83
         self.suo_y = self.WIDTH * 0.39
         self.suo_w_r = self.WIDTH * 0.14
         self.suo_h_r = self.WIDTH * 0.1
+        self.suo_x = self.WIDTH * 0.83
+        self.suo_y = self.WIDTH * 0.39
+        self.suo_w_r = self.WIDTH * 0.14
+        self.suo_h_r = self.WIDTH * 0.1
+
+        self.thermal_width_d = self.WIDTH * 5 / 37
+        self.thermal_height_d = self.HEIGHT * 0.8 / 20.5
+
+        self.PROJ_COEFF_thermal_d = 30 * self.thermal_height
+        self.PROJ_COEFF_thermal_zoom_extra_d = 180 * self.thermal_height
+        self.PROJ_COEFF_thermal_zoom_d = 90 * self.thermal_height
+        if self.thermal_width_d % self.NUM_RAYS == 0:
+            self.SCALE_thermal_d = self.thermal_width_d // self.NUM_RAYS
+        else:
+            self.SCALE_thermal_d = int(self.thermal_width_d // self.NUM_RAYS) + 1
+        self.thermal_x_d = self.WIDTH * 9.1 / 37
+        self.thermal_y_d = self.HEIGHT * 11 / 20.5
+        self.thermal_y_d_2 = self.HEIGHT * 9.4 / 20.5
+        self.thermal_sight_d = pygame.transform.scale(self.thermal_sight_base,
+                                                    (self.thermal_width / 4, self.thermal_height / 4))
+        self.thermal_sight_zoom_d = pygame.transform.scale(self.thermal_sight_zoom_base,
+                                                      (self.thermal_width / 4, self.thermal_height / 4))
+        self.gunner_site2 = pygame.transform.scale(self.gunner_site_base2,
+                                                  (self.WIDTH, self.HEIGHT))
+
 
 def thermal_texture(surface, t, max_t):
     w, h = surface.get_size()
