@@ -9,7 +9,7 @@ from bin.buttons import SelectButton
 
 
 class Tank:
-    def __init__(self, settings, x, y, movement_angle, minimap_k, x_minimap, y_minimap):
+    def __init__(self, settings, x, y, movement_angle, minimap_k, x_minimap, y_minimap, apfsds_c=1, he_c=1, heat_c=1):
         self.s = settings
 
         self.x = x
@@ -24,10 +24,25 @@ class Tank:
         self.lock = False
         self.lock_on = False
         self.extra_zoom = False
+        self.ready = True
+        self.block = False
+        self.is_shot = False
+        self.reload = False
 
         self.x_minimap = x_minimap
         self.y_minimap = y_minimap
         self.minimap_k = minimap_k
+
+        self.apfsds_c, self.he_c, self.heat_c = apfsds_c, he_c, heat_c
+        self.ammo_list = [self.apfsds_c, self.he_c, self.heat_c]
+        self.ammo_list_text = ['БР', 'ОФ', 'КС']
+        self.current_ammo = 0
+        self.current_ammo_in_gun = 0
+
+        self.shot_timer = 0
+        self.shot_time = 2
+        self.reload_timer = 0
+        self.reload_time = self.s.reload_time
 
         self.v = 0
         self.depth = '0000'
@@ -92,16 +107,37 @@ class Tank:
                            self.depth_m[3], int(self.s.WIDTH * 0.008),
                            font_name='resources/fonts/depth_thermal_font.ttf'
                            )
-        ssu_text = Text(self.s.thermal_x_d * 1.06, self.s.thermal_y_d_2 * 1.393, (183, 183, 183),
-                        'ССУ', int(self.s.WIDTH * 0.006),
+        ammo_text1 = Text(self.s.thermal_x_d * 1.165, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
+                          self.ammo_list_text[self.current_ammo][0], int(self.s.WIDTH * 0.008),
+                          font_name='resources/fonts/depth_thermal_font.ttf'
+                          )
+        ammo_text2 = Text(self.s.thermal_x_d * 1.201, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
+                          self.ammo_list_text[self.current_ammo][1], int(self.s.WIDTH * 0.008),
+                          font_name='resources/fonts/depth_thermal_font.ttf'
+                          )
+        ssu_text = Text(self.s.thermal_x_d * 1.12, self.s.thermal_y_d_2 * 1.393, (183, 183, 183),
+                        'ССУ               ОК', int(self.s.WIDTH * 0.006),
                         font_name='resources/fonts/depth_thermal_font.ttf'
                         )
         floor = pygame.Rect(self.s.thermal_x_d, 0, self.s.thermal_width,
                             self.s.HEIGHT)
+        ready_text1 = Text(self.s.thermal_x_d * 1.0354, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
+                           'Г', int(self.s.WIDTH * 0.008),
+                           font_name='resources/fonts/depth_thermal_font.ttf'
+                           )
+        ready_text2 = Text(self.s.thermal_x_d * 1.0687, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
+                           'О', int(self.s.WIDTH * 0.008),
+                           font_name='resources/fonts/depth_thermal_font.ttf'
+                           )
+        ready_text3 = Text(self.s.thermal_x_d * 1.107, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
+                           'Т', int(self.s.WIDTH * 0.008),
+                           font_name='resources/fonts/depth_thermal_font.ttf'
+                           )
         while show:
             optic_sight_button.check(pygame.mouse.get_pos())
             thermal_sight_button.check(pygame.mouse.get_pos())
             suo_button.check(pygame.mouse.get_pos())
+            self.timer()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     print(self.s.map.world_map, self.s.map.world_map_dict)
@@ -157,6 +193,8 @@ class Tank:
                         depth_text2.set_another_text(d[1])
                         depth_text3.set_another_text(d[2])
                         depth_text4.set_another_text(d[3])
+                        ammo_text1.set_another_text(self.ammo_list_text[self.current_ammo][0])
+                        ammo_text2.set_another_text(self.ammo_list_text[self.current_ammo][1])
                         print(2)
                         if self.zoom:
                             self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
@@ -193,6 +231,7 @@ class Tank:
                                                              self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
                     elif event.button == suo_button:
                         self.suo()
+
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         print('escape')
@@ -254,6 +293,15 @@ class Tank:
                             self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                              self.s.thermal_y_d_2, self.s.thermal_width,
                                                              self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                    self.ammo(event, [ammo_text1, ammo_text2])
+                    if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
+                            self.ammo_list[self.current_ammo] > 0:
+                        self.reload = True
+                        self.block = True
+                        print(self.ammo_list)
+                        self.current_ammo_in_gun = int(str(self.current_ammo)[:])
+                        print(self.ammo_list)
+
                 optic_sight_button.handle_event(event)
                 thermal_sight_button.handle_event(event)
                 suo_button.handle_event(event)
@@ -280,6 +328,12 @@ class Tank:
                     depth_text2.draw(self.s.display)
                     depth_text3.draw(self.s.display)
                     depth_text4.draw(self.s.display)
+                    ammo_text1.draw(self.s.display)
+                    ammo_text2.draw(self.s.display)
+                    if self.ready:
+                        ready_text1.draw(self.s.display)
+                        ready_text2.draw(self.s.display)
+                        ready_text3.draw(self.s.display)
                 else:
                     ssu_text.draw(self.s.display)
             self.s.display.blit(self.s.gunner_site2)
@@ -406,68 +460,70 @@ class Tank:
             self.angle_of_view -= self.s.tower_v * t
 
         elif keys[pygame.K_UP]:
-            self.horizontal += self.s.vertical_v * t
-            self.thermal_horizontal += self.s.vertical_v * t
-            self.thermal_horizontal_d += self.s.vertical_v * t / 5
-            if self.zoom:
-                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                       3 * self.horizontal + self.s.HEIGHT // 2)
-                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                               self.s.thermal_y, self.s.thermal_width,
-                                               3 * self.thermal_horizontal + self.s.thermal_height // 2)
-                self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                 self.s.thermal_y_d_2, self.s.thermal_width,
-                                                 3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+            if self.block is False:
+                self.horizontal += self.s.vertical_v * t
+                self.thermal_horizontal += self.s.vertical_v * t
+                self.thermal_horizontal_d += self.s.vertical_v * t / 5
+                if self.zoom:
+                    self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                           3 * self.horizontal + self.s.HEIGHT // 2)
+                    self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                                   self.s.thermal_y, self.s.thermal_width,
+                                                   3 * self.thermal_horizontal + self.s.thermal_height // 2)
+                    self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                     self.s.thermal_y_d_2, self.s.thermal_width,
+                                                     3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
 
-            elif self.extra_zoom:
-                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                       6 * self.horizontal + self.s.HEIGHT // 2)
-                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                               self.s.thermal_y, self.s.thermal_width,
-                                               6 * self.thermal_horizontal + self.s.thermal_height // 2)
-                self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                 self.s.thermal_y_d_2, self.s.thermal_width,
-                                                 6 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
-            else:
-                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                       self.horizontal + self.s.HEIGHT // 2)
-                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                               self.s.thermal_y, self.s.thermal_width,
-                                               self.thermal_horizontal + self.s.thermal_height // 2)
-                self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                 self.s.thermal_y_d_2, self.s.thermal_width,
-                                                 self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                elif self.extra_zoom:
+                    self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                           6 * self.horizontal + self.s.HEIGHT // 2)
+                    self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                                   self.s.thermal_y, self.s.thermal_width,
+                                                   6 * self.thermal_horizontal + self.s.thermal_height // 2)
+                    self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                     self.s.thermal_y_d_2, self.s.thermal_width,
+                                                     6 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                else:
+                    self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                           self.horizontal + self.s.HEIGHT // 2)
+                    self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                                   self.s.thermal_y, self.s.thermal_width,
+                                                   self.thermal_horizontal + self.s.thermal_height // 2)
+                    self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                     self.s.thermal_y_d_2, self.s.thermal_width,
+                                                     self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
         elif keys[pygame.K_DOWN]:
-            self.horizontal -= self.s.vertical_v * t
-            self.thermal_horizontal -= self.s.vertical_v * t
-            self.thermal_horizontal_d -= self.s.vertical_v * t / 5
-            if self.zoom:
-                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                       3 * self.horizontal + self.s.HEIGHT // 2)
-                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                               self.s.thermal_y, self.s.thermal_width,
-                                               3 * self.thermal_horizontal + self.s.thermal_height // 2)
-                self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                 self.s.thermal_y_d_2, self.s.thermal_width,
-                                                 3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
-            elif self.extra_zoom:
-                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                       6 * self.horizontal + self.s.HEIGHT // 2)
-                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                               self.s.thermal_y, self.s.thermal_width,
-                                               6 * self.thermal_horizontal + self.s.thermal_height // 2)
-                self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                 self.s.thermal_y_d_2, self.s.thermal_width,
-                                                 6 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
-            else:
-                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                       self.horizontal + self.s.HEIGHT // 2)
-                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                               self.s.thermal_y, self.s.thermal_width,
-                                               self.s.thermal_height // 2 + self.thermal_horizontal)
-                self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                 self.s.thermal_y_d_2, self.s.thermal_width,
-                                                 self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+            if self.block is False:
+                self.horizontal -= self.s.vertical_v * t
+                self.thermal_horizontal -= self.s.vertical_v * t
+                self.thermal_horizontal_d -= self.s.vertical_v * t / 5
+                if self.zoom:
+                    self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                           3 * self.horizontal + self.s.HEIGHT // 2)
+                    self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                                   self.s.thermal_y, self.s.thermal_width,
+                                                   3 * self.thermal_horizontal + self.s.thermal_height // 2)
+                    self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                     self.s.thermal_y_d_2, self.s.thermal_width,
+                                                     3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                elif self.extra_zoom:
+                    self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                           6 * self.horizontal + self.s.HEIGHT // 2)
+                    self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                                   self.s.thermal_y, self.s.thermal_width,
+                                                   6 * self.thermal_horizontal + self.s.thermal_height // 2)
+                    self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                     self.s.thermal_y_d_2, self.s.thermal_width,
+                                                     6 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                else:
+                    self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                           self.horizontal + self.s.HEIGHT // 2)
+                    self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                                   self.s.thermal_y, self.s.thermal_width,
+                                                   self.s.thermal_height // 2 + self.thermal_horizontal)
+                    self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                     self.s.thermal_y_d_2, self.s.thermal_width,
+                                                     self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
         if self.type == 0:
             self.horizontal = self.tryaska
             self.thermal_horizontal = self.tryaska
@@ -481,7 +537,7 @@ class Tank:
                                                3 * self.thermal_horizontal + self.s.thermal_height // 2)
                 self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                  self.s.thermal_y_d_2, self.s.thermal_width,
-                                                3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                                                 3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
 
             elif self.extra_zoom:
                 self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
@@ -491,7 +547,7 @@ class Tank:
                                                6 * self.thermal_horizontal + self.s.thermal_height // 2)
                 self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                  self.s.thermal_y_d_2, self.s.thermal_width,
-                                                6 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                                                 6 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
             else:
                 self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                        self.horizontal + self.s.HEIGHT // 2)
@@ -540,8 +596,8 @@ class Tank:
                                                self.s.thermal_y, self.s.thermal_width,
                                                3 * self.thermal_horizontal + self.s.thermal_height // 2)
                 self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                               self.s.thermal_y_d_2, self.s.thermal_width,
-                                              3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                                                 self.s.thermal_y_d_2, self.s.thermal_width,
+                                                 3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
 
             elif self.extra_zoom:
                 self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
@@ -562,12 +618,39 @@ class Tank:
                                                  self.s.thermal_y_d_2, self.s.thermal_width,
                                                  self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
 
+    def ammo(self, event, text):
+        if event.key == pygame.K_1:
+            self.current_ammo = 0
+        elif event.key == pygame.K_2:
+            self.current_ammo = 1
+        elif event.key == pygame.K_3:
+            self.current_ammo = 2
+        if len(text) > 1:
+            for i in range(len(text)):
+                text[i].set_another_text(self.ammo_list_text[self.current_ammo][i])
+        else:
+            text[0].set_another_text(self.ammo_list_text[self.current_ammo])
+
     def suo(self):
         self.stab = True if self.stab is False else False
         self.rangefinder_suo = True if self.rangefinder_suo is False else False
         self.thermal_on = True if self.thermal_on is False else False
         self.lock_on = True if self.lock_on is False else False
 
+    def timer(self):
+        if self.shot_timer >= self.shot_time:
+            self.is_shot = False
+            self.block = False
+            self.shot_timer = 0
+        if self.reload_timer >= self.reload_time:
+            self.reload = False
+            self.block = False
+            self.ready = True
+            self.reload_timer = 0
+        if self.is_shot:
+            self.shot_timer += 1 / self.s.FPS
+        if self.reload:
+            self.reload_timer += 1 / self.s.FPS
     def mapping(self, a, b):
         return (a // self.s.tile_w) * self.s.tile_w, (b // self.s.tile_h) * self.s.tile_h
 
@@ -1170,6 +1253,7 @@ class Tank:
 
     def optic_sight(self):
         show = True
+
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                                  is_topleft=True)
@@ -1184,6 +1268,10 @@ class Tank:
                             self.s.HEIGHT)
         floor = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                             self.s.HEIGHT)
+        ammo_text = Text(self.s.WIDTH * 0.48, self.s.HEIGHT * 0.98, (255, 0, 0),
+                         self.ammo_list_text[self.current_ammo], int(self.s.WIDTH * 0.033),
+                         font_name='resources/fonts/lcd_font.otf'
+                         )
         self.optic = True
         if not self.zoom:
             self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
@@ -1202,9 +1290,10 @@ class Tank:
                                            3 * self.thermal_horizontal + self.s.thermal_height // 2)
             self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                              self.s.thermal_y_d_2, self.s.thermal_width,
-                                            3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                                             3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
         while show:
             self.s.display.fill((0, 0, 0))
+            self.timer()
             pygame.draw.rect(self.s.display, (53, 104, 45), floor)
 
             for event in pygame.event.get():
@@ -1228,7 +1317,7 @@ class Tank:
                                 3 * self.thermal_horizontal + self.s.thermal_height // 2)
                             self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                              self.s.thermal_y_d_2, self.s.thermal_width,
-                                                            3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                                                             3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
                         else:
                             self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                                    self.horizontal + self.s.HEIGHT // 2)
@@ -1239,6 +1328,22 @@ class Tank:
                             self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                              self.s.thermal_y_d_2, self.s.thermal_width,
                                                              self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                    self.ammo(event, [ammo_text])
+                    if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
+                            self.ammo_list[self.current_ammo] > 0:
+                        self.reload = True
+                        self.block = True
+                        print(self.ammo_list)
+                        self.current_ammo_in_gun = int(str(self.current_ammo)[:])
+                        print(self.ammo_list)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == pygame.BUTTON_LEFT:
+                        print(1)
+                        if self.ready:
+                            self.ammo_list[self.current_ammo] -= 1
+                            self.ready = False
+                            self.is_shot = True
+                            self.block = True
             self.movement()
             self.guidance()
             pygame.draw.rect(self.s.display, (135, 206, 235), self.sky)
@@ -1254,10 +1359,14 @@ class Tank:
             fps_count_text.draw(self.s.display)
 
             depth_text.draw(self.s.display)
+            ammo_text.draw((self.s.display))
 
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
         self.optic = False
+
+    def shot(self):
+        pass
 
     def thermal_sight(self):
         show = True
@@ -1284,10 +1393,30 @@ class Tank:
                            self.depth_m[3], int(self.s.WIDTH * 0.03),
                            font_name='resources/fonts/depth_thermal_font.ttf'
                            )
-        ssu_text = Text(self.s.WIDTH * 0.274, self.s.HEIGHT * 0.823, (183, 183, 183),
-                        'ССУ', int(self.s.WIDTH * 0.028),
+        ammo_text1 = Text(self.s.WIDTH * 0.377, self.s.HEIGHT * 0.8275, (183, 183, 183),
+                          self.ammo_list_text[self.current_ammo][0], int(self.s.WIDTH * 0.030),
+                          font_name='resources/fonts/depth_thermal_font.ttf'
+                          )
+        ammo_text2 = Text(self.s.WIDTH * 0.409, self.s.HEIGHT * 0.8275, (183, 183, 183),
+                          self.ammo_list_text[self.current_ammo][1], int(self.s.WIDTH * 0.03),
+                          font_name='resources/fonts/depth_thermal_font.ttf'
+                          )
+        ssu_text = Text(self.s.WIDTH * 0.324, self.s.HEIGHT * 0.823, (183, 183, 183),
+                        'ССУ          ОК', int(self.s.WIDTH * 0.028),
                         font_name='resources/fonts/depth_thermal_font.ttf'
                         )
+        ready_text1 = Text(self.s.WIDTH * 0.25, self.s.HEIGHT * 0.828, (183, 183, 183),
+                           'Г', int(self.s.WIDTH * 0.03),
+                           font_name='resources/fonts/depth_thermal_font.ttf'
+                           )
+        ready_text2 = Text(self.s.WIDTH * 0.2846, self.s.HEIGHT * 0.828, (183, 183, 183),
+                           'О', int(self.s.WIDTH * 0.03),
+                           font_name='resources/fonts/depth_thermal_font.ttf'
+                           )
+        ready_text3 = Text(self.s.WIDTH * 0.3176, self.s.HEIGHT * 0.828, (183, 183, 183),
+                           'Т', int(self.s.WIDTH * 0.03),
+                           font_name='resources/fonts/depth_thermal_font.ttf'
+                           )
         floor = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2, 0, self.s.thermal_width,
                             self.s.HEIGHT)
         black = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2, 0, self.s.thermal_width,
@@ -1316,8 +1445,9 @@ class Tank:
                                              3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
         self.thermal = True
         while show:
-            print(self.angle_of_view)
             self.s.display.fill((150, 150, 150))
+            self.timer()
+
             if self.thermal_on:
                 pygame.draw.rect(self.s.display, self.floor_thermal_color, floor)
                 pygame.draw.rect(self.s.display, self.sky_thermal_color, self.sky_thermal)
@@ -1330,6 +1460,7 @@ class Tank:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         show = False
+                    self.ammo(event, [ammo_text1, ammo_text2])
                     if event.key == pygame.K_e and self.rangefinder_suo:
                         d = self.rangefinder()
                         depth_text1.set_another_text(d[0])
@@ -1349,7 +1480,7 @@ class Tank:
                                 3 * self.thermal_horizontal + self.s.thermal_height // 2)
                             self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                              self.s.thermal_y_d_2, self.s.thermal_width,
-                                                            3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                                                             3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
                         else:
                             self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                                    self.horizontal + self.s.HEIGHT // 2)
@@ -1372,7 +1503,7 @@ class Tank:
                                 6 * self.thermal_horizontal + self.s.thermal_height // 2)
                             self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                              self.s.thermal_y_d_2, self.s.thermal_width,
-                                                            6 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                                                             6 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
                         else:
                             self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                                    self.horizontal + self.s.HEIGHT // 2)
@@ -1387,6 +1518,23 @@ class Tank:
                         self.lock_x = self.x + float(self.depth) * math.cos(self.angle_of_view * 3.14 / 180)
                         self.lock_y = self.y + float(self.depth) * math.sin(self.angle_of_view * 3.14 / 180)
                         self.lock = True if self.lock is False else False
+                    if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and self.ammo_list[self.current_ammo] > 0:
+                        self.reload = True
+                        self.block = True
+                        print(self.ammo_list)
+                        self.current_ammo_in_gun = int(str(self.current_ammo)[:])
+                        print(self.ammo_list)
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == pygame.BUTTON_LEFT:
+                        print(1)
+                        if self.ready:
+                            self.ammo_list[self.current_ammo_in_gun] -= 1
+                            self.current_ammo_in_gun = None
+                            self.ready = False
+                            self.is_shot = True
+                            self.block = True
+
 
             self.movement()
             self.guidance()
@@ -1415,6 +1563,12 @@ class Tank:
                     depth_text2.draw(self.s.display)
                     depth_text3.draw(self.s.display)
                     depth_text4.draw(self.s.display)
+                    ammo_text1.draw(self.s.display)
+                    ammo_text2.draw(self.s.display)
+                    if self.ready:
+                        ready_text1.draw(self.s.display)
+                        ready_text2.draw(self.s.display)
+                        ready_text3.draw(self.s.display)
                 else:
                     ssu_text.draw(self.s.display)
             pygame.display.flip()

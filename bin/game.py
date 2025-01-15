@@ -724,7 +724,7 @@ class Game:
                         print(APFSDS_COUNT, HE_COUNT, HEAT_COUNT)
                         print([i for i, j in self.s.tank_dict.items() if j][0])
                         print([i for i, j in self.s.lvl_dict.items() if j][0])
-                        self.play()
+                        self.play(APFSDS_COUNT, HE_COUNT, HEAT_COUNT)
 
                 for i in button_list:
                     i.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
@@ -754,7 +754,7 @@ class Game:
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
 
-    def play(self):
+    def play(self, APFSDS_COUNT, HE_COUNT, HEAT_COUNT):
         print(self.s.WIDTH // 2, self.s.HEIGHT // 2)
-        tank = Tank(self.s, self.s.map_width // 2, self.s.map_height // 2, 0, self.s.minimap_k, 0, 0)
+        tank = Tank(self.s, self.s.map_width // 2, self.s.map_height // 2, 0, self.s.minimap_k, 0, 0, APFSDS_COUNT, HE_COUNT, HEAT_COUNT)
         tank.start()
