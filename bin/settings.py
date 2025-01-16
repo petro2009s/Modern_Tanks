@@ -51,11 +51,11 @@ class Settings:
             self.menu_list[i] = pygame.transform.scale(self.menu_list[i], (self.WIDTH, self.HEIGHT))
 
         self.music_menu = pygame.mixer.Sound("resources/sounds/music_menu.mp3")
+        self.shoot_sound = pygame.mixer.Sound("resources/sounds/shoot.mp3")
 
         self.graph_dict = [self.bd.select('graph_table', 'low')[0][0], self.bd.select('graph_table', 'mid')[0][0],
                            self.bd.select('graph_table', 'high')[0][0]]
-        self.d_dict = [self.bd.select('d_table', 'low')[0][0], self.bd.select('d_table', 'mid')[0][0],
-                       self.bd.select('d_table', 'high')[0][0]]
+        self.minimap_dict = [self.bd.select('minimap_table', '[on]')[0][0], self.bd.select('minimap_table', 'off')[0][0]]
         self.fps_dict = [self.bd.select('FPS_table', 'low')[0][0], self.bd.select('FPS_table', 'mid')[0][0],
                          self.bd.select('FPS_table', 'high')[0][0]]
         self.full_dict = [bool(self.display.get_flags() & pygame.FULLSCREEN),
@@ -80,11 +80,6 @@ class Settings:
             self.T_90M_TTH = list(map(lambda x: x[:-1], f.readlines()))
         with open('resources/descriptions/guide.txt', encoding='utf-8') as f:
             self.guide_descr = list(map(lambda x: x[:-1], f.readlines()))
-
-        self.MAX_AMMO = 22
-        self.APFSDS_COUNT = 0
-        self.HE_COUNT = 0
-        self.HEAT_COUNT = 0
 
         self.minimap_k = 5
 
@@ -119,7 +114,7 @@ class Settings:
         self.optic_scope_width = self.HEIGHT
         self.FOV_optic = 12
         self.HALF_FOV_optic = self.FOV_optic // 2
-        self.NUM_RAYS = 150
+        self.NUM_RAYS = 125 + 75 * self.graph_dict.index(1)
         self.DELTA_ANGLE_optic = self.FOV_optic / self.NUM_RAYS
         self.DIST_optic = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_optic * 3.14 / 180))
         self.PROJ_COEFF_optic = 70 * self.HEIGHT
@@ -255,10 +250,43 @@ class Settings:
                                                    (self.WIDTH, self.HEIGHT))
         self.reload_time = 7.2
 
+    def graph_set(self, n):
+        self.NUM_RAYS = n
+        self.DELTA_ANGLE_optic = self.FOV_optic / self.NUM_RAYS
+        self.DIST_optic = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_optic * 3.14 / 180))
+        if self.optic_scope_width % self.NUM_RAYS == 0:
+            self.SCALE_optic = self.optic_scope_width // self.NUM_RAYS
+        else:
+            self.SCALE_optic = int(self.optic_scope_width / self.NUM_RAYS) + 1
+        self.DELTA_ANGLE_optic_zoom = self.FOV_optic_zoom / self.NUM_RAYS
+        self.DIST_optic_zoom = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_optic_zoom * 3.14 / 180))
+        if self.optic_scope_width % self.NUM_RAYS == 0:
+            self.SCALE_optic_zoom = self.optic_scope_width // self.NUM_RAYS
+        else:
+            self.SCALE_optic_zoom = int(self.optic_scope_width / self.NUM_RAYS) + 1
+        self.DELTA_ANGLE_thermal = self.FOV_thermal / self.NUM_RAYS
+        self.DIST_thermal = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_thermal * 3.14 / 180))
+        if self.thermal_width % self.NUM_RAYS == 0:
+            self.SCALE_thermal = self.thermal_width // self.NUM_RAYS
+            print('scale int')
+        else:
+            self.SCALE_thermal = int(self.thermal_width // self.NUM_RAYS) + 1
+            print('not')
+        self.DELTA_ANGLE_thermal_zoom = self.FOV_thermal_zoom / self.NUM_RAYS
+        self.DIST_thermal_zoom = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_thermal_zoom * 3.14 / 180))
+        self.DELTA_ANGLE_thermal_zoom_extra = self.FOV_thermal_zoom_extra / self.NUM_RAYS
+        self.DIST_thermal_zoom_extra = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_thermal_zoom_extra * 3.14 / 180))
+        if self.thermal_width_d % self.NUM_RAYS == 0:
+            self.SCALE_thermal_d = self.thermal_width_d // self.NUM_RAYS
+            print(11241232)
+        else:
+            print(2432342)
+            self.SCALE_thermal_d = int(self.thermal_width_d // self.NUM_RAYS) + 1
+
     def update_db(self):
         self.bd.update_to_db("graph_table", "(low, mid, high)",
                              f"({self.graph_dict[0]}, {self.graph_dict[1]}, {self.graph_dict[2]})")
-        self.bd.update_to_db("d_table", "(low, mid, high)", f"({self.d_dict[0]}, {self.d_dict[1]}, {self.d_dict[2]})")
+        self.bd.update_to_db("minimap_table", "([on], off)", f"({self.minimap_dict[0]}, {self.minimap_dict[1]})")
         self.bd.update_to_db("FPS_table", "(low, mid, high)",
                              f"({self.fps_dict[0]}, {self.fps_dict[1]}, {self.fps_dict[2]})")
         self.bd.update_to_db("volume_table", "(volume_music, volume_sound, volume_general)",

@@ -11,12 +11,10 @@ class DBController:
     def check_db(self):
         if not os.path.exists(self.name):
             query_table_posts1 = '''
-
-CREATE TABLE d_table (
-    low  INTEGER DEFAULT (False),
-    mid  INTEGER DEFAULT (True),
-    high INTEGER DEFAULT (False) 
-            );'''
+CREATE TABLE minimap_table (
+    [on] INTEGER DEFAULT (True),
+    off  INTEGER DEFAULT (False) 
+);'''
             self.query(query_table_posts1)
 
             query_table_posts2 = '''
@@ -91,7 +89,7 @@ CREATE TABLE size_table (
     # Функция для очистки БД
     def clear(self):
         query = f"""
-        DELETE FROM d_table
+        DELETE FROM minimap_table
         """
         query_1 = f"""
         DELETE FROM graph_table
@@ -106,7 +104,7 @@ CREATE TABLE size_table (
         DELETE FROM size_table
         """
 
-        query2 = '''INSERT INTO d_table (low, mid, high) VALUES (False, True, False);'''
+        query2 = '''INSERT INTO minimap_table ([on], off) VALUES (True, False);'''
         query3 = '''INSERT INTO graph_table (low, mid, high) VALUES (False, True, False);'''
         query4 = '''INSERT INTO FPS_table (low, mid, high) VALUES (False, True, False);'''
         query5 = '''INSERT INTO full_table ([on], off) VALUES (True, False);'''

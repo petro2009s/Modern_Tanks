@@ -9,7 +9,8 @@ from bin.buttons import SelectButton
 
 
 class Tank:
-    def __init__(self, settings, x, y, movement_angle, minimap_k, x_minimap, y_minimap, apfsds_c=1, he_c=1, heat_c=1):
+    def __init__(self, settings, x, y, movement_angle, minimap_k, x_minimap, y_minimap, apfsds_c=1, he_c=1, heat_c=1,
+                 minimap_displaying=False):
         self.s = settings
 
         self.x = x
@@ -32,6 +33,7 @@ class Tank:
         self.x_minimap = x_minimap
         self.y_minimap = y_minimap
         self.minimap_k = minimap_k
+        self.minimap_displaying = minimap_displaying
 
         self.apfsds_c, self.he_c, self.heat_c = apfsds_c, he_c, heat_c
         self.ammo_list = [self.apfsds_c, self.he_c, self.heat_c]
@@ -350,42 +352,43 @@ class Tank:
             self.s.clock.tick(self.s.FPS)
 
     def draw_minimap(self, x, y):
-        self.s.map.draw(self.s.display, x, y, k=self.s.minimap_k)
-        pygame.draw.circle(self.s.display, (255, 0, 00),
-                           (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
-                           int(self.s.WIDTH * 0.006) // self.s.minimap_k)
+        if self.minimap_displaying:
+            self.s.map.draw(self.s.display, x, y, k=self.s.minimap_k)
+            pygame.draw.circle(self.s.display, (255, 0, 00),
+                               (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+                               int(self.s.WIDTH * 0.006) // self.s.minimap_k)
 
-        pygame.draw.line(self.s.display, (255, 0, 0),
-                         (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
-                         (x + (self.x + self.sq * math.sin(self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
-                          y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
-        pygame.draw.line(self.s.display, (255, 255, 255),
-                         (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
-                         (x + (self.x + self.v * 0.5 * math.sin(self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
-                          y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
-        pygame.draw.line(self.s.display, (0, 0, 255),
-                         (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
-                         (x + (self.x // self.s.minimap_k + self.s.WIDTH * 0.05 * math.cos(
-                             self.angle_of_view * 3.14 / 180)),
-                          y + (self.y // self.s.minimap_k + self.s.WIDTH * 0.05 * math.sin(
-                              self.angle_of_view * 3.14 / 180))))
-        pygame.draw.line(self.s.display, (0, 255, 0),
-                         (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
-                         (x + (self.x + self.s.WIDTH * 0.05 * math.sin(
-                             self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
-                          y + (self.y - self.s.WIDTH * 0.05 * math.cos(
-                              self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
+            pygame.draw.line(self.s.display, (255, 0, 0),
+                             (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+                             (x + (self.x + self.sq * math.sin(self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
+                              y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
+            pygame.draw.line(self.s.display, (255, 255, 255),
+                             (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+                             (x + (self.x + self.v * 0.5 * math.sin(self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
+                              y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
+            pygame.draw.line(self.s.display, (0, 0, 255),
+                             (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+                             (x + (self.x // self.s.minimap_k + self.s.WIDTH * 0.05 * math.cos(
+                                 self.angle_of_view * 3.14 / 180)),
+                              y + (self.y // self.s.minimap_k + self.s.WIDTH * 0.05 * math.sin(
+                                  self.angle_of_view * 3.14 / 180))))
+            pygame.draw.line(self.s.display, (0, 255, 0),
+                             (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
+                             (x + (self.x + self.s.WIDTH * 0.05 * math.sin(
+                                 self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
+                              y + (self.y - self.s.WIDTH * 0.05 * math.cos(
+                                  self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
 
-        image = pygame.transform.rotate(self.s.minimap_tank_b, -self.movement_angle)
-        rect = image.get_rect()
-        rect.center = (x + self.pos(k=self.s.minimap_k)[0],
-                       y + self.pos(k=self.s.minimap_k)[1])
-        self.s.display.blit(image, rect)
-        image = pygame.transform.rotate(self.s.minimap_tank_tower, 270 - self.angle_of_view)
-        rect2 = image.get_rect()
-        rect2.center = (x + self.pos(k=self.s.minimap_k)[0],
-                        y + self.pos(k=self.s.minimap_k)[1])
-        self.s.display.blit(image, rect2)
+            image = pygame.transform.rotate(self.s.minimap_tank_b, -self.movement_angle)
+            rect = image.get_rect()
+            rect.center = (x + self.pos(k=self.s.minimap_k)[0],
+                           y + self.pos(k=self.s.minimap_k)[1])
+            self.s.display.blit(image, rect)
+            image = pygame.transform.rotate(self.s.minimap_tank_tower, 270 - self.angle_of_view)
+            rect2 = image.get_rect()
+            rect2.center = (x + self.pos(k=self.s.minimap_k)[0],
+                            y + self.pos(k=self.s.minimap_k)[1])
+            self.s.display.blit(image, rect2)
 
     def movement(self):
         keys = pygame.key.get_pressed()
@@ -1344,6 +1347,10 @@ class Tank:
                             self.ready = False
                             self.is_shot = True
                             self.block = True
+                            self.s.shoot_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.shoot_sound.play()
+                        else:
+                            pygame.mixer.Sound('resources/sounds/button_menu_sound.mp3').play()
             self.movement()
             self.guidance()
             pygame.draw.rect(self.s.display, (135, 206, 235), self.sky)
@@ -1534,6 +1541,10 @@ class Tank:
                             self.ready = False
                             self.is_shot = True
                             self.block = True
+                            self.s.shoot_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.shoot_sound.play()
+                        else:
+                            pygame.mixer.Sound('resources/sounds/button_menu_sound.mp3').play()
 
 
             self.movement()
