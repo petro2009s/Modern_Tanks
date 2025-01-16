@@ -256,7 +256,7 @@ class Game:
         fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200),
                               str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                               is_topleft=True)
-        background = pygame.Surface((1820, 970))
+        background = pygame.Surface((self.s.WIDTH * 0.948, self.s.HEIGHT * 0.898))
         background.set_alpha(128)
         background.fill((37, 46, 37))
 
@@ -451,7 +451,7 @@ class Game:
             self.s.display.blit(menu_im, (0, 0))
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
-            self.s.display.blit(background, (50, 50))
+            self.s.display.blit(background, (self.s.WIDTH * 0.026, self.s.HEIGHT * 0.0463))
 
             for i in all_list:
                 i.draw(self.s.display)
@@ -626,7 +626,7 @@ class Game:
                      apfsds_count_txt, he_count_txt_bl, he_count_txt, heat_count_txt_bl, heat_count_txt,
                      max_ammo_text_bl, max_ammo_text]
 
-        background = pygame.Surface((1820, 995))
+        background = pygame.Surface((self.s.WIDTH * 0.948, self.s.HEIGHT * 0.9213))
         background.set_alpha(128)
         background.fill((37, 46, 37))
 
@@ -732,7 +732,7 @@ class Game:
                 for i in button_list:
                     i.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
 
-            self.s.display.blit(background, (50, 25))
+            self.s.display.blit(background, (self.s.WIDTH * 0.026, self.s.HEIGHT * 0.02315))
 
             for i in button_list:
                 i.draw(self.s.display)

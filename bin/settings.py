@@ -51,7 +51,9 @@ class Settings:
             self.menu_list[i] = pygame.transform.scale(self.menu_list[i], (self.WIDTH, self.HEIGHT))
 
         self.music_menu = pygame.mixer.Sound("resources/sounds/music_menu.mp3")
-        self.shoot_sound = pygame.mixer.Sound("resources/sounds/shoot.mp3")
+        self.shoot_sound = pygame.mixer.Sound("resources/sounds/shoot1.mp3")
+        self.reload_sound = pygame.mixer.Sound("resources/sounds/reload.mp3")
+        self.background_sound = pygame.mixer.Sound("resources/sounds/background.mp3")
 
         self.graph_dict = [self.bd.select('graph_table', 'low')[0][0], self.bd.select('graph_table', 'mid')[0][0],
                            self.bd.select('graph_table', 'high')[0][0]]

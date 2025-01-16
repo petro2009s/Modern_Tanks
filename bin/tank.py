@@ -12,6 +12,7 @@ class Tank:
     def __init__(self, settings, x, y, movement_angle, minimap_k, x_minimap, y_minimap, apfsds_c=1, he_c=1, heat_c=1,
                  minimap_displaying=False):
         self.s = settings
+        self.s.music_menu.stop()
 
         self.x = x
         self.y = y
@@ -29,6 +30,11 @@ class Tank:
         self.block = False
         self.is_shot = False
         self.reload = False
+
+        self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
+        if self.s.volume_music == 0:
+            self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100 * 0.5)
+        self.s.background_sound.play(-1)
 
         self.x_minimap = x_minimap
         self.y_minimap = y_minimap
@@ -237,6 +243,11 @@ class Tank:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         print('escape')
+                        self.s.music_menu.play(-1)
+                        self.s.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
+                        self.s.background_sound.stop()
+                        self.s.reload_sound.stop()
+                        self.s.shoot_sound.stop()
                         show = False
 
                     if event.key == pygame.K_e and self.rangefinder_suo:
@@ -1334,11 +1345,13 @@ class Tank:
                     self.ammo(event, [ammo_text])
                     if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
                             self.ammo_list[self.current_ammo] > 0:
+                        self.s.reload_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                        self.s.reload_sound.play()
                         self.reload = True
                         self.block = True
-                        print(self.ammo_list)
                         self.current_ammo_in_gun = int(str(self.current_ammo)[:])
                         print(self.ammo_list)
+
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == pygame.BUTTON_LEFT:
                         print(1)
@@ -1349,8 +1362,7 @@ class Tank:
                             self.block = True
                             self.s.shoot_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
                             self.s.shoot_sound.play()
-                        else:
-                            pygame.mixer.Sound('resources/sounds/button_menu_sound.mp3').play()
+
             self.movement()
             self.guidance()
             pygame.draw.rect(self.s.display, (135, 206, 235), self.sky)
@@ -1528,9 +1540,10 @@ class Tank:
                     if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and self.ammo_list[self.current_ammo] > 0:
                         self.reload = True
                         self.block = True
-                        print(self.ammo_list)
                         self.current_ammo_in_gun = int(str(self.current_ammo)[:])
                         print(self.ammo_list)
+                        self.s.reload_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                        self.s.reload_sound.play()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == pygame.BUTTON_LEFT:
@@ -1543,8 +1556,6 @@ class Tank:
                             self.block = True
                             self.s.shoot_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
                             self.s.shoot_sound.play()
-                        else:
-                            pygame.mixer.Sound('resources/sounds/button_menu_sound.mp3').play()
 
 
             self.movement()
