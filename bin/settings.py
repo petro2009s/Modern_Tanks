@@ -4,6 +4,7 @@ import os
 import screeninfo
 from bin.bd import DBController
 from bin.map import Map
+from bin.sprites import Sprite
 import math
 
 
@@ -44,6 +45,7 @@ class Settings:
         self.menu5 = pygame.image.load('resources/images/menu_p5.png').convert()
         self.gif = gif_pygame.load("resources/images/menu_g.gif")
         gif_pygame.transform.scale(self.gif, (self.WIDTH, self.HEIGHT))
+        pygame.display.set_icon(self.icon)
         self.cursor_base = pygame.image.load('resources/images/cursor.png').convert_alpha()
         self.cursor = pygame.transform.scale(self.cursor_base, (self.WIDTH * 0.03125, self.WIDTH * 0.03125))
         self.menu_list = [self.menu1, self.menu2, self.menu3, self.menu4, self.menu5]
@@ -110,7 +112,7 @@ class Settings:
         self.max_speed_s = -self.WIDTH * 0.01 * (self.FPS / 60) * (7 / self.side)
         self.min_speed_ad = self.WIDTH * 0.01 * (self.FPS / 60) * 10 / 60 * (7 / self.side)
 
-        self.tower_v = 20
+        self.tower_v = 50
         self.vertical_v = 30
 
         self.optic_scope_width = self.HEIGHT
@@ -250,7 +252,14 @@ class Settings:
         self.gunner_site_base2 = pygame.image.load('resources/images/gunner_site2.png').convert_alpha()
         self.gunner_site2 = pygame.transform.scale(self.gunner_site_base2,
                                                    (self.WIDTH, self.HEIGHT))
-        self.reload_time = 7.2
+        self.reload_time = 6.5
+        self.test_sprite = pygame.image.load('resources/images/bush.png').convert_alpha()
+        self.bush_sprite = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        thermal_texture(self.bush_sprite_thermal, 20, 50)
+        self.center_ray = self.NUM_RAYS // 2 - 1
+        self.sprites = Sprite(self)
+        self.FAKE_RAYS = int(self.NUM_RAYS * 0.25)
 
     def graph_set(self, n):
         self.NUM_RAYS = n
@@ -425,6 +434,13 @@ class Settings:
                                                            (self.thermal_width / 4, self.thermal_height / 4))
         self.gunner_site2 = pygame.transform.scale(self.gunner_site_base2,
                                                    (self.WIDTH, self.HEIGHT))
+        self.bush_sprite = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        thermal_texture(self.bush_sprite_thermal, 20, 50)
+        self.center_ray = self.NUM_RAYS // 2 - 1
+        self.sprites = Sprite(self)
+
+        self.FAKE_RAYS = int(self.NUM_RAYS * 0.25)
 
 
 def thermal_texture(surface, t, max_t):
