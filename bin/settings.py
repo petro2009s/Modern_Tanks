@@ -112,8 +112,8 @@ class Settings:
         self.max_speed_s = -self.WIDTH * 0.01 * (self.FPS / 60) * (7 / self.side)
         self.min_speed_ad = self.WIDTH * 0.01 * (self.FPS / 60) * 10 / 60 * (7 / self.side)
 
-        self.tower_v = 50
-        self.vertical_v = 30
+        self.tower_v = 30
+        self.vertical_v = 50
 
         self.optic_scope_width = self.HEIGHT
         self.FOV_optic = 12
@@ -258,9 +258,15 @@ class Settings:
         self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
         thermal_texture(self.bush_sprite_thermal, 20, 50)
         self.center_ray = self.NUM_RAYS // 2 - 1
-        self.sprites = Sprite(self)
-        self.FAKE_RAYS = int(self.NUM_RAYS * 0.25)
 
+        self.FAKE_RAYS = int(self.NUM_RAYS * 2)
+
+        self.test_sprite_v = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in range(8)]
+        self.test_sprite_v_thermal = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in range(8)]
+        for i in self.test_sprite_v_thermal:
+            thermal_texture(i, 60, 60)
+
+        self.sprites = Sprite(self)
     def graph_set(self, n):
         self.NUM_RAYS = n
         self.DELTA_ANGLE_optic = self.FOV_optic / self.NUM_RAYS
@@ -438,9 +444,14 @@ class Settings:
         self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
         thermal_texture(self.bush_sprite_thermal, 20, 50)
         self.center_ray = self.NUM_RAYS // 2 - 1
-        self.sprites = Sprite(self)
+        self.FAKE_RAYS = int(self.NUM_RAYS * 2)
 
-        self.FAKE_RAYS = int(self.NUM_RAYS * 0.25)
+        self.test_sprite_v = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in range(8)]
+        self.test_sprite_v_thermal = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in range(8)]
+        for i in self.test_sprite_v_thermal:
+            thermal_texture(i, 60, 60)
+
+        self.sprites = Sprite(self)
 
 
 def thermal_texture(surface, t, max_t):
