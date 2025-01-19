@@ -452,11 +452,7 @@ class Game:
                             self.s.monitor = self.s.monitor_on_text
                             self.s.WIDTH = self.s.monitors[self.s.monitor].width
                             self.s.HEIGHT = self.s.monitors[self.s.monitor].height
-                            if full_dict_temp[0]:
-                                pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), pygame.FULLSCREEN,
-                                                        display=self.s.monitor)
-                            else:
-                                pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), display=self.s.monitor)
+                            pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), display=self.s.monitor)
                             self.s.size_list = pygame.display.list_modes()
                         elif not ((self.s.width_m < self.s.size_on_text[0] or self.s.height_m < self.s.size_on_text[
                             1]) and full_dict_temp[1]):
