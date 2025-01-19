@@ -55,6 +55,12 @@ CREATE TABLE size_table (
 );'''
             self.query(query_table_posts6)
 
+            query_table_posts7 = f'''
+CREATE TABLE monitor_table (
+    id  INTEGER DEFAULT (0)
+);'''
+            self.query(query_table_posts7)
+
             self.clear()
 
     # Функция исполнения запросов
@@ -103,16 +109,22 @@ CREATE TABLE size_table (
         query_4 = f"""
         DELETE FROM size_table
         """
+        query_5 = f"""
+        DELETE FROM monito_table
+        """
 
         query2 = '''INSERT INTO minimap_table ([on], off) VALUES (True, False);'''
         query3 = '''INSERT INTO graph_table (low, mid, high) VALUES (False, True, False);'''
         query4 = '''INSERT INTO FPS_table (low, mid, high) VALUES (False, True, False);'''
         query5 = '''INSERT INTO full_table ([on], off) VALUES (True, False);'''
         query6 = f'''INSERT INTO size_table (width, height) VALUES ({screeninfo.get_monitors()[0].width}, {screeninfo.get_monitors()[0].height});'''
+        query7 = '''INSERT INTO monitor_table (id) VALUES (0);'''
 
         self.query(query)
         self.query(query_2)
         self.query(query_1)
+        self.query(query_5)
+        self.query(query7)
         self.query(query2)
         self.query(query3)
         self.query(query4)

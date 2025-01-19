@@ -111,15 +111,24 @@ class Game:
         volume_header = Text(self.s.WIDTH * 0.776, self.s.HEIGHT * 0.1, (200, 200, 200), 'Настройки звука',
                              int(self.s.WIDTH * 0.03125))
 
-        screen_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.204, (0, 0, 0), 'Разрешение экрана',
+        screen_size_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.204, (0, 0, 0), 'Разрешение экрана',
                               int(self.s.WIDTH * 0.0208))
-        screen_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.2, (200, 200, 200), 'Разрешение экрана',
+        screen_size_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.2, (200, 200, 200), 'Разрешение экрана',
                            int(self.s.WIDTH * 0.0208))
 
         fullscreen_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.404, (0, 0, 0), 'Полноэкранный режим',
                                   int(self.s.WIDTH * 0.0208))
         fullscreen_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.4, (200, 200, 200), 'Полноэкранный режим',
                                int(self.s.WIDTH * 0.0208))
+
+        screen_choice_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.604, (0, 0, 0), 'Выбор монитора',
+                                  int(self.s.WIDTH * 0.0208))
+        screen_choice_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.6, (200, 200, 200), 'Выбор монитора',
+                               int(self.s.WIDTH * 0.0208))
+        screen_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.704, (0, 0, 0),
+                            f"Монитор {self.s.monitor + 1}", int(self.s.WIDTH * 0.0258))
+        screen_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.7, (200, 200, 200),
+                         f"Монитор {self.s.monitor + 1}", int(self.s.WIDTH * 0.0258))
 
         gr_text_bl = Text(self.s.WIDTH * 0.184, self.s.HEIGHT * 0.204, (0, 0, 0), 'Разрешение рендера',
                           int(self.s.WIDTH * 0.0208))
@@ -170,12 +179,12 @@ class Game:
         sound_text_volume = Text(self.s.WIDTH * 0.776, self.s.HEIGHT * 0.7, (200, 200, 200), str(self.s.volume_sound),
                                  int(self.s.WIDTH * 0.0417))
 
-        apply_button = Button(self.s.WIDTH * 0.382, self.s.HEIGHT * 0.63, self.s.WIDTH * 0.234, self.s.HEIGHT * 0.139,
+        apply_button = Button(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336, self.s.HEIGHT * 0.0925,
                               'Применить', self.s.size_text_b, 'resources/images/button_inact.png',
                               'resources/images/button_active.png',
                               'resources/sounds/button_menu_sound.mp3')
 
-        back_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.833, self.s.WIDTH * 0.335, self.s.HEIGHT * 0.0925,
+        back_button = Button(self.s.WIDTH * 0.081, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336, self.s.HEIGHT * 0.0925,
                              'Назад', self.s.size_text_b, 'resources/images/button_inact.png',
                              'resources/images/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
@@ -214,12 +223,20 @@ class Game:
                                 self.s.HEIGHT * 0.139, 'Выключить', sound='resources/sounds/button_menu_sound.mp3',
                                 font_size=int(self.s.size_text_b * 0.833))
 
-        plus_screen = Button(self.s.WIDTH * 0.579, self.s.HEIGHT * 0.263, self.s.WIDTH * 0.0417,
+        plus_screen_size = Button(self.s.WIDTH * 0.579, self.s.HEIGHT * 0.263, self.s.WIDTH * 0.0417,
                               self.s.HEIGHT * 0.074, '', 1, 'resources/images/plus.png',
                              'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
 
-        minus_screen = Button(self.s.WIDTH * 0.377, self.s.HEIGHT * 0.263, self.s.WIDTH * 0.0417,
+        minus_screen_size = Button(self.s.WIDTH * 0.377, self.s.HEIGHT * 0.263, self.s.WIDTH * 0.0417,
                                 self.s.HEIGHT * 0.074, '', 1, 'resources/images/minus.png',
+                              'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
+
+        plus_screen = Button(self.s.WIDTH * 0.579, self.s.HEIGHT * 0.663, self.s.WIDTH * 0.0417,
+                             self.s.HEIGHT * 0.074, '', 1, 'resources/images/plus.png',
+                             'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
+
+        minus_screen = Button(self.s.WIDTH * 0.377, self.s.HEIGHT * 0.663, self.s.WIDTH * 0.0417,
+                              self.s.HEIGHT * 0.074, '', 1, 'resources/images/minus.png',
                               'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
 
         plus_general = Button(self.s.WIDTH * 0.8333, self.s.HEIGHT * 0.263, self.s.WIDTH * 0.0417,
@@ -248,7 +265,7 @@ class Game:
         fps_list = [fps_low, fps_mid, fps_high]
         full_list = [full_on, full_off]
         button_list = [plus_music, minus_music, plus_sound, minus_sound, plus_general, minus_general, plus_screen,
-                       minus_screen, apply_button]
+                       minus_screen, plus_screen_size, minus_screen_size, apply_button]
 
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
@@ -262,13 +279,14 @@ class Game:
 
         all_list = [back_button, gr_high, gr_low, gr_mid, minimap_on, minimap_off, fps_high, fps_low, fps_mid, gr_text_bl,
                     gr_text, minimap_text_bl, minimap_text, fps_text_bl, fps_text, header_bl, header, fps_count_text_bl,
-                    fps_count_text,
+                    fps_count_text, screen_choice_text_bl, screen_choice_text, screen_size_text_bl, screen_size_text,
                     plus_music, minus_music, plus_sound, minus_sound, volume_header_bl, volume_header, music_text_bl,
                     music_text, sound_text_bl, sound_text, music_text_volume_bl, music_text_volume,
                     sound_text_volume_bl,
                     sound_text_volume, general_text_bl, general_text, general_text_volume_bl, general_text_volume,
                     plus_general, minus_general, screen_text_bl, screen_text, fullscreen_text_bl, fullscreen_text,
-                    plus_screen, minus_screen, size_text_bl, size_text, apply_button, full_on, full_off]
+                    plus_screen, minus_screen, plus_screen_size, minus_screen_size, size_text_bl, size_text,
+                    apply_button, full_on, full_off]
         set_list = ['low', 'mid', 'high']
         v = {'0': False, '1': True}
         while sett:
@@ -367,19 +385,31 @@ class Game:
                         full_dict_temp[0] = False
                         full_dict_temp[1] = True
 
-                    if event.button == plus_screen:
+                    if event.button == plus_screen_size:
                         if self.s.size_list.index(tuple(self.s.size_on_text)) != 0:
                             self.s.size_on_text = list(
                                 self.s.size_list[self.s.size_list.index(tuple(self.s.size_on_text)) - 1])
                             size_text.set_another_text("*".join(list(map(str, self.s.size_on_text))))
                             size_text_bl.set_another_text("*".join(list(map(str, self.s.size_on_text))))
 
-                    if event.button == minus_screen:
+                    if event.button == minus_screen_size:
                         if self.s.size_list.index(tuple(self.s.size_on_text)) + 1 != len(self.s.size_list):
                             self.s.size_on_text = list(
                                 self.s.size_list[self.s.size_list.index(tuple(self.s.size_on_text)) + 1])
                             size_text.set_another_text("*".join(list(map(str, self.s.size_on_text))))
                             size_text_bl.set_another_text("*".join(list(map(str, self.s.size_on_text))))
+
+                    if event.button == plus_screen:
+                        if self.s.monitor + 1 != len(self.s.monitors):
+                            self.s.monitor += 1
+                            screen_text.set_another_text(f"Монитор {self.s.monitor + 1}")
+                            screen_text_bl.set_another_text(f"Монитор {self.s.monitor + 1}")
+
+                    if event.button == minus_screen:
+                        if self.s.monitor != 0:
+                            self.s.monitor -= 1
+                            screen_text.set_another_text(f"Монитор {self.s.monitor + 1}")
+                            screen_text_bl.set_another_text(f"Монитор {self.s.monitor + 1}")
 
                     if event.button == plus_general:
                         self.s.volume_general += 10 * (self.s.volume_general != 100)
@@ -420,12 +450,13 @@ class Game:
                             1]) and full_dict_temp[1]):
                             self.s.WIDTH, self.s.HEIGHT = self.s.size_on_text
                             if full_dict_temp[0]:
-                                pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), pygame.FULLSCREEN)
+                                pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), pygame.FULLSCREEN, display=self.s.monitor)
                             else:
                                 if self.s.width_m == self.s.WIDTH and self.s.height_m == self.s.HEIGHT:
-                                    pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT - 40))
+                                    pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT - 40), display=self.s.monitor)
                                 else:
-                                    pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT))
+                                    pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), display=self.s.monitor)
+                            self.s.size_list = pygame.display.list_modes()
                             self.s.full_dict = full_dict_temp
                             sett = False
                             self.s.update_size()
@@ -761,5 +792,5 @@ class Game:
 
     def play(self, APFSDS_COUNT, HE_COUNT, HEAT_COUNT):
         print(self.s.WIDTH // 2, self.s.HEIGHT // 2)
-        tank = Tank(self.s, self.s.map_width // 2, self.s.map_height // 2, 0, self.s.minimap_k, 0, 0, APFSDS_COUNT, HE_COUNT, HEAT_COUNT, self.s.minimap_dict[0])
+        tank = Tank(self.s, self.s.map_width // 2, self.s.map_height // 2, 0, self.s.minimap_k, 0, 0, APFSDS_COUNT, HE_COUNT, HEAT_COUNT, self.s.minimap_dict[0], True)
         tank.start()

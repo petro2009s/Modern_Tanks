@@ -10,11 +10,12 @@ import math
 
 class Settings:
     def __init__(self):
-
         self.bd = DBController('resources/ModernTanksDB')
         # self.bd.clear()
-        self.width_m = screeninfo.get_monitors()[0].width
-        self.height_m = screeninfo.get_monitors()[0].height
+        self.monitors = screeninfo.get_monitors()
+        self.monitor = int(self.bd.select('monitor_table', 'id')[0][0])
+        self.width_m = self.monitors[self.monitor].width
+        self.height_m = self.monitors[self.monitor].height
         self.WIDTH = self.bd.select('size_table', 'width')[0][0]
         self.HEIGHT = self.bd.select('size_table', 'height')[0][0]
         if (self.width_m < self.WIDTH or self.height_m < self.HEIGHT) and self.bd.select('full_table', 'off')[0][0]:
@@ -27,16 +28,16 @@ class Settings:
 
         self.button_color = (50, 60, 50)
         pygame.init()
-        self.display = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.display = pygame.display.set_mode((self.WIDTH, self.HEIGHT), display=self.monitor)
         self.icon = pygame.image.load('resources/images/icon_test2_p.png').convert()
         os.environ['SDL_VIDEO_CENTERED'] = '1'
         if self.bd.select('full_table', '[on]')[0][0]:
-            pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.FULLSCREEN)
+            pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.FULLSCREEN, display=self.monitor)
         else:
             if self.width_m == self.WIDTH and self.height_m == self.HEIGHT:
-                pygame.display.set_mode((self.WIDTH, self.HEIGHT - 40))
+                pygame.display.set_mode((self.WIDTH, self.HEIGHT - 40), display=self.monitor)
             else:
-                pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+                pygame.display.set_mode((self.WIDTH, self.HEIGHT), display=self.monitor)
 
         self.menu1 = pygame.image.load('resources/images/menu_p1.png').convert()
         self.menu2 = pygame.image.load('resources/images/menu_p2.png').convert()
@@ -304,6 +305,7 @@ class Settings:
                              f"({self.volume_music}, {self.volume_sound}, {self.volume_general})")
         self.bd.update_to_db("full_table", "([on], off)", f"({self.full_dict[0]}, {self.full_dict[1]})")
         self.bd.update_to_db("size_table", "(width, height)", f"({self.WIDTH}, {self.HEIGHT})")
+        self.bd.update_to_db("monitor_table", "id", f"{self.monitor}")
 
     def update_size(self):
         gif_pygame.transform.scale(self.gif, (self.WIDTH, self.HEIGHT))
