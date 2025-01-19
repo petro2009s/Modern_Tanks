@@ -19,6 +19,7 @@ class Game:
         self.s.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
 
     def start_game(self, apply_sett=""):
+        pygame.display.set_icon(self.s.icon)
         if apply_sett:
             self.settings_menu()
         show = True
@@ -96,6 +97,7 @@ class Game:
             self.s.clock.tick(self.s.FPS)
 
     def settings_menu(self):
+        pygame.display.set_icon(self.s.icon)
         sett = True
         menu_im = self.s.menu_list[random.randint(0, 4)]
 
@@ -493,6 +495,7 @@ class Game:
             self.s.clock.tick(self.s.FPS)
         self.s.update_db()
     def game_menu(self):
+        pygame.display.set_icon(self.s.icon)
         gm = True
 
         APFSDS_COUNT = 1
@@ -791,6 +794,7 @@ class Game:
             self.s.clock.tick(self.s.FPS)
 
     def play(self, APFSDS_COUNT, HE_COUNT, HEAT_COUNT):
+        pygame.display.set_icon(self.s.icon)
         print(self.s.WIDTH // 2, self.s.HEIGHT // 2)
         tank = Tank(self.s, self.s.map_width // 2, self.s.map_height // 2, 0, self.s.minimap_k, 0, 0, APFSDS_COUNT, HE_COUNT, HEAT_COUNT, self.s.minimap_dict[0])
         tank.start()

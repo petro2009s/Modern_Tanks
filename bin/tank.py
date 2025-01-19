@@ -57,9 +57,9 @@ class Tank:
         self.depth = '0000'
         self.depth_m = '0000'
         self.angle_of_view = 0
-        self.horizontal = 0
-        self.thermal_horizontal = self.s.HEIGHT * -0.02
-        self.thermal_horizontal_d = self.s.HEIGHT * -0.004
+        self.horizontal = -self.s.HEIGHT * 0.085
+        self.thermal_horizontal = -self.s.HEIGHT * 0.12
+        self.thermal_horizontal_d = -self.s.HEIGHT * 0.04
         self.lock_x = 0
         self.lock_y = 0
         self.type = 1
@@ -143,6 +143,18 @@ class Tank:
                            'Т', int(self.s.WIDTH * 0.008),
                            font_name='resources/fonts/depth_thermal_font.ttf'
                            )
+        weapon_text1 = Text(self.s.thermal_x_d * 1.3554, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
+                           'О', int(self.s.WIDTH * 0.008),
+                           font_name='resources/fonts/depth_thermal_font.ttf'
+                           )
+        weapon_text2 = Text(self.s.thermal_x_d * 1.3854, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
+                            'С', int(self.s.WIDTH * 0.03),
+                            font_name='resources/fonts/depth_thermal_font.ttf'
+                            )
+        weapon_text3 = Text(self.s.thermal_x_d * 1.4154, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
+                            'Н', int(self.s.WIDTH * 0.03),
+                            font_name='resources/fonts/depth_thermal_font.ttf'
+                            )
         while show:
             optic_sight_button.check(pygame.mouse.get_pos())
             thermal_sight_button.check(pygame.mouse.get_pos())
@@ -156,6 +168,7 @@ class Tank:
 
                 if event.type == pygame.USEREVENT:
                     if event.button == optic_sight_button:
+                        self.extra_zoom = False
                         self.thermal_d = False
                         self.optic_sight()
                         self.thermal_d = True
@@ -358,6 +371,9 @@ class Tank:
                     depth_text4.draw(self.s.display)
                     ammo_text1.draw(self.s.display)
                     ammo_text2.draw(self.s.display)
+                    # weapon_text1.draw(self.s.display)
+                    # weapon_text2.draw(self.s.display)
+                    # weapon_text3.draw(self.s.display)
                     if self.ready:
                         ready_text1.draw(self.s.display)
                         ready_text2.draw(self.s.display)
@@ -1544,6 +1560,18 @@ class Tank:
         v = pygame.Rect(0, 0,
                         (self.s.WIDTH - self.s.thermal_base_width) // 2,
                         self.s.HEIGHT)
+        weapon_text1 = Text(self.s.WIDTH * 0.682, self.s.HEIGHT * 0.828, (183, 183, 183),
+                           'О', int(self.s.WIDTH * 0.03),
+                           font_name='resources/fonts/depth_thermal_font.ttf'
+                           )
+        weapon_text2 = Text(self.s.WIDTH * 0.714, self.s.HEIGHT * 0.828, (183, 183, 183),
+                            'С', int(self.s.WIDTH * 0.03),
+                            font_name='resources/fonts/depth_thermal_font.ttf'
+                            )
+        weapon_text3 = Text(self.s.WIDTH * 0.7485, self.s.HEIGHT * 0.828, (183, 183, 183),
+                            'Н', int(self.s.WIDTH * 0.03),
+                            font_name='resources/fonts/depth_thermal_font.ttf'
+                            )
         if not self.zoom:
             self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                    self.horizontal + self.s.HEIGHT // 2)
@@ -1701,6 +1729,9 @@ class Tank:
                     depth_text4.draw(self.s.display)
                     ammo_text1.draw(self.s.display)
                     ammo_text2.draw(self.s.display)
+                    weapon_text1.draw(self.s.display)
+                    weapon_text2.draw(self.s.display)
+                    weapon_text3.draw(self.s.display)
                     if self.ready:
                         ready_text1.draw(self.s.display)
                         ready_text2.draw(self.s.display)
