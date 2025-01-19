@@ -128,9 +128,9 @@ class Game:
         screen_choice_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.6, (200, 200, 200), 'Выбор монитора',
                                int(self.s.WIDTH * 0.0208))
         screen_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.704, (0, 0, 0),
-                            f"Монитор {self.s.monitor + 1}", int(self.s.WIDTH * 0.0258))
+                            f"Монитор {self.s.monitor_on_text + 1}", int(self.s.WIDTH * 0.0258))
         screen_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.7, (200, 200, 200),
-                         f"Монитор {self.s.monitor + 1}", int(self.s.WIDTH * 0.0258))
+                         f"Монитор {self.s.monitor_on_text + 1}", int(self.s.WIDTH * 0.0258))
 
         gr_text_bl = Text(self.s.WIDTH * 0.184, self.s.HEIGHT * 0.204, (0, 0, 0), 'Разрешение рендера',
                           int(self.s.WIDTH * 0.0208))
@@ -402,16 +402,16 @@ class Game:
                             size_text_bl.set_another_text("*".join(list(map(str, self.s.size_on_text))))
 
                     if event.button == plus_screen:
-                        if self.s.monitor + 1 != len(self.s.monitors):
-                            self.s.monitor += 1
-                            screen_text.set_another_text(f"Монитор {self.s.monitor + 1}")
-                            screen_text_bl.set_another_text(f"Монитор {self.s.monitor + 1}")
+                        if self.s.monitor_on_text + 1 != len(self.s.monitors):
+                            self.s.monitor_on_text += 1
+                            screen_text.set_another_text(f"Монитор {self.s.monitor_on_text + 1}")
+                            screen_text_bl.set_another_text(f"Монитор {self.s.monitor_on_text + 1}")
 
                     if event.button == minus_screen:
-                        if self.s.monitor != 0:
-                            self.s.monitor -= 1
-                            screen_text.set_another_text(f"Монитор {self.s.monitor + 1}")
-                            screen_text_bl.set_another_text(f"Монитор {self.s.monitor + 1}")
+                        if self.s.monitor_on_text != 0:
+                            self.s.monitor_on_text -= 1
+                            screen_text.set_another_text(f"Монитор {self.s.monitor_on_text + 1}")
+                            screen_text_bl.set_another_text(f"Монитор {self.s.monitor_on_text + 1}")
 
                     if event.button == plus_general:
                         self.s.volume_general += 10 * (self.s.volume_general != 100)
@@ -448,7 +448,17 @@ class Game:
                         sound_text_volume_bl.set_another_text(str(self.s.volume_sound))
 
                     if event.button == apply_button:
-                        if not ((self.s.width_m < self.s.size_on_text[0] or self.s.height_m < self.s.size_on_text[
+                        if self.s.monitor_on_text != self.s.monitor:
+                            self.s.monitor = self.s.monitor_on_text
+                            self.s.WIDTH = self.s.monitors[self.s.monitor].width
+                            self.s.HEIGHT = self.s.monitors[self.s.monitor].height
+                            if full_dict_temp[0]:
+                                pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), pygame.FULLSCREEN,
+                                                        display=self.s.monitor)
+                            else:
+                                pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), display=self.s.monitor)
+                            self.s.size_list = pygame.display.list_modes()
+                        elif not ((self.s.width_m < self.s.size_on_text[0] or self.s.height_m < self.s.size_on_text[
                             1]) and full_dict_temp[1]):
                             self.s.WIDTH, self.s.HEIGHT = self.s.size_on_text
                             if full_dict_temp[0]:
@@ -458,11 +468,10 @@ class Game:
                                     pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT - 40), display=self.s.monitor)
                                 else:
                                     pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), display=self.s.monitor)
-                            self.s.size_list = pygame.display.list_modes()
-                            self.s.full_dict = full_dict_temp
-                            sett = False
-                            self.s.update_size()
-                            self.start_game("apply_set")
+                        self.s.full_dict = full_dict_temp
+                        sett = False
+                        self.s.update_size()
+                        self.start_game("apply_set")
 
                 back_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
 

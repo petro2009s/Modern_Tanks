@@ -14,6 +14,7 @@ class Settings:
         # self.bd.clear()
         self.monitors = screeninfo.get_monitors()
         self.monitor = int(self.bd.select('monitor_table', 'id')[0][0])
+        self.monitor_on_text = self.monitor
         self.width_m = self.monitors[self.monitor].width
         self.height_m = self.monitors[self.monitor].height
         self.WIDTH = self.bd.select('size_table', 'width')[0][0]
