@@ -1754,7 +1754,8 @@ class Tank:
         return math.atan(dy / dx)
 
     def check_wall(self, x, y):
-        return (int(x), int(y)) in self.s.map.world_map
+        all_map = self.s.map.world_map | self.s.sprites.collision_set
+        return (int(x), int(y)) in all_map
 
     def collisions(self, dx, dy):
         self.stuck = False
