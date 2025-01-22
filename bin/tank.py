@@ -272,12 +272,6 @@ class Tank:
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        print('escape')
-                        self.s.music_menu.play(-1)
-                        self.s.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
-                        self.s.background_sound.stop()
-                        self.s.reload_sound.stop()
-                        self.s.shoot_sound.stop()
                         # show = False
                         self.s.display.blit(self.s.gunner_site2)
                         self.exit()
@@ -499,6 +493,11 @@ class Tank:
                         pygame.quit()
                         sys.exit()
                     elif event.button == exit_to_menu_button:
+                        self.s.music_menu.play(-1)
+                        self.s.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
+                        self.s.background_sound.stop()
+                        self.s.reload_sound.stop()
+                        self.s.shoot_sound.stop()
                         self.menu = True
                         show = False
                 if event.type == pygame.KEYDOWN:
@@ -522,6 +521,7 @@ class Tank:
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
         pygame.mouse.set_visible(False)
+
     def movement(self):
         keys = pygame.key.get_pressed()
 

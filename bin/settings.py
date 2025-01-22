@@ -24,7 +24,7 @@ class Settings:
             self.HEIGHT = self.height_m
             self.bd.update_to_db("size_table", "(width, height)", f"({self.WIDTH}, {self.HEIGHT})")
         self.size_text_b = int(self.WIDTH * 0.01875)
-        self.size_list = pygame.display.list_modes()
+        self.size_list = pygame.display.list_modes(display=self.monitor)
         self.size_on_text = [self.WIDTH, self.HEIGHT]
 
         self.button_color = (50, 60, 50)

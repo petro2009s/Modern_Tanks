@@ -323,7 +323,7 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    # self.s.update_db()
+                    self.s.update_db()
                     pygame.quit()
                     sys.exit()
 
@@ -406,12 +406,21 @@ class Game:
                             self.s.monitor_on_text += 1
                             screen_text.set_another_text(f"Монитор {self.s.monitor_on_text + 1}")
                             screen_text_bl.set_another_text(f"Монитор {self.s.monitor_on_text + 1}")
+                            self.s.size_list = pygame.display.list_modes(display=self.s.monitor_on_text)
+                            self.s.size_on_text = self.s.size_list[0]
+                            size_text.set_another_text("*".join(list(map(str, self.s.size_on_text))))
+                            size_text_bl.set_another_text("*".join(list(map(str, self.s.size_on_text))))
+
 
                     if event.button == minus_screen:
                         if self.s.monitor_on_text != 0:
                             self.s.monitor_on_text -= 1
                             screen_text.set_another_text(f"Монитор {self.s.monitor_on_text + 1}")
                             screen_text_bl.set_another_text(f"Монитор {self.s.monitor_on_text + 1}")
+                            self.s.size_list = pygame.display.list_modes(display=self.s.monitor_on_text)
+                            self.s.size_on_text = self.s.size_list[0]
+                            size_text.set_another_text("*".join(list(map(str, self.s.size_on_text))))
+                            size_text_bl.set_another_text("*".join(list(map(str, self.s.size_on_text))))
 
                     if event.button == plus_general:
                         self.s.volume_general += 10 * (self.s.volume_general != 100)
@@ -448,22 +457,17 @@ class Game:
                         sound_text_volume_bl.set_another_text(str(self.s.volume_sound))
 
                     if event.button == apply_button:
-                        if self.s.monitor_on_text != self.s.monitor:
-                            self.s.monitor = self.s.monitor_on_text
-                            self.s.WIDTH = self.s.monitors[self.s.monitor].width
-                            self.s.HEIGHT = self.s.monitors[self.s.monitor].height
+                        self.s.monitor = self.s.monitor_on_text
+                        self.s.WIDTH, self.s.HEIGHT = self.s.size_on_text
+                        if full_dict_temp[0]:
                             pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), display=self.s.monitor)
-                            self.s.size_list = pygame.display.list_modes()
-                        elif not ((self.s.width_m < self.s.size_on_text[0] or self.s.height_m < self.s.size_on_text[
-                            1]) and full_dict_temp[1]):
-                            self.s.WIDTH, self.s.HEIGHT = self.s.size_on_text
-                            if full_dict_temp[0]:
-                                pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), pygame.FULLSCREEN, display=self.s.monitor)
+                            pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), pygame.FULLSCREEN,
+                                                    display=self.s.monitor)
+                        else:
+                            if self.s.size_list[0] == self.s.WIDTH and self.s.size_list[0] == self.s.HEIGHT:
+                                pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT - 40), display=self.s.monitor)
                             else:
-                                if self.s.width_m == self.s.WIDTH and self.s.height_m == self.s.HEIGHT:
-                                    pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT - 40), display=self.s.monitor)
-                                else:
-                                    pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), display=self.s.monitor)
+                                pygame.display.set_mode((self.s.WIDTH, self.s.HEIGHT), display=self.s.monitor)
                         self.s.full_dict = full_dict_temp
                         sett = False
                         self.s.update_size()
