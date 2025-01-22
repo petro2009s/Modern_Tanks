@@ -151,7 +151,7 @@ class Settings:
         self.gunner_site_base = pygame.image.load('resources/images/gunner_site.png').convert_alpha()
         self.gunner_site = pygame.transform.scale(self.gunner_site_base,
                                                   (self.WIDTH, self.HEIGHT))
-        self.max_t = 50
+        self.max_t = 80
         self.texture_w = self.WIDTH * 0.6 * 1.44
         self.texture_h = self.WIDTH * 0.6
 
@@ -258,7 +258,7 @@ class Settings:
         self.test_sprite = pygame.image.load('resources/images/bush.png').convert_alpha()
         self.bush_sprite = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
         self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        thermal_texture(self.bush_sprite_thermal, 20, 50)
+        thermal_texture(self.bush_sprite_thermal, 20, self.max_t)
         self.center_ray = self.NUM_RAYS // 2 - 1
 
         self.FAKE_RAYS = int(self.NUM_RAYS * 2)
@@ -266,7 +266,10 @@ class Settings:
         self.test_sprite_v = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in range(8)]
         self.test_sprite_v_thermal = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in range(8)]
         for i in self.test_sprite_v_thermal:
-            thermal_texture(i, 60, 60)
+            thermal_texture(i, 80, 80)
+        self.tree_sprite = pygame.image.load('resources/images/tree.png').convert_alpha()
+        self.tree_sprite_thermal = pygame.transform.scale(self.tree_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        thermal_texture(self.tree_sprite_thermal, 20, self.max_t)
 
         self.sprites = Sprite(self)
     def graph_set(self, n):

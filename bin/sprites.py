@@ -9,21 +9,26 @@ class Sprite:
         self.sprite_types = {'bush_thermal': self.s.bush_sprite_thermal,
                              'bush': self.s.bush_sprite,
                              'bmp': self.s.test_sprite_v,
-                             'bmp_thermal': self.s.test_sprite_v_thermal}
+                             'bmp_thermal': self.s.test_sprite_v_thermal,
+                             'tree_thermal': self.s.tree_sprite_thermal,
+                             'tree': self.s.tree_sprite}
         self.list_of_objects_thermal = [
-            SpriteObject(self.sprite_types['bush_thermal'], True, (45.1, 7.1), 1, 1, self.s, 1),
-            SpriteObject(self.sprite_types['bush_thermal'], True, (47.1, 9.1), 1, 1, self.s, 1),
-            SpriteObject(self.sprite_types['bmp_thermal'], False, (54, 17), 0.7, 1, self.s, 3, k=1.77)]
+            SpriteObject(self.sprite_types['bush_thermal'], True, (45.1, 7.1), 0.7, 1, self.s, 1),
+            SpriteObject(self.sprite_types['bush_thermal'], True, (47.1, 9.1), 0.7, 1, self.s, 1),
+            SpriteObject(self.sprite_types['bmp_thermal'], False, (54, 17), 0.7, 1, self.s, 3, k=1.77),
+            SpriteObject(self.sprite_types['tree_thermal'], True, (50, 18), 0, 2, self.s, 1)]
         self.list_of_objects = [
-            SpriteObject(self.sprite_types['bush'], True, (45.1, 7.1), 1, 1, self.s, 1),
-            SpriteObject(self.sprite_types['bush'], True, (47.1, 9.1), 1, 1, self.s, 1),
-            SpriteObject(self.sprite_types['bmp'], False, (54, 17), 0.7, 1, self.s, 3, k=1.77)]
+            SpriteObject(self.sprite_types['bush'], True, (45.1, 7.1), 0.7, 1, self.s, 1),
+            SpriteObject(self.sprite_types['bush'], True, (47.1, 9.1), 0.7, 1, self.s, 1),
+            SpriteObject(self.sprite_types['bmp'], False, (54, 17), 0.7, 1, self.s, 3, k=1.77),
+            SpriteObject(self.sprite_types['tree'], True, (50, 18), 0, 2, self.s, 1)]
         self.collision_set = {(54, 17)}
 
 
 class SpriteObject:
     def __init__(self, object, stat, pos, shift, scale, s, a1, k=1):
         self.s = s
+        self.movement_angle = 1
         self.object = object
         self.stat = stat
         self.pos = self.x, self.y = pos[0] * self.s.tile_w, pos[1] * self.s.tile_h
@@ -135,7 +140,6 @@ class SpriteObject:
         dist *= math.cos(math.radians(HALF_FOV - current_ray * DELTA_ANGLE))
         fake_ray = current_ray + self.s.FAKE_RAYS
         if 0 <= fake_ray <= self.s.NUM_RAYS - 1 + 2 * self.s.FAKE_RAYS and dist < fake_walls[fake_ray][0]:
-            print(0 <= abs(math.degrees(gamma)) <= self.a1, abs(math.degrees(gamma)))
             if 0 <= abs(math.degrees(gamma)) <= self.a1:
                 tank.depth = dist
             proj_height = min(int(PROJ_COEFF / dist * self.scale), self.s.HEIGHT)
@@ -156,3 +160,9 @@ class SpriteObject:
             return (dist, sprite, sprite_pos)
         else:
             return (False,)
+    def bmp_movement(self):
+        dx = -0.05 * self.s.tile_w * self.s.FPS / 60 * self.movement_angle
+        if ((self.x + dx) // self.s.tile_w, self.y // self.s.tile_h) in self.s.map.world_map:
+            self.movement_angle *= -1
+            print('eafsfs')
+        self.x += dx

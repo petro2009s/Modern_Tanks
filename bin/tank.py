@@ -5,15 +5,16 @@ import sys
 import math
 from bin.text import Text
 from bin.test_settings import TankSettings
-from bin.buttons import SelectButton
+from bin.buttons import SelectButton, Button
 
 
 class Tank:
     def __init__(self, settings, x, y, movement_angle, minimap_k, x_minimap, y_minimap, apfsds_c=1, he_c=1, heat_c=1,
                  minimap_displaying=False):
+
         self.s = settings
         self.s.music_menu.stop()
-
+        pygame.display.set_icon(self.s.icon)
         self.x = x
         self.y = y
 
@@ -31,6 +32,7 @@ class Tank:
         self.is_shot = False
         self.reload = False
         self.thermal_d = False
+        self.menu = False
 
         self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
         if self.s.volume_music == 0:
@@ -59,7 +61,13 @@ class Tank:
         self.angle_of_view = 0
         self.horizontal = -self.s.HEIGHT * 0.085
         self.thermal_horizontal = -self.s.HEIGHT * 0.12
-        self.thermal_horizontal_d = -self.s.HEIGHT * 0.04
+        self.thermal_horizontal_d = -self.s.HEIGHT * 0.02
+        self.min_hor_thermal = -self.s.HEIGHT * 0.2
+        self.min_hor_thermal_d = -self.s.HEIGHT * 0.06
+        self.min_hor_optic = -self.s.HEIGHT * 0.15
+        self.max_hor_thermal = self.s.HEIGHT * 0.5
+        self.max_hor_thermal_d = self.s.HEIGHT * 0.15
+        self.max_hor_optic = self.s.HEIGHT * 0.375
         self.lock_x = 0
         self.lock_y = 0
         self.type = 1
@@ -87,6 +95,7 @@ class Tank:
         self.walls = []
 
     def start(self):
+        pygame.display.set_icon(self.s.icon)
         print(sorted(self.s.map.world_map))
         show = True
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
@@ -96,9 +105,9 @@ class Tank:
                               str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                               is_topleft=True)
         optic_sight_button = SelectButton(self.s.optic_sight_x, self.s.optic_sight_y, self.s.optic_sight_w_r,
-                                          self.s.optic_sight_h_r, 'прицел', font_size=20)
+                                          self.s.optic_sight_h_r, 'Оптический прицел', font_size=20)
         thermal_sight_button = SelectButton(self.s.thermal_sight_x, self.s.thermal_sight_y, self.s.thermal_sight_w_r,
-                                            self.s.thermal_sight_h_r, 'прицел', font_size=20)
+                                            self.s.thermal_sight_h_r, 'Тепловизор', font_size=20)
         suo_button = SelectButton(self.s.suo_x, self.s.suo_y, self.s.suo_w_r,
                                   self.s.suo_h_r, 'суо', font_size=20)
         depth_text4 = Text(self.s.thermal_x_d * 1.42, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
@@ -126,7 +135,7 @@ class Tank:
                           font_name='resources/fonts/depth_thermal_font.ttf'
                           )
         ssu_text = Text(self.s.thermal_x_d * 1.12, self.s.thermal_y_d_2 * 1.393, (183, 183, 183),
-                        'ССУ               ОК', int(self.s.WIDTH * 0.006),
+                        'ССУ              ВКЛ', int(self.s.WIDTH * 0.006),
                         font_name='resources/fonts/depth_thermal_font.ttf'
                         )
         floor = pygame.Rect(self.s.thermal_x_d, 0, self.s.thermal_width,
@@ -143,19 +152,21 @@ class Tank:
                            'Т', int(self.s.WIDTH * 0.008),
                            font_name='resources/fonts/depth_thermal_font.ttf'
                            )
-        weapon_text1 = Text(self.s.thermal_x_d * 1.3554, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
+        weapon_text1 = Text(self.s.thermal_x_d * 1.474, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
                            'О', int(self.s.WIDTH * 0.008),
                            font_name='resources/fonts/depth_thermal_font.ttf'
                            )
-        weapon_text2 = Text(self.s.thermal_x_d * 1.3854, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
-                            'С', int(self.s.WIDTH * 0.03),
+        weapon_text2 = Text(self.s.thermal_x_d * 1.507, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
+                            'С', int(self.s.WIDTH * 0.008),
                             font_name='resources/fonts/depth_thermal_font.ttf'
                             )
-        weapon_text3 = Text(self.s.thermal_x_d * 1.4154, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
-                            'Н', int(self.s.WIDTH * 0.03),
+        weapon_text3 = Text(self.s.thermal_x_d * 1.544, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
+                            'Н', int(self.s.WIDTH * 0.008),
                             font_name='resources/fonts/depth_thermal_font.ttf'
                             )
         while show:
+            if self.menu:
+                show = False
             optic_sight_button.check(pygame.mouse.get_pos())
             thermal_sight_button.check(pygame.mouse.get_pos())
             suo_button.check(pygame.mouse.get_pos())
@@ -267,7 +278,9 @@ class Tank:
                         self.s.background_sound.stop()
                         self.s.reload_sound.stop()
                         self.s.shoot_sound.stop()
-                        show = False
+                        # show = False
+                        self.s.display.blit(self.s.gunner_site2)
+                        self.exit()
 
                     if event.key == pygame.K_e and self.rangefinder_suo:
                         d = self.rangefinder()
@@ -371,9 +384,9 @@ class Tank:
                     depth_text4.draw(self.s.display)
                     ammo_text1.draw(self.s.display)
                     ammo_text2.draw(self.s.display)
-                    # weapon_text1.draw(self.s.display)
-                    # weapon_text2.draw(self.s.display)
-                    # weapon_text3.draw(self.s.display)
+                    weapon_text1.draw(self.s.display)
+                    weapon_text2.draw(self.s.display)
+                    weapon_text3.draw(self.s.display)
                     if self.ready:
                         ready_text1.draw(self.s.display)
                         ready_text2.draw(self.s.display)
@@ -432,6 +445,83 @@ class Tank:
                             y + self.pos(k=self.s.minimap_k)[1])
             self.s.display.blit(image, rect2)
 
+    def exit(self):
+        pygame.display.set_icon(self.s.icon)
+        exit_to_menu_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.51, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1, 'Выйти в меню', self.s.size_text_b, 'resources/images/button_inact.png',
+                              'resources/images/button_active.png',
+                              'resources/sounds/button_menu_sound.mp3')
+        continue_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.32, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1, 'Продолжить', self.s.size_text_b, 'resources/images/button_inact.png',
+                              'resources/images/button_active.png',
+                              'resources/sounds/button_menu_sound.mp3')
+        quit_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.69, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1,
+                             'Выйти', self.s.size_text_b, 'resources/images/button_inact.png',
+                             'resources/images/button_active.png',
+                             'resources/sounds/button_menu_sound.mp3')
+        guidence_text = Text(round(self.s.WIDTH * 0.7), round(self.s.HEIGHT * 0.3), (200, 200, 200), 'Управление:',
+                    int(self.s.WIDTH * 0.01),
+                    is_topleft=True)
+        q_text = Text(self.s.WIDTH * 0.7, self.s.HEIGHT * 0.33, (200, 200, 200), 'Q - захват цели',
+                    int(self.s.WIDTH * 0.01),
+                    is_topleft=True)
+        e_text = Text(self.s.WIDTH * 0.7, self.s.HEIGHT * 0.36, (200, 200, 200), 'E - замер дистанции',
+                      int(self.s.WIDTH * 0.01),
+                      is_topleft=True)
+        r_text = Text(self.s.WIDTH * 0.7, self.s.HEIGHT * 0.39, (200, 200, 200), 'R - перезарядка',
+                      int(self.s.WIDTH * 0.01),
+                      is_topleft=True)
+        lkm_text = Text(self.s.WIDTH * 0.7, self.s.HEIGHT * 0.42, (200, 200, 200), 'ЛКМ - выстрел',
+                      int(self.s.WIDTH * 0.01),
+                      is_topleft=True)
+        background = pygame.Surface((self.s.WIDTH, self.s.HEIGHT))
+        background.set_alpha(128)
+        background.fill((1, 1, 1))
+        background_text = pygame.Surface((self.s.WIDTH * 0.2, self.s.HEIGHT * 0.2))
+        background_text.set_alpha(128)
+        background_text.fill((37, 46, 37))
+        self.s.display.blit(background, (0, 0))
+        self.s.display.blit(background_text, (self.s.WIDTH * 0.68, self.s.HEIGHT * 0.28))
+        show = True
+        pygame.mouse.set_visible(True)
+        while show:
+            # self.s.display.blit(background, (0, 0))
+            continue_button.check(pygame.mouse.get_pos())
+            exit_to_menu_button.check(pygame.mouse.get_pos())
+            quit_button.check(pygame.mouse.get_pos())
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                if event.type == pygame.USEREVENT:
+                    if event.button == continue_button:
+                        show = False
+                    elif event.button == quit_button:
+                        pygame.quit()
+                        sys.exit()
+                    elif event.button == exit_to_menu_button:
+                        self.menu = True
+                        show = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        show = False
+
+                continue_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
+                exit_to_menu_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
+                quit_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
+
+
+            continue_button.draw(self.s.display)
+            exit_to_menu_button.draw(self.s.display)
+            quit_button.draw(self.s.display)
+            guidence_text.draw(self.s.display)
+            q_text.draw(self.s.display)
+            e_text.draw(self.s.display)
+            r_text.draw(self.s.display)
+            lkm_text.draw(self.s.display)
+
+            pygame.display.flip()
+            self.s.clock.tick(self.s.FPS)
+        pygame.mouse.set_visible(False)
     def movement(self):
         keys = pygame.key.get_pressed()
 
@@ -506,9 +596,9 @@ class Tank:
 
         elif keys[pygame.K_UP]:
             if self.block is False:
-                self.horizontal += self.s.vertical_v * t
-                self.thermal_horizontal += self.s.vertical_v * t
-                self.thermal_horizontal_d += self.s.vertical_v * t / 5
+                self.horizontal = min(self.horizontal + self.s.vertical_v * t, self.max_hor_optic)
+                self.thermal_horizontal = min(self.thermal_horizontal + self.s.vertical_v * t, self.max_hor_thermal)
+                self.thermal_horizontal_d = min(self.thermal_horizontal_d + self.s.vertical_v * t, self.max_hor_thermal_d)
                 if self.zoom:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                            3 * self.horizontal + self.s.HEIGHT // 2)
@@ -539,9 +629,9 @@ class Tank:
                                                      self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
         elif keys[pygame.K_DOWN]:
             if self.block is False:
-                self.horizontal -= self.s.vertical_v * t
-                self.thermal_horizontal -= self.s.vertical_v * t
-                self.thermal_horizontal_d -= self.s.vertical_v * t / 5
+                self.horizontal = max(self.horizontal - self.s.vertical_v * t, self.min_hor_optic)
+                self.thermal_horizontal = max(self.thermal_horizontal - self.s.vertical_v * t, self.min_hor_thermal)
+                self.thermal_horizontal_d = max(self.thermal_horizontal_d - self.s.vertical_v * t, self.min_hor_thermal_d)
                 if self.zoom:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                            3 * self.horizontal + self.s.HEIGHT // 2)
@@ -1372,7 +1462,7 @@ class Tank:
 
     def optic_sight(self):
         show = True
-
+        pygame.display.set_icon(self.s.icon)
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                                  is_topleft=True)
@@ -1413,6 +1503,10 @@ class Tank:
                                              self.s.thermal_y_d_2, self.s.thermal_width,
                                              3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
         while show:
+            # self.s.sprites.list_of_objects[2].bmp_movement()
+            # self.s.sprites.list_of_objects_thermal[2].bmp_movement()
+            if self.menu:
+                show = False
             self.s.display.fill((0, 0, 0))
             self.timer()
             pygame.draw.rect(self.s.display, (53, 104, 45), floor)
@@ -1503,6 +1597,7 @@ class Tank:
 
     def thermal_sight(self):
         show = True
+        pygame.display.set_icon(self.s.icon)
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                                  is_topleft=True)
@@ -1535,7 +1630,7 @@ class Tank:
                           font_name='resources/fonts/depth_thermal_font.ttf'
                           )
         ssu_text = Text(self.s.WIDTH * 0.324, self.s.HEIGHT * 0.823, (183, 183, 183),
-                        'ССУ          ОК', int(self.s.WIDTH * 0.028),
+                        'ССУ        ВКЛ', int(self.s.WIDTH * 0.028),
                         font_name='resources/fonts/depth_thermal_font.ttf'
                         )
         ready_text1 = Text(self.s.WIDTH * 0.25, self.s.HEIGHT * 0.828, (183, 183, 183),
@@ -1592,7 +1687,10 @@ class Tank:
                                              self.s.thermal_y_d_2, self.s.thermal_width,
                                              3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
         self.thermal = True
+        if self.menu:
+            show = False
         while show:
+
             self.s.display.fill((150, 150, 150))
             self.timer()
 
