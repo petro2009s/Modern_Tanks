@@ -33,6 +33,7 @@ class Tank:
         self.reload = False
         self.thermal_d = False
         self.menu = False
+        self.is_sprite_depth = False
 
         self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
         if self.s.volume_music == 0:
@@ -58,6 +59,8 @@ class Tank:
         self.v = 0
         self.depth = '0000'
         self.depth_m = '0000'
+        self.depth_sprite = '0000'
+        self.true_depth = '0000'
         self.angle_of_view = 0
         self.horizontal = -self.s.HEIGHT * 0.085
         self.thermal_horizontal = -self.s.HEIGHT * 0.12
@@ -578,20 +581,21 @@ class Tank:
     def guidance(self):
         keys = pygame.key.get_pressed()
         t = 1 / self.s.FPS
-
-        if ((self.x - self.lock_x) ** 2 + (self.y - self.lock_y > 0) ** 2) ** 0.5 > float(self.depth):
+        print(self.is_sprite_depth, ((self.x - self.lock_x) ** 2 + (self.y - self.lock_y) ** 2) ** 0.5, float(self.depth))
+        if int(((self.x - self.lock_x) ** 2 + (self.y - self.lock_y) ** 2) ** 0.5) > float(self.depth) * 1.006:
             self.lock = False
         if self.lock:
             if (self.x - self.lock_x > 0 and self.y - self.lock_y > 0) or (
                     self.x - self.lock_x > 0 and self.y - self.lock_y < 0):
                 self.angle_of_view = self.lock_f(self.lock_x, self.lock_y) * 180 / 3.14 + 180
             else:
+                print(self.lock_x, self.lock_y)
                 self.angle_of_view = self.lock_f(self.lock_x, self.lock_y) * 180 / 3.14
 
-        elif keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] and not self.lock:
             self.angle_of_view += self.s.tower_v * t
 
-        elif keys[pygame.K_LEFT]:
+        elif keys[pygame.K_LEFT] and not self.lock:
             self.angle_of_view -= self.s.tower_v * t
 
         elif keys[pygame.K_UP]:
@@ -1667,6 +1671,8 @@ class Tank:
                             'Н', int(self.s.WIDTH * 0.03),
                             font_name='resources/fonts/depth_thermal_font.ttf'
                             )
+        lock_rect = pygame.Rect(0, 0, self.s.WIDTH * 0.1, self.s.HEIGHT * 0.15)
+        lock_rect.center = (self.s.WIDTH // 2, self.s.HEIGHT * 0.437)
         if not self.zoom:
             self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                    self.horizontal + self.s.HEIGHT // 2)
@@ -1690,6 +1696,8 @@ class Tank:
         if self.menu:
             show = False
         while show:
+            self.s.sprites.list_of_objects[2].bmp_movement(self)
+            self.s.sprites.list_of_objects_thermal[2].bmp_movement(self)
 
             self.s.display.fill((150, 150, 150))
             self.timer()
@@ -1761,8 +1769,12 @@ class Tank:
                                                              self.s.thermal_y_d_2, self.s.thermal_width,
                                                              self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
                     if event.key == pygame.K_q and self.lock_on:
-                        self.lock_x = self.x + float(self.depth) * math.cos(self.angle_of_view * 3.14 / 180)
-                        self.lock_y = self.y + float(self.depth) * math.sin(self.angle_of_view * 3.14 / 180)
+                        if self.is_sprite_depth:
+                            self.true_depth = min(float(self.depth), float(self.depth_sprite))
+                        else:
+                            self.true_depth = float(self.depth)
+                        self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
+                        self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
                         self.lock = True if self.lock is False else False
                     if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and self.ammo_list[self.current_ammo] > 0:
                         self.reload = True
@@ -1787,6 +1799,7 @@ class Tank:
 
             self.movement()
             self.guidance()
+            self.is_sprite_depth = False
             if self.thermal_on:
                 if self.zoom:
                     self.ray_casting(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
@@ -1812,6 +1825,10 @@ class Tank:
 
                 pygame.draw.rect(self.s.display, (150, 150, 150), z)
                 pygame.draw.rect(self.s.display, (150, 150, 150), v)
+            # if self.is_sprite_depth:
+            #     self.true_depth = min(float(self.depth), float(self.depth_sprite))
+            # else:
+            #     self.true_depth = float(self.depth)
             self.s.display.blit(self.s.thermal_image, ((self.s.WIDTH - self.s.thermal_base_width) // 2, 0))
 
             self.draw_minimap(self.x_minimap, self.y_minimap)
@@ -1834,6 +1851,8 @@ class Tank:
                         ready_text1.draw(self.s.display)
                         ready_text2.draw(self.s.display)
                         ready_text3.draw(self.s.display)
+                    if self.lock:
+                        pygame.draw.rect(self.s.display, (0, 0, 0), lock_rect, int(self.s.WIDTH * 0.004))
                 else:
                     ssu_text.draw(self.s.display)
             pygame.display.flip()
