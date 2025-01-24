@@ -807,3 +807,4 @@ class Game:
         print(self.s.WIDTH // 2, self.s.HEIGHT // 2)
         tank = Tank(self.s, self.s.map_width // 2, self.s.map_height // 2, 0, self.s.minimap_k, 0, 0, APFSDS_COUNT, HE_COUNT, HEAT_COUNT, self.s.minimap_dict[0])
         tank.start()
+

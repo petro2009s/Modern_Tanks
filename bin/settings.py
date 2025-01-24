@@ -269,7 +269,13 @@ class Settings:
             thermal_texture(i, 80, 80)
         self.tree_sprite = pygame.image.load('resources/images/tree.png').convert_alpha()
         self.tree_sprite_thermal = pygame.transform.scale(self.tree_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.destroyed_image = pygame.image.load('resources/images/destroyed.png').convert_alpha()
+        self.destroyed_image = pygame.transform.scale(self.destroyed_image, (self.WIDTH, self.HEIGHT))
         thermal_texture(self.tree_sprite_thermal, 20, self.max_t)
+        self.mine_coords = {(55, 20), (56, 21), (55, 21), (57, 25), (50, 60)}
+        self.fpv_coords = set([(i, j) for j in range(len(self.world_map) // 2) for i in range(len(self.world_map[0]))])
+        self.fpv_time = 4
+        self.count_of_targets = '1'
         self.sprites = Sprite(self)
     def graph_set(self, n):
         self.NUM_RAYS = n
@@ -455,7 +461,7 @@ class Settings:
         self.test_sprite_v_thermal = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in range(8)]
         for i in self.test_sprite_v_thermal:
             thermal_texture(i, 60, 60)
-
+        self.destroyed_image = pygame.transform.scale(self.destroyed_image, (self.WIDTH, self.HEIGHT))
         self.sprites = Sprite(self)
 
 
