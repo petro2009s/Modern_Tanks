@@ -270,7 +270,6 @@ class Settings:
         self.tree_sprite = pygame.image.load('resources/images/tree.png').convert_alpha()
         self.tree_sprite_thermal = pygame.transform.scale(self.tree_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
         thermal_texture(self.tree_sprite_thermal, 20, self.max_t)
-
         self.sprites = Sprite(self)
     def graph_set(self, n):
         self.NUM_RAYS = n

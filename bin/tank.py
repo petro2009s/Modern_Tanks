@@ -50,6 +50,7 @@ class Tank:
         self.ammo_list_text = ['БР', 'ОФ', 'КС']
         self.current_ammo = 0
         self.current_ammo_in_gun = 0
+        self.current_shooted_ammo = None
 
         self.shot_timer = 0
         self.shot_time = 2
@@ -168,6 +169,7 @@ class Tank:
                             font_name='resources/fonts/depth_thermal_font.ttf'
                             )
         while show:
+            self.movement_check()
             if self.menu:
                 show = False
             optic_sight_button.check(pygame.mouse.get_pos())
@@ -356,19 +358,19 @@ class Tank:
                 if self.zoom:
                     self.ray_casting(self.s.thermal_x_d,
                                      self.s.thermal_y_d, sight_type='4d')
-                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal]
+                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
                     self.world(temp, self.s.thermal_sight_zoom_d,
                                (self.s.thermal_x_d, self.s.thermal_y_d_2))
                 elif self.extra_zoom:
                     self.ray_casting(self.s.thermal_x_d,
                                      self.s.thermal_y_d, sight_type='4.5d')
-                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal]
+                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
                     self.world(temp, self.s.thermal_sight_zoom_d,
                                (self.s.thermal_x_d, self.s.thermal_y_d_2))
                 else:
                     self.ray_casting(self.s.thermal_x_d,
                                      self.s.thermal_y_d, sight_type='3d')
-                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal]
+                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
                     self.world(temp, self.s.thermal_sight_d,
                                (self.s.thermal_x_d * 1.01, self.s.thermal_y_d_2))
                 # optic_sight_button.draw(self.s.display)
@@ -581,7 +583,7 @@ class Tank:
     def guidance(self):
         keys = pygame.key.get_pressed()
         t = 1 / self.s.FPS
-        print(self.is_sprite_depth, ((self.x - self.lock_x) ** 2 + (self.y - self.lock_y) ** 2) ** 0.5, float(self.depth))
+        # print(self.is_sprite_depth, ((self.x - self.lock_x) ** 2 + (self.y - self.lock_y) ** 2) ** 0.5, float(self.depth))
         if int(((self.x - self.lock_x) ** 2 + (self.y - self.lock_y) ** 2) ** 0.5) > float(self.depth) * 1.006:
             self.lock = False
         if self.lock:
@@ -784,6 +786,7 @@ class Tank:
         if self.shot_timer >= self.shot_time:
             self.is_shot = False
             self.block = False
+            self.current_shooted_ammo = None
             self.shot_timer = 0
         if self.reload_timer >= self.reload_time:
             self.reload = False
@@ -1507,8 +1510,7 @@ class Tank:
                                              self.s.thermal_y_d_2, self.s.thermal_width,
                                              3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
         while show:
-            # self.s.sprites.list_of_objects[2].bmp_movement()
-            # self.s.sprites.list_of_objects_thermal[2].bmp_movement()
+            self.movement_check()
             if self.menu:
                 show = False
             self.s.display.fill((0, 0, 0))
@@ -1573,12 +1575,12 @@ class Tank:
             pygame.draw.rect(self.s.display, (135, 206, 235), self.sky)
             if not self.zoom:
                 self.ray_casting(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, sight_type='1')
-                temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects]
+                temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects if not obj.death]
                 self.world(temp, self.s.optic_sight,
                            (self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0))
             else:
                 self.ray_casting(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, sight_type='2')
-                temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects]
+                temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects if not obj.death]
                 self.world(temp, self.s.optic_sight_zoom,
                            (self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0))
             pygame.draw.rect(self.s.display, (0, 0, 0), black)
@@ -1696,8 +1698,7 @@ class Tank:
         if self.menu:
             show = False
         while show:
-            self.s.sprites.list_of_objects[2].bmp_movement(self)
-            self.s.sprites.list_of_objects_thermal[2].bmp_movement(self)
+            self.movement_check()
 
             self.s.display.fill((150, 150, 150))
             self.timer()
@@ -1789,6 +1790,7 @@ class Tank:
                         print(1)
                         if self.ready:
                             self.ammo_list[self.current_ammo_in_gun] -= 1
+                            self.current_shooted_ammo = int(str(self.current_ammo_in_gun)[:])
                             self.current_ammo_in_gun = None
                             self.ready = False
                             self.is_shot = True
@@ -1804,14 +1806,14 @@ class Tank:
                 if self.zoom:
                     self.ray_casting(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
                                      self.s.thermal_y, sight_type='4')
-                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal]
+                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
                     self.world(temp, self.s.thermal_sight_zoom,
                                (self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
                                 self.s.thermal_y))
                 elif self.extra_zoom:
                     self.ray_casting(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
                                      self.s.thermal_y, sight_type='4.5')
-                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal]
+                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
                     self.world(temp, self.s.thermal_sight_zoom,
                                (self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
                                 self.s.thermal_y))
@@ -1819,7 +1821,7 @@ class Tank:
                     self.ray_casting(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
                                      self.s.thermal_y, sight_type='3')
 
-                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal]
+                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
                     self.world(temp, self.s.thermal_sight, (self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
                                      self.s.thermal_y))
 
@@ -1860,7 +1862,11 @@ class Tank:
         self.thermal = False
 
     def rangefinder(self):
-        depth = str(min(int(float(self.depth) * (7 / self.side)), 9999))
+        if self.is_sprite_depth:
+            self.true_depth = min(float(self.depth), float(self.depth_sprite))
+        else:
+            self.true_depth = float(self.depth)
+        depth = str(min(int(float(self.true_depth) * (7 / self.side)), 9999))
         depth = '0' * (4 - len(depth)) + depth
         self.depth_m = depth[:]
         return depth
@@ -1868,7 +1874,10 @@ class Tank:
     def lock_f(self, x, y):
         dx = self.x - x
         dy = self.y - y
-        return math.atan(dy / dx)
+        if dx != 0:
+            return math.atan(dy / dx)
+        else:
+            return 3.14 / 2
 
     def check_wall(self, x, y):
         all_map = self.s.map.world_map | self.s.sprites.collision_set
@@ -1914,8 +1923,13 @@ class Tank:
                 self.s.display.blit(obj, pos)
         self.s.display.blit(mark, mark_pos)
 
-
-
+    def movement_check(self):
+        for i in self.s.sprites.list_of_objects:
+            if i.type == 'bmp':
+                i.bmp_movement(self)
+        for i in self.s.sprites.list_of_objects_thermal:
+            if i.type == 'bmp':
+                i.bmp_movement(self)
 #
 # s = TankSettings()
 # ex = Tank(s, 120, 120, 0, 5, 0, 0)
