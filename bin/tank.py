@@ -2014,6 +2014,8 @@ class Tank:
 
     def check_death(self):
         if self.death:
+            self.s.explode_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+            self.s.explode_sound.play()
             death_text_bl = Text(self.s.WIDTH * 0.5028, self.s.HEIGHT * 0.1052, (0, 0, 0), 'Вас уничтожили!',
                          int(self.s.WIDTH * 0.052))
             death_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.1, (200, 200, 200), 'Вас уничтожили!',
