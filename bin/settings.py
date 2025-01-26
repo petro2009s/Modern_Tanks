@@ -274,8 +274,12 @@ class Settings:
         thermal_texture(self.tree_sprite_thermal, 20, self.max_t)
         self.mine_coords = {(55, 20), (56, 21), (55, 21), (57, 25), (50, 60)}
         self.fpv_coords = set([(i, j) for j in range(len(self.world_map) // 2) for i in range(len(self.world_map[0]))])
-        self.fpv_time = 4
+        self.fpv_time = 7
+        self.task_1 = 'уничтожить БМП и уехать'
+        self.task_2 = 'на начальную точку.'
         self.count_of_targets = '1'
+        self.start_point = (self.map_width // 9, self.map_height // 1.1)
+        self.end_point = [(i, j) for j in range(int((self.map_height // 1.1) // self.tile_h), int((self.map_height // 1) // self.tile_h)) for i in range(int((self.map_width // 12) // self.tile_w), int((self.map_width // 7) // self.tile_w))]
         self.sprites = Sprite(self)
     def graph_set(self, n):
         self.NUM_RAYS = n
@@ -462,8 +466,14 @@ class Settings:
         for i in self.test_sprite_v_thermal:
             thermal_texture(i, 60, 60)
         self.destroyed_image = pygame.transform.scale(self.destroyed_image, (self.WIDTH, self.HEIGHT))
+        self.start_point = (self.map_width // 9, self.map_height // 1.1)
+        self.end_point = [(i, j) for j in range(int((self.map_height // 1.1) // self.tile_h),
+                                                int((self.map_height // 1) // self.tile_h)) for i in
+                          range(int((self.map_width // 12) // self.tile_w), int((self.map_width // 7) // self.tile_w))]
         self.sprites = Sprite(self)
 
+    def update_sprites(self):
+        self.sprites = Sprite(self)
 
 def thermal_texture(surface, t, max_t):
     w, h = surface.get_size()

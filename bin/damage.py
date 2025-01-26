@@ -18,7 +18,7 @@ class Damage:
                 self.tank.cause = 'наезд на мину'
             # print(self.tank.death)
     def check_drones(self):
-        print((self.tank.x // self.tank.s.tile_w, self.tank.y // self.tank.s.tile_h) in self.fpv_coords, self.fpv_timer)
+        # print((self.tank.x // self.tank.s.tile_w, self.tank.y // self.tank.s.tile_h) in self.fpv_coords, self.fpv_timer)
         if (self.tank.x // self.tank.s.tile_w, self.tank.y // self.tank.s.tile_h) in self.fpv_coords:
             if self.tank.v == 0:
                 self.fpv_timer += 1 / self.tank.s.FPS

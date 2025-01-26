@@ -13,15 +13,15 @@ class Sprite:
                              'tree_thermal': self.s.tree_sprite_thermal,
                              'tree': self.s.tree_sprite}
         self.list_of_objects_thermal = [
-            SpriteObject(self.sprite_types['bush_thermal'], True, (45.1, 7.1), 0.7, 1, self.s, 5, self, 'oth'),
-            SpriteObject(self.sprite_types['bush_thermal'], True, (47.1, 9.1), 0.7, 1, self.s, 5, self, 'oth'),
-            SpriteObject(self.sprite_types['bmp_thermal'], False, (54, 17), 0.7, 1, self.s, 15, self, 'bmp', k=1.77, v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100),
-            SpriteObject(self.sprite_types['tree_thermal'], True, (50, 18), 0, 2, self.s, 5, self, 'oth')]
+            SpriteObject(self.sprite_types['bush_thermal'], True, (45.1, 7.1), 0.7, 1, self.s, 2, self, 'oth'),
+            SpriteObject(self.sprite_types['bush_thermal'], True, (47.1, 9.1), 0.7, 1, self.s, 2, self, 'oth'),
+            SpriteObject(self.sprite_types['bmp_thermal'], False, (54, 17), 0.7, 1, self.s, 7, self, 'bmp', k=1.77, v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100),
+            SpriteObject(self.sprite_types['tree_thermal'], True, (50, 18), 0, 2, self.s, 2, self, 'oth')]
         self.list_of_objects = [
-            SpriteObject(self.sprite_types['bush'], True, (45.1, 7.1), 0.7, 1, self.s, 5, self, 'oth'),
-            SpriteObject(self.sprite_types['bush'], True, (47.1, 9.1), 0.7, 1, self.s, 5, self, 'oth'),
-            SpriteObject(self.sprite_types['bmp'], False, (54, 17), 0.7, 1, self.s, 15, self, 'bmp', k=1.77, v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100),
-            SpriteObject(self.sprite_types['tree'], True, (50, 18), 0, 2, self.s, 5, self, 'oth')]
+            SpriteObject(self.sprite_types['bush'], True, (45.1, 7.1), 0.7, 1, self.s, 2, self, 'oth'),
+            SpriteObject(self.sprite_types['bush'], True, (47.1, 9.1), 0.7, 1, self.s, 2, self, 'oth'),
+            SpriteObject(self.sprite_types['bmp'], False, (54, 17), 0.7, 1, self.s, 7, self, 'bmp', k=1.77, v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100),
+            SpriteObject(self.sprite_types['tree'], True, (50, 18), 0, 2, self.s, 2, self, 'oth')]
         self.collision_set = {(54, 17)}
 
 
@@ -121,7 +121,7 @@ class SpriteObject:
                 drx, dry = (self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0)
                 HALF_FOV = self.s.HALF_FOV_optic
             elif tank.thermal_d:
-                print(1)
+                # print(1)
                 DELTA_ANGLE = self.s.DELTA_ANGLE_thermal
                 PROJ_COEFF = self.s.PROJ_COEFF_thermal_d
                 horizontal = 1 * tank.thermal_horizontal_d
@@ -164,17 +164,17 @@ class SpriteObject:
             sprite_pos = (
                 drx + current_ray * SCALE - half_proj_height, horizontal + dry + height // 2 - half_proj_height + shift)
             # print(self.s.center_ray - self.a1 * (6 - HALF_FOV), current_ray, self.s.center_ray + self.a1 * (6 - HALF_FOV), self.s.center_ray - self.a1 * (6 - HALF_FOV) <= current_ray <= self.s.center_ray + self.a1 * (6 - HALF_FOV))
-            if self.s.center_ray - self.a1 * (6 - HALF_FOV) <= current_ray <= self.s.center_ray + self.a1 * (6 - HALF_FOV):
+            if self.s.center_ray - self.a1 * (7 - HALF_FOV) <= current_ray <= self.s.center_ray + self.a1 * (7 - HALF_FOV):
                 print('ffffff')
-                print(int(tank.depth_m) * tank.side / 7, dist)
-                if tank.horizontal + self.s.HEIGHT // 2 * 0.68 >= \
+                print(horizontal)
+                if height // 2 * 1.3 - horizontal >= \
                     sprite_pos[1] and (
-                    sprite_pos[1] + proj_height) >= tank.horizontal + self.s.HEIGHT // 2:
+                    sprite_pos[1] + proj_height) >= (height // 2 * 0.7 - horizontal):
                     print(2)
                     tank.depth_sprite = str(dist)
                     tank.is_sprite_depth = True
                     # print('gjvtyzk', tank.thermal_horizontal)
-                    print(tank.is_shot, tank.current_shooted_ammo)
+                    # print(tank.is_shot, tank.current_shooted_ammo)
                     if tank.is_shot and tank.current_shooted_ammo is not None:
                         print(3)
 
@@ -199,16 +199,17 @@ class SpriteObject:
             return (False,)
 
     def bmp_movement(self, tank):
-        dx = self.v * self.movement_angle
-        if dx != 0:
-            if ((self.x + dx) // self.s.tile_w, self.y // self.s.tile_h) == (
-            tank.x // self.s.tile_w, tank.y // self.s.tile_h):
-                dx = 0
-            if ((self.x + dx) // self.s.tile_w, self.y // self.s.tile_h) in self.s.map.world_map:
-                self.movement_angle *= -1
-            print(self.movement_angle)
-            self.x += dx
-            self.sprites.collision_set = {(self.x // self.s.tile_w, self.y // self.s.tile_h)}
+        if self.v != 0:
+            dx = self.v * self.movement_angle
+            if dx != 0:
+                if ((self.x + dx) // self.s.tile_w, self.y // self.s.tile_h) == (
+                tank.x // self.s.tile_w, tank.y // self.s.tile_h):
+                    dx = 0
+                if ((self.x + dx) // self.s.tile_w, self.y // self.s.tile_h) in self.s.map.world_map:
+                    self.movement_angle *= -1
+                # print(self.movement_angle)
+                self.x += dx
+                self.sprites.collision_set = {(self.x // self.s.tile_w, self.y // self.s.tile_h)}
 
     def minus_hp(self, tank):
         print(int(tank.depth_m) * tank.side / 7)

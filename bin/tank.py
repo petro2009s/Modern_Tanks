@@ -82,12 +82,8 @@ class Tank:
         self.lock_y = 0
         self.type = 1
         self.tryaska = 0
-        print(self.s.map.world_map, sep='\n')
-        print(self.x, self.y)
-
         self.stuck = False
         self.side = min(int(self.s.WIDTH * 0.02), int(self.s.tile_w * 0.8))
-        print(self.side)
 
         self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                self.horizontal + self.s.HEIGHT // 2)
@@ -107,7 +103,7 @@ class Tank:
 
     def start(self):
         pygame.display.set_icon(self.s.icon)
-        print(sorted(self.s.map.world_map))
+        # print(sorted(self.s.map.world_map))
         show = True
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
@@ -176,7 +172,7 @@ class Tank:
                             font_name='resources/fonts/depth_thermal_font.ttf'
                             )
         while show:
-
+            self.check_mission()
             self.movement_check()
             self.check_is_done()
             self.check_death()
@@ -190,7 +186,7 @@ class Tank:
             self.timer()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    print(self.s.map.world_map, self.s.map.world_map_dict)
+                    # print(self.s.map.world_map, self.s.map.world_map_dict)
                     pygame.quit()
                     sys.exit()
 
@@ -203,7 +199,7 @@ class Tank:
                         self.thermal_d = True
                         if self.menu:
                             show = False
-                        print(1)
+                        # print(1)
                         d = self.depth_m
                         depth_text1.set_another_text(d[0])
                         depth_text2.set_another_text(d[1])
@@ -256,7 +252,7 @@ class Tank:
                         depth_text4.set_another_text(d[3])
                         ammo_text1.set_another_text(self.ammo_list_text[self.current_ammo][0])
                         ammo_text2.set_another_text(self.ammo_list_text[self.current_ammo][1])
-                        print(2)
+                        # print(2)
                         if self.zoom:
                             self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                                    3 * self.horizontal + self.s.HEIGHT // 2)
@@ -489,13 +485,27 @@ class Tank:
         lkm_text = Text(self.s.WIDTH * 0.7, self.s.HEIGHT * 0.42, (200, 200, 200), 'ЛКМ - выстрел',
                       int(self.s.WIDTH * 0.01),
                       is_topleft=True)
+
+        task_text_1 = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.3, (200, 200, 200),
+                         f'Боевая задача: {self.s.task_1}',
+                         int(self.s.WIDTH * 0.01), is_topleft=True)
+        task_text_2 = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.33, (200, 200, 200),
+                           f'{self.s.task_2}',
+                           int(self.s.WIDTH * 0.01), is_topleft=True)
+        destroyed_targets_text = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.36, (200, 200, 200),
+                                      f'Уничтожено целей: {self.count_of_destroyed_targets} из {self.count_of_targets}.',
+                                      int(self.s.WIDTH * 0.01), is_topleft=True)
         background = pygame.Surface((self.s.WIDTH, self.s.HEIGHT))
         background.set_alpha(128)
         background.fill((1, 1, 1))
         background_text = pygame.Surface((self.s.WIDTH * 0.2, self.s.HEIGHT * 0.2))
         background_text.set_alpha(128)
         background_text.fill((37, 46, 37))
+        background_text2 = pygame.Surface((self.s.WIDTH * 0.29, self.s.HEIGHT * 0.2))
+        background_text2.set_alpha(128)
+        background_text2.fill((37, 46, 37))
         self.s.display.blit(background, (0, 0))
+        self.s.display.blit(background_text2, (self.s.WIDTH * 0.02, self.s.HEIGHT * 0.28))
         self.s.display.blit(background_text, (self.s.WIDTH * 0.68, self.s.HEIGHT * 0.28))
         show = True
         pygame.mouse.set_visible(True)
@@ -536,6 +546,9 @@ class Tank:
             exit_to_menu_button.draw(self.s.display)
             quit_button.draw(self.s.display)
             guidence_text.draw(self.s.display)
+            task_text_1.draw(self.s.display)
+            task_text_2.draw(self.s.display)
+            destroyed_targets_text.draw(self.s.display)
             q_text.draw(self.s.display)
             e_text.draw(self.s.display)
             r_text.draw(self.s.display)
@@ -609,7 +622,7 @@ class Tank:
                     self.x - self.lock_x > 0 and self.y - self.lock_y < 0):
                 self.angle_of_view = self.lock_f(self.lock_x, self.lock_y) * 180 / 3.14 + 180
             else:
-                print(self.lock_x, self.lock_y)
+                # print(self.lock_x, self.lock_y)
                 self.angle_of_view = self.lock_f(self.lock_x, self.lock_y) * 180 / 3.14
 
         # if keys[pygame.K_RIGHT] and not self.lock:
@@ -629,7 +642,7 @@ class Tank:
             if self.block is False:
                 self.horizontal = min(self.horizontal + self.s.vertical_v * t, self.max_hor_optic)
                 self.thermal_horizontal = min(self.thermal_horizontal + self.s.vertical_v * t, self.max_hor_thermal)
-                self.thermal_horizontal_d = min(self.thermal_horizontal_d + self.s.vertical_v * t, self.max_hor_thermal_d)
+                self.thermal_horizontal_d = min((self.thermal_horizontal_d + self.s.vertical_v * t) / 5, self.max_hor_thermal_d)
                 if self.zoom:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                            3 * self.horizontal + self.s.HEIGHT // 2)
@@ -638,7 +651,7 @@ class Tank:
                                                    3 * self.thermal_horizontal + self.s.thermal_height // 2)
                     self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                      self.s.thermal_y_d_2, self.s.thermal_width,
-                                                     3 * self.thermal_horizontal_d / 2 + self.s.thermal_height_d // 2)
+                                                     3 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
 
                 elif self.extra_zoom:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
@@ -648,7 +661,7 @@ class Tank:
                                                    6 * self.thermal_horizontal + self.s.thermal_height // 2)
                     self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                      self.s.thermal_y_d_2, self.s.thermal_width,
-                                                     6 * self.thermal_horizontal_d / 2 + self.s.thermal_height_d // 2)
+                                                     6 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
                 else:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                            self.horizontal + self.s.HEIGHT // 2)
@@ -657,12 +670,12 @@ class Tank:
                                                    self.thermal_horizontal + self.s.thermal_height // 2)
                     self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                      self.s.thermal_y_d_2, self.s.thermal_width,
-                                                     self.thermal_horizontal_d / 2 + self.s.thermal_height_d // 2)
+                                                     self.thermal_horizontal_d + self.s.thermal_height_d // 2)
         elif keys[pygame.K_DOWN]:
             if self.block is False:
                 self.horizontal = max(self.horizontal - self.s.vertical_v * t, self.min_hor_optic)
                 self.thermal_horizontal = max(self.thermal_horizontal - self.s.vertical_v * t, self.min_hor_thermal)
-                self.thermal_horizontal_d = max(self.thermal_horizontal_d - self.s.vertical_v * t, self.min_hor_thermal_d)
+                self.thermal_horizontal_d = max((self.thermal_horizontal_d - self.s.vertical_v * t) / 5, self.min_hor_thermal_d)
                 if self.zoom:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                            3 * self.horizontal + self.s.HEIGHT // 2)
@@ -671,7 +684,7 @@ class Tank:
                                                    3 * self.thermal_horizontal + self.s.thermal_height // 2)
                     self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                      self.s.thermal_y_d_2, self.s.thermal_width,
-                                                     3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                                                     3 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
                 elif self.extra_zoom:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                            6 * self.horizontal + self.s.HEIGHT // 2)
@@ -680,7 +693,7 @@ class Tank:
                                                    6 * self.thermal_horizontal + self.s.thermal_height // 2)
                     self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                      self.s.thermal_y_d_2, self.s.thermal_width,
-                                                     6 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                                                     6 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
                 else:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                            self.horizontal + self.s.HEIGHT // 2)
@@ -689,7 +702,7 @@ class Tank:
                                                    self.s.thermal_height // 2 + self.thermal_horizontal)
                     self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                      self.s.thermal_y_d_2, self.s.thermal_width,
-                                                     self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+                                                     self.thermal_horizontal_d + self.s.thermal_height_d // 2)
         else:
             if pygame.mouse.get_focused() and not self.lock:
                 dif_x = pygame.mouse.get_pos()[0] - self.s.WIDTH // 2
@@ -697,7 +710,7 @@ class Tank:
                 if self.block is False:
                     self.horizontal = min(self.horizontal + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01), self.max_hor_optic)
                     self.thermal_horizontal = min(self.thermal_horizontal + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01), self.max_hor_thermal)
-                    self.thermal_horizontal_d = min(self.thermal_horizontal_d + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01),
+                    self.thermal_horizontal_d = min(self.thermal_horizontal_d + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01) / 5,
                                                     self.max_hor_thermal_d)
                     if self.zoom:
                         self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
@@ -980,7 +993,7 @@ class Tank:
 
                         break
                     if x > self.s.map_width:
-                        print(1)
+                        # print(1)
                         texture_v = None
                         break
                     x += dx * self.s.tile_w
@@ -999,7 +1012,7 @@ class Tank:
                         texture_h = self.s.map.world_map_dict[temp2]
                         break
                     if y > self.s.map_height:
-                        print(2)
+                        # print(2)
                         texture_h = None
                         break
                     y += dy * self.s.tile_h
@@ -1557,6 +1570,7 @@ class Tank:
                          self.ammo_list_text[self.current_ammo], int(self.s.WIDTH * 0.033),
                          font_name='resources/fonts/lcd_font.otf'
                          )
+
         self.optic = True
         if not self.zoom:
             self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
@@ -1577,7 +1591,7 @@ class Tank:
                                              self.s.thermal_y_d_2, self.s.thermal_width,
                                              3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
         while show:
-
+            self.check_mission()
             self.movement_check()
             self.check_is_done()
             self.check_death()
@@ -1595,7 +1609,7 @@ class Tank:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        print('escape')
+                        # print('escape')
                         show = False
                     if event.key == pygame.K_e and self.rangefinder_suo:
                         depth_text.set_another_text(self.rangefinder())
@@ -1633,8 +1647,9 @@ class Tank:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == pygame.BUTTON_LEFT:
-                        print(1)
+                        # print(1)
                         if self.ready:
+                            self.current_shooted_ammo = int(str(self.current_ammo_in_gun)[:])
                             self.ammo_list[self.current_ammo] -= 1
                             self.ready = False
                             self.is_shot = True
@@ -1666,6 +1681,8 @@ class Tank:
             depth_text.draw(self.s.display)
             ammo_text.draw(self.s.display)
 
+            if self.ready:
+                pygame.draw.circle(self.s.display, (255, 0, 0), (self.s.WIDTH * 0.45, self.s.HEIGHT * 0.933), self.s.WIDTH * 0.006)
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
         self.optic = False
@@ -1673,6 +1690,117 @@ class Tank:
     def check_is_done(self):
         if self.count_of_destroyed_targets >= self.count_of_targets:
             self.done = 'выполнена'
+
+    def check_mission(self):
+        if self.done == 'выполнена':
+
+            if ((self.x // self.s.tile_w), (self.y // self.s.tile_h)) in self.s.end_point:
+                end_text_bl = Text(self.s.WIDTH * 0.5028, self.s.HEIGHT * 0.1052, (0, 0, 0), 'Миссия выполнена!',
+                                     int(self.s.WIDTH * 0.052))
+                end_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.1, (200, 200, 200), 'Миссия выполнена!',
+                                  int(self.s.WIDTH * 0.052))
+
+                done_text_bl = Text(self.s.WIDTH * 0.032, self.s.HEIGHT * 0.253, (0, 0, 0),
+                                    f'Боевая задача {self.done}:', int(self.s.WIDTH * 0.025),
+                                    is_topleft=True)
+                done_text = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.25, (200, 200, 200),
+                                 f'Боевая задача {self.done}:',
+                                 int(self.s.WIDTH * 0.025), is_topleft=True)
+                destroyed_targets_text_bl = Text(self.s.WIDTH * 0.072, self.s.HEIGHT * 0.333, (0, 0, 0),
+                                                 f'Уничтожено целей: {self.count_of_destroyed_targets} из {self.count_of_targets}.',
+                                                 int(self.s.WIDTH * 0.025),
+                                                 is_topleft=True)
+                destroyed_targets_text = Text(self.s.WIDTH * 0.07, self.s.HEIGHT * 0.33, (200, 200, 200),
+                                              f'Уничтожено целей: {self.count_of_destroyed_targets} из {self.count_of_targets}.',
+                                              int(self.s.WIDTH * 0.025), is_topleft=True)
+                fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
+                                         str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
+                                         is_topleft=True)
+                fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200),
+                                      str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
+                                      is_topleft=True)
+                destroyed_text_bl = Text(self.s.WIDTH * 0.072, self.s.HEIGHT * 0.413, (0, 0, 0),
+                                         f'Техника не потеряна.', int(self.s.WIDTH * 0.025),
+                                         is_topleft=True)
+                destroyed_text = Text(self.s.WIDTH * 0.07, self.s.HEIGHT * 0.41, (200, 200, 200),
+                                      f'Техника не потеряна.', int(self.s.WIDTH * 0.025),
+                                      is_topleft=True)
+                pygame.display.set_icon(self.s.icon)
+                exit_to_menu_button = Button(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
+                                             self.s.HEIGHT * 0.0925,
+                                             'Выйти в меню', self.s.size_text_b, 'resources/images/button_inact.png',
+                                             'resources/images/button_active.png',
+                                             'resources/sounds/button_menu_sound.mp3')
+
+                quit_button = Button(self.s.WIDTH * 0.081, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
+                                     self.s.HEIGHT * 0.0925,
+                                     'Выйти', self.s.size_text_b, 'resources/images/button_inact.png',
+                                     'resources/images/button_active.png',
+                                     'resources/sounds/button_menu_sound.mp3')
+                img = pygame.transform.scale(self.s.menu3, (self.s.WIDTH, self.s.HEIGHT))
+                background = pygame.Surface((self.s.WIDTH * 0.45, self.s.HEIGHT * 0.44))
+                background.set_alpha(128)
+                background.fill((50, 60, 50))
+                # self.s.display.blit(background, (0, 0))
+                # self.s.display.blit(background_text, (self.s.WIDTH * 0.68, self.s.HEIGHT * 0.28))
+                show = True
+                # pygame.mouse.set_visible(True)
+                while show:
+                    # self.s.display.blit(background, (0, 0))
+                    exit_to_menu_button.check(pygame.mouse.get_pos())
+                    quit_button.check(pygame.mouse.get_pos())
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            sys.exit()
+
+                        if event.type == pygame.USEREVENT:
+                            if event.button == quit_button:
+                                pygame.quit()
+                                sys.exit()
+                            elif event.button == exit_to_menu_button:
+                                self.s.music_menu.play(-1)
+                                self.s.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
+                                self.s.background_sound.stop()
+                                self.s.reload_sound.stop()
+                                self.s.shoot_sound.stop()
+                                self.menu = True
+                                show = False
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_ESCAPE:
+                                self.s.music_menu.play(-1)
+                                self.s.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
+                                self.s.background_sound.stop()
+                                self.s.reload_sound.stop()
+                                self.s.shoot_sound.stop()
+                                self.menu = True
+                                show = False
+
+                        exit_to_menu_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
+                        quit_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
+
+                    self.s.display.blit(img, (0, 0))
+                    self.s.display.blit(background, (self.s.WIDTH * 0.026, self.s.HEIGHT * 0.24))
+                    exit_to_menu_button.draw(self.s.display)
+                    quit_button.draw(self.s.display)
+                    end_text_bl.draw(self.s.display)
+                    end_text.draw(self.s.display)
+                    done_text_bl.draw(self.s.display)
+                    done_text.draw(self.s.display)
+                    destroyed_targets_text_bl.draw(self.s.display)
+                    destroyed_targets_text.draw(self.s.display)
+                    destroyed_text_bl.draw(self.s.display)
+                    destroyed_text.draw(self.s.display)
+
+                    fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
+                    fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
+                    fps_count_text_bl.draw(self.s.display)
+                    fps_count_text.draw(self.s.display)
+                    if pygame.mouse.get_focused():
+                        self.s.display.blit(self.s.cursor, pygame.mouse.get_pos())
+
+                    pygame.display.flip()
+                    self.s.clock.tick(self.s.FPS)
     def shot(self):
         pass
 
@@ -1773,7 +1901,7 @@ class Tank:
         if self.menu:
             show = False
         while show:
-
+            self.check_mission()
             self.movement_check()
             self.check_is_done()
             self.check_death()
@@ -1868,7 +1996,7 @@ class Tank:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == pygame.BUTTON_LEFT:
-                        print(1)
+                        # print(1)
                         if self.ready:
                             self.ammo_list[self.current_ammo_in_gun] -= 1
                             self.current_shooted_ammo = int(str(self.current_ammo_in_gun)[:])
