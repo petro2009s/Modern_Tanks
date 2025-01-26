@@ -58,6 +58,8 @@ class Settings:
         self.shoot_sound = pygame.mixer.Sound("resources/sounds/shoot1.mp3")
         self.reload_sound = pygame.mixer.Sound("resources/sounds/reload.mp3")
         self.background_sound = pygame.mixer.Sound("resources/sounds/background.mp3")
+        self.explode_sound = pygame.mixer.Sound("resources/sounds/explode.mp3")
+        self.fpv_sound = pygame.mixer.Sound("resources/sounds/drone.mp3")
 
         self.graph_dict = [self.bd.select('graph_table', 'low')[0][0], self.bd.select('graph_table', 'mid')[0][0],
                            self.bd.select('graph_table', 'high')[0][0]]
