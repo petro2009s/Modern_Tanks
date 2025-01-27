@@ -36,6 +36,8 @@ class Tank:
         self.menu = False
         self.is_sprite_depth = False
         self.death = False
+        self.shot_anim = False
+        self.st = True
         self.cause = ''
 
         self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
@@ -82,6 +84,9 @@ class Tank:
         self.lock_y = 0
         self.type = 1
         self.tryaska = 0
+        self.shot_anim_counter = 1
+        self.depth_to_shot = 0
+
         self.stuck = False
         self.side = min(int(self.s.WIDTH * 0.02), int(self.s.tile_w * 0.8))
 
@@ -172,6 +177,7 @@ class Tank:
                             font_name='resources/fonts/depth_thermal_font.ttf'
                             )
         while show:
+            self.check_anim()
             self.check_mission()
             self.movement_check()
             self.check_is_done()
@@ -195,7 +201,9 @@ class Tank:
 
                         self.extra_zoom = False
                         self.thermal_d = False
+                        self.st = False
                         self.optic_sight()
+                        self.st = True
                         self.thermal_d = True
                         if self.menu:
                             show = False
@@ -241,8 +249,10 @@ class Tank:
                     elif event.button == thermal_sight_button:
 
                         self.thermal_d = False
+                        self.st = False
                         self.thermal_sight()
                         self.thermal_d = True
+                        self.st = True
                         d = self.depth_m
                         if self.menu:
                             show = False
@@ -364,7 +374,7 @@ class Tank:
                 thermal_sight_button.handle_event(event)
                 suo_button.handle_event(event)
             self.movement()
-            # self.guidance()
+            self.guidance()
             self.s.display.blit(self.s.gunner_site, (0, 0))
             if self.thermal_on:
                 pygame.draw.rect(self.s.display, self.floor_thermal_color, floor)
@@ -390,6 +400,7 @@ class Tank:
                 # optic_sight_button.draw(self.s.display)
                 # thermal_sight_button.draw(self.s.display)
                 # suo_button.draw(self.s.display)
+                self.shot(self.s.thermal_x_d * 1.3, self.s.thermal_y_d_2 * 1.2)
                 if self.zoom or self.extra_zoom:
                     depth_text1.draw(self.s.display)
                     depth_text2.draw(self.s.display)
@@ -406,6 +417,7 @@ class Tank:
                         ready_text3.draw(self.s.display)
                 else:
                     ssu_text.draw(self.s.display)
+
             self.s.display.blit(self.s.gunner_site2)
             self.draw_minimap(self.x_minimap, self.y_minimap)
 
@@ -631,18 +643,125 @@ class Tank:
         # elif keys[pygame.K_LEFT] and not self.lock:
         #     self.angle_of_view -= self.s.tower_v * t
 
+        if not self.st:
+            # print(self.thermal_d)
+            if keys[pygame.K_RIGHT] and not self.lock:
+                self.angle_of_view += self.s.tower_v * t
 
+            elif keys[pygame.K_LEFT] and not self.lock:
+                self.angle_of_view -= self.s.tower_v * t
+            elif keys[pygame.K_UP]:
+                if self.block is False:
+                    self.horizontal = min(self.horizontal + self.s.vertical_v * t, self.max_hor_optic)
+                    self.thermal_horizontal = min(self.thermal_horizontal + self.s.vertical_v * t, self.max_hor_thermal)
+                    self.thermal_horizontal_d = min((self.thermal_horizontal_d + self.s.vertical_v * t) / 5, self.max_hor_thermal_d)
+                    if self.zoom:
+                        self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                               3 * self.horizontal + self.s.HEIGHT // 2)
+                        self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                                       self.s.thermal_y, self.s.thermal_width,
+                                                       3 * self.thermal_horizontal + self.s.thermal_height // 2)
+                        self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                         self.s.thermal_y_d_2, self.s.thermal_width,
+                                                         3 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
 
-        if keys[pygame.K_RIGHT] and not self.lock:
-            self.angle_of_view += self.s.tower_v * t
+                    elif self.extra_zoom:
+                        self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                               6 * self.horizontal + self.s.HEIGHT // 2)
+                        self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                                       self.s.thermal_y, self.s.thermal_width,
+                                                       6 * self.thermal_horizontal + self.s.thermal_height // 2)
+                        self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                         self.s.thermal_y_d_2, self.s.thermal_width,
+                                                         6 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
+                    else:
+                        self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                               self.horizontal + self.s.HEIGHT // 2)
+                        self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                                       self.s.thermal_y, self.s.thermal_width,
+                                                       self.thermal_horizontal + self.s.thermal_height // 2)
+                        self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                         self.s.thermal_y_d_2, self.s.thermal_width,
+                                                         self.thermal_horizontal_d + self.s.thermal_height_d // 2)
+            elif keys[pygame.K_DOWN]:
+                if self.block is False:
+                    self.horizontal = max(self.horizontal - self.s.vertical_v * t, self.min_hor_optic)
+                    self.thermal_horizontal = max(self.thermal_horizontal - self.s.vertical_v * t, self.min_hor_thermal)
+                    self.thermal_horizontal_d = max((self.thermal_horizontal_d - self.s.vertical_v * t) / 5, self.min_hor_thermal_d)
+                    if self.zoom:
+                        self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                               3 * self.horizontal + self.s.HEIGHT // 2)
+                        self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                                       self.s.thermal_y, self.s.thermal_width,
+                                                       3 * self.thermal_horizontal + self.s.thermal_height // 2)
+                        self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                         self.s.thermal_y_d_2, self.s.thermal_width,
+                                                         3 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
+                    elif self.extra_zoom:
+                        self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                               6 * self.horizontal + self.s.HEIGHT // 2)
+                        self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                                       self.s.thermal_y, self.s.thermal_width,
+                                                       6 * self.thermal_horizontal + self.s.thermal_height // 2)
+                        self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                         self.s.thermal_y_d_2, self.s.thermal_width,
+                                                         6 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
+                    else:
+                        self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                               self.horizontal + self.s.HEIGHT // 2)
+                        self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                                       self.s.thermal_y, self.s.thermal_width,
+                                                       self.s.thermal_height // 2 + self.thermal_horizontal)
+                        self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                         self.s.thermal_y_d_2, self.s.thermal_width,
+                                                         self.thermal_horizontal_d + self.s.thermal_height_d // 2)
+            else:
+                if pygame.mouse.get_focused() and not self.lock:
+                    dif_x = pygame.mouse.get_pos()[0] - self.s.WIDTH // 2
+                    dif_y = pygame.mouse.get_pos()[1] - self.s.HEIGHT // 2
+                    if self.block is False:
+                        self.horizontal = min(self.horizontal + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01), self.max_hor_optic)
+                        self.thermal_horizontal = min(self.thermal_horizontal + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01), self.max_hor_thermal)
+                        self.thermal_horizontal_d = min(self.thermal_horizontal_d + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01) / 5,
+                                                        self.max_hor_thermal_d)
+                        if self.zoom:
+                            self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                                   3 * self.horizontal + self.s.HEIGHT // 2)
+                            self.sky_thermal = pygame.Rect(
+                                self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                self.s.thermal_y, self.s.thermal_width,
+                                3 * self.thermal_horizontal + self.s.thermal_height // 2)
+                            self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                             self.s.thermal_y_d_2, self.s.thermal_width,
+                                                             3 * self.thermal_horizontal_d / 2 + self.s.thermal_height_d // 2)
 
-        elif keys[pygame.K_LEFT] and not self.lock:
-            self.angle_of_view -= self.s.tower_v * t
-        elif keys[pygame.K_UP]:
-            if self.block is False:
-                self.horizontal = min(self.horizontal + self.s.vertical_v * t, self.max_hor_optic)
-                self.thermal_horizontal = min(self.thermal_horizontal + self.s.vertical_v * t, self.max_hor_thermal)
-                self.thermal_horizontal_d = min((self.thermal_horizontal_d + self.s.vertical_v * t) / 5, self.max_hor_thermal_d)
+                        elif self.extra_zoom:
+                            self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                                   6 * self.horizontal + self.s.HEIGHT // 2)
+                            self.sky_thermal = pygame.Rect(
+                                self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                self.s.thermal_y, self.s.thermal_width,
+                                6 * self.thermal_horizontal + self.s.thermal_height // 2)
+                            self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                             self.s.thermal_y_d_2, self.s.thermal_width,
+                                                             6 * self.thermal_horizontal_d / 2 + self.s.thermal_height_d // 2)
+                        else:
+                            self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
+                                                   self.horizontal + self.s.HEIGHT // 2)
+                            self.sky_thermal = pygame.Rect(
+                                self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                self.s.thermal_y, self.s.thermal_width,
+                                self.thermal_horizontal + self.s.thermal_height // 2)
+                            self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
+                                                             self.s.thermal_y_d_2, self.s.thermal_width,
+                                                             self.thermal_horizontal_d / 2 + self.s.thermal_height_d // 2)
+                    pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
+                    self.angle_of_view += dif_x * self.s.tower_v * t / (self.s.WIDTH * 0.07)
+            if self.type == 0:
+                self.horizontal = self.tryaska
+                self.thermal_horizontal = self.tryaska
+                self.thermal_horizontal_d = self.tryaska
+                self.type = 1
                 if self.zoom:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                            3 * self.horizontal + self.s.HEIGHT // 2)
@@ -651,7 +770,7 @@ class Tank:
                                                    3 * self.thermal_horizontal + self.s.thermal_height // 2)
                     self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                      self.s.thermal_y_d_2, self.s.thermal_width,
-                                                     3 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
+                                                     3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
 
                 elif self.extra_zoom:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
@@ -661,7 +780,7 @@ class Tank:
                                                    6 * self.thermal_horizontal + self.s.thermal_height // 2)
                     self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                      self.s.thermal_y_d_2, self.s.thermal_width,
-                                                     6 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
+                                                     6 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
                 else:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                            self.horizontal + self.s.HEIGHT // 2)
@@ -670,12 +789,39 @@ class Tank:
                                                    self.thermal_horizontal + self.s.thermal_height // 2)
                     self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                      self.s.thermal_y_d_2, self.s.thermal_width,
-                                                     self.thermal_horizontal_d + self.s.thermal_height_d // 2)
-        elif keys[pygame.K_DOWN]:
-            if self.block is False:
-                self.horizontal = max(self.horizontal - self.s.vertical_v * t, self.min_hor_optic)
-                self.thermal_horizontal = max(self.thermal_horizontal - self.s.vertical_v * t, self.min_hor_thermal)
-                self.thermal_horizontal_d = max((self.thermal_horizontal_d - self.s.vertical_v * t) / 5, self.min_hor_thermal_d)
+                                                     self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+            elif self.stab is False and self.v != 0 and self.type == 1:
+                if abs(self.v) < self.s.max_speed_w * 0.1:
+                    self.tryaska = self.horizontal
+                    self.horizontal += random.randint(-int(self.s.HEIGHT * 0.005), int(self.s.HEIGHT * 0.005))
+                    self.thermal_horizontal = self.horizontal
+                    self.thermal_horizontal_d = self.horizontal
+                    self.type = 0
+                elif abs(self.v) < self.s.max_speed_w * 0.3:
+                    self.tryaska = self.horizontal
+                    self.horizontal += random.randint(-int(self.s.HEIGHT * 0.01), int(self.s.HEIGHT * 0.01))
+                    self.thermal_horizontal = self.horizontal
+                    self.thermal_horizontal_d = self.horizontal
+                    self.type = 0
+                elif abs(self.v) < self.s.max_speed_w * 0.5:
+                    self.tryaska = self.horizontal
+                    self.horizontal += random.randint(-int(self.s.HEIGHT * 0.02), int(self.s.HEIGHT * 0.02))
+                    self.thermal_horizontal = self.horizontal
+                    self.thermal_horizontal_d = self.horizontal
+                    self.type = 0
+                elif abs(self.v) < self.s.max_speed_w * 0.7:
+                    self.tryaska = self.horizontal
+                    self.horizontal += random.randint(-int(self.s.HEIGHT * 0.025), int(self.s.HEIGHT * 0.025))
+                    self.thermal_horizontal = self.horizontal
+                    self.thermal_horizontal_d = self.horizontal
+                    self.type = 0
+                elif abs(self.v) <= self.s.max_speed_w:
+                    self.tryaska = self.horizontal
+                    self.horizontal += random.randint(-int(self.s.HEIGHT * 0.03), int(self.s.HEIGHT * 0.03))
+                    self.thermal_horizontal = self.horizontal
+                    self.thermal_horizontal_d = self.horizontal
+                    self.type = 0
+
                 if self.zoom:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                            3 * self.horizontal + self.s.HEIGHT // 2)
@@ -684,7 +830,8 @@ class Tank:
                                                    3 * self.thermal_horizontal + self.s.thermal_height // 2)
                     self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                      self.s.thermal_y_d_2, self.s.thermal_width,
-                                                     3 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
+                                                     3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+
                 elif self.extra_zoom:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                            6 * self.horizontal + self.s.HEIGHT // 2)
@@ -693,154 +840,19 @@ class Tank:
                                                    6 * self.thermal_horizontal + self.s.thermal_height // 2)
                     self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                      self.s.thermal_y_d_2, self.s.thermal_width,
-                                                     6 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
+                                                     6 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
                 else:
                     self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                            self.horizontal + self.s.HEIGHT // 2)
                     self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
                                                    self.s.thermal_y, self.s.thermal_width,
-                                                   self.s.thermal_height // 2 + self.thermal_horizontal)
+                                                   self.thermal_horizontal + self.s.thermal_height // 2)
                     self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                      self.s.thermal_y_d_2, self.s.thermal_width,
-                                                     self.thermal_horizontal_d + self.s.thermal_height_d // 2)
-        else:
-            if pygame.mouse.get_focused() and not self.lock:
-                dif_x = pygame.mouse.get_pos()[0] - self.s.WIDTH // 2
-                dif_y = pygame.mouse.get_pos()[1] - self.s.HEIGHT // 2
-                if self.block is False:
-                    self.horizontal = min(self.horizontal + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01), self.max_hor_optic)
-                    self.thermal_horizontal = min(self.thermal_horizontal + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01), self.max_hor_thermal)
-                    self.thermal_horizontal_d = min(self.thermal_horizontal_d + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01) / 5,
-                                                    self.max_hor_thermal_d)
-                    if self.zoom:
-                        self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                               3 * self.horizontal + self.s.HEIGHT // 2)
-                        self.sky_thermal = pygame.Rect(
-                            self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                            self.s.thermal_y, self.s.thermal_width,
-                            3 * self.thermal_horizontal + self.s.thermal_height // 2)
-                        self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                         self.s.thermal_y_d_2, self.s.thermal_width,
-                                                         3 * self.thermal_horizontal_d / 2 + self.s.thermal_height_d // 2)
-
-                    elif self.extra_zoom:
-                        self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                               6 * self.horizontal + self.s.HEIGHT // 2)
-                        self.sky_thermal = pygame.Rect(
-                            self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                            self.s.thermal_y, self.s.thermal_width,
-                            6 * self.thermal_horizontal + self.s.thermal_height // 2)
-                        self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                         self.s.thermal_y_d_2, self.s.thermal_width,
-                                                         6 * self.thermal_horizontal_d / 2 + self.s.thermal_height_d // 2)
-                    else:
-                        self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                               self.horizontal + self.s.HEIGHT // 2)
-                        self.sky_thermal = pygame.Rect(
-                            self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                            self.s.thermal_y, self.s.thermal_width,
-                            self.thermal_horizontal + self.s.thermal_height // 2)
-                        self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                         self.s.thermal_y_d_2, self.s.thermal_width,
-                                                         self.thermal_horizontal_d / 2 + self.s.thermal_height_d // 2)
-                pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
-                self.angle_of_view += dif_x * self.s.tower_v * t / (self.s.WIDTH * 0.07)
-        if self.type == 0:
-            self.horizontal = self.tryaska
-            self.thermal_horizontal = self.tryaska
-            self.thermal_horizontal_d = self.tryaska
-            self.type = 1
-            if self.zoom:
-                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                       3 * self.horizontal + self.s.HEIGHT // 2)
-                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                               self.s.thermal_y, self.s.thermal_width,
-                                               3 * self.thermal_horizontal + self.s.thermal_height // 2)
-                self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                 self.s.thermal_y_d_2, self.s.thermal_width,
-                                                 3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
-
-            elif self.extra_zoom:
-                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                       6 * self.horizontal + self.s.HEIGHT // 2)
-                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                               self.s.thermal_y, self.s.thermal_width,
-                                               6 * self.thermal_horizontal + self.s.thermal_height // 2)
-                self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                 self.s.thermal_y_d_2, self.s.thermal_width,
-                                                 6 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
-            else:
-                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                       self.horizontal + self.s.HEIGHT // 2)
-                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                               self.s.thermal_y, self.s.thermal_width,
-                                               self.thermal_horizontal + self.s.thermal_height // 2)
-                self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                 self.s.thermal_y_d_2, self.s.thermal_width,
-                                                 self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
-        elif self.stab is False and self.v != 0 and self.type == 1:
-            if abs(self.v) < self.s.max_speed_w * 0.1:
-                self.tryaska = self.horizontal
-                self.horizontal += random.randint(-int(self.s.HEIGHT * 0.005), int(self.s.HEIGHT * 0.005))
-                self.thermal_horizontal = self.horizontal
-                self.thermal_horizontal_d = self.horizontal
-                self.type = 0
-            elif abs(self.v) < self.s.max_speed_w * 0.3:
-                self.tryaska = self.horizontal
-                self.horizontal += random.randint(-int(self.s.HEIGHT * 0.01), int(self.s.HEIGHT * 0.01))
-                self.thermal_horizontal = self.horizontal
-                self.thermal_horizontal_d = self.horizontal
-                self.type = 0
-            elif abs(self.v) < self.s.max_speed_w * 0.5:
-                self.tryaska = self.horizontal
-                self.horizontal += random.randint(-int(self.s.HEIGHT * 0.02), int(self.s.HEIGHT * 0.02))
-                self.thermal_horizontal = self.horizontal
-                self.thermal_horizontal_d = self.horizontal
-                self.type = 0
-            elif abs(self.v) < self.s.max_speed_w * 0.7:
-                self.tryaska = self.horizontal
-                self.horizontal += random.randint(-int(self.s.HEIGHT * 0.025), int(self.s.HEIGHT * 0.025))
-                self.thermal_horizontal = self.horizontal
-                self.thermal_horizontal_d = self.horizontal
-                self.type = 0
-            elif abs(self.v) <= self.s.max_speed_w:
-                self.tryaska = self.horizontal
-                self.horizontal += random.randint(-int(self.s.HEIGHT * 0.03), int(self.s.HEIGHT * 0.03))
-                self.thermal_horizontal = self.horizontal
-                self.thermal_horizontal_d = self.horizontal
-                self.type = 0
-
-            if self.zoom:
-                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                       3 * self.horizontal + self.s.HEIGHT // 2)
-                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                               self.s.thermal_y, self.s.thermal_width,
-                                               3 * self.thermal_horizontal + self.s.thermal_height // 2)
-                self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                 self.s.thermal_y_d_2, self.s.thermal_width,
-                                                 3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
-
-            elif self.extra_zoom:
-                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                       6 * self.horizontal + self.s.HEIGHT // 2)
-                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                               self.s.thermal_y, self.s.thermal_width,
-                                               6 * self.thermal_horizontal + self.s.thermal_height // 2)
-                self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                 self.s.thermal_y_d_2, self.s.thermal_width,
-                                                 6 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
-            else:
-                self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
-                                       self.horizontal + self.s.HEIGHT // 2)
-                self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                               self.s.thermal_y, self.s.thermal_width,
-                                               self.thermal_horizontal + self.s.thermal_height // 2)
-                self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
-                                                 self.s.thermal_y_d_2, self.s.thermal_width,
-                                                 self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
-        self.angle_of_view %= 360
-        # if self.angle_of_view < 0:
-        #     self.angle_of_view = 360 + self.angle_of_view
+                                                     self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+            self.angle_of_view %= 360
+            # if self.angle_of_view < 0:
+            #     self.angle_of_view = 360 + self.angle_of_view
 
     def ammo(self, event, text):
         if event.key == pygame.K_1:
@@ -1591,6 +1603,7 @@ class Tank:
                                              self.s.thermal_y_d_2, self.s.thermal_width,
                                              3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
         while show:
+            self.check_anim()
             self.check_mission()
             self.movement_check()
             self.check_is_done()
@@ -1654,6 +1667,12 @@ class Tank:
                             self.ready = False
                             self.is_shot = True
                             self.block = True
+                            if self.is_sprite_depth:
+                                self.true_depth = min(float(self.depth), float(self.depth_sprite))
+                            else:
+                                self.true_depth = float(self.depth)
+                            self.depth_to_shot = float(str(self.true_depth)[:])
+                            self.shot_anim = True
                             self.s.shoot_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
                             self.s.shoot_sound.play()
 
@@ -1683,6 +1702,7 @@ class Tank:
 
             if self.ready:
                 pygame.draw.circle(self.s.display, (255, 0, 0), (self.s.WIDTH * 0.45, self.s.HEIGHT * 0.933), self.s.WIDTH * 0.006)
+            self.shot(self.s.WIDTH // 2, self.s.HEIGHT // 2)
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
         self.optic = False
@@ -1801,9 +1821,61 @@ class Tank:
 
                     pygame.display.flip()
                     self.s.clock.tick(self.s.FPS)
-    def shot(self):
-        pass
+    def shot(self, x, y):
+        if self.shot_anim:
+            if self.shot_anim_counter % self.s.shot_frames_delta == 0:
+                if self.zoom:
+                    if self.thermal:
+                        PROJ_COEFF = self.s.PROJ_COEFF_thermal_zoom
+                        horizontal = 3 * self.thermal_horizontal
+                    elif self.optic:
+                        PROJ_COEFF = self.s.PROJ_COEFF_optic_zoom
+                        horizontal = 3 * self.horizontal
+                    elif self.thermal_d:
+                        PROJ_COEFF = self.s.PROJ_COEFF_thermal_zoom_d
+                        horizontal = 3 * self.thermal_horizontal_d
 
+                elif self.extra_zoom:
+                    if self.thermal:
+                        PROJ_COEFF = self.s.PROJ_COEFF_thermal_zoom_extra
+                        horizontal = 6 * self.thermal_horizontal
+
+                    elif self.thermal_d:
+                        PROJ_COEFF = self.s.PROJ_COEFF_thermal_zoom_extra_d
+                        horizontal = 6 * self.thermal_horizontal_d
+
+                else:
+                    if self.thermal:
+                        PROJ_COEFF = self.s.PROJ_COEFF_thermal
+                        horizontal = 1 * self.thermal_horizontal
+
+                    elif self.optic:
+
+                        PROJ_COEFF = self.s.PROJ_COEFF_optic
+                        horizontal = 1 * self.horizontal
+
+                    elif self.thermal_d:
+
+                        PROJ_COEFF = self.s.PROJ_COEFF_thermal_d
+                        horizontal = 1 * self.thermal_horizontal_d
+
+                if self.thermal or self.thermal_d:
+                    frame = self.s.shot_anim_thermal[self.shot_anim_counter // self.s.shot_frames_delta - 1]
+                else:
+                    frame = self.s.shot_anim[self.shot_anim_counter // self.s.shot_frames_delta - 1]
+                proj_height = min(int(PROJ_COEFF / self.depth_to_shot), 5 * self.s.HEIGHT)
+
+                frame = pygame.transform.scale(frame, (proj_height, proj_height))
+                rect = frame.get_rect()
+                rect.center = (x, y)
+                print(proj_height, horizontal)
+                self.s.display.blit(frame, rect)
+            self.shot_anim_counter += 1
+
+    def check_anim(self):
+        if self.shot_anim_counter > self.s.shot_frames:
+            self.shot_anim = False
+            self.shot_anim_counter = 0
     def thermal_sight(self):
         show = True
         pygame.display.set_icon(self.s.icon)
@@ -1901,6 +1973,8 @@ class Tank:
         if self.menu:
             show = False
         while show:
+            self.check_anim()
+
             self.check_mission()
             self.movement_check()
             self.check_is_done()
@@ -2004,6 +2078,12 @@ class Tank:
                             self.ready = False
                             self.is_shot = True
                             self.block = True
+                            if self.is_sprite_depth:
+                                self.true_depth = min(float(self.depth), float(self.depth_sprite))
+                            else:
+                                self.true_depth = float(self.depth)
+                            self.depth_to_shot = float(str(self.true_depth)[:])
+                            self.shot_anim = True
                             self.s.shoot_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
                             self.s.shoot_sound.play()
 
@@ -2048,6 +2128,8 @@ class Tank:
             fps_count_text_bl.draw(self.s.display)
             fps_count_text.draw(self.s.display)
             if self.thermal_on:
+                self.shot(self.s.WIDTH // 2, self.s.HEIGHT // 2 * 0.85)
+
                 if self.zoom or self.extra_zoom:
                     depth_text1.draw(self.s.display)
                     depth_text2.draw(self.s.display)

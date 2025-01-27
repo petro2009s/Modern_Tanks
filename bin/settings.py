@@ -63,7 +63,8 @@ class Settings:
 
         self.graph_dict = [self.bd.select('graph_table', 'low')[0][0], self.bd.select('graph_table', 'mid')[0][0],
                            self.bd.select('graph_table', 'high')[0][0]]
-        self.minimap_dict = [self.bd.select('minimap_table', '[on]')[0][0], self.bd.select('minimap_table', 'off')[0][0]]
+        self.minimap_dict = [self.bd.select('minimap_table', '[on]')[0][0],
+                             self.bd.select('minimap_table', 'off')[0][0]]
         self.fps_dict = [self.bd.select('FPS_table', 'low')[0][0], self.bd.select('FPS_table', 'mid')[0][0],
                          self.bd.select('FPS_table', 'high')[0][0]]
         self.full_dict = [bool(self.display.get_flags() & pygame.FULLSCREEN),
@@ -256,7 +257,7 @@ class Settings:
         self.gunner_site_base2 = pygame.image.load('resources/images/gunner_site2.png').convert_alpha()
         self.gunner_site2 = pygame.transform.scale(self.gunner_site_base2,
                                                    (self.WIDTH, self.HEIGHT))
-        self.reload_time = 6.5
+        self.reload_time = 1
         self.test_sprite = pygame.image.load('resources/images/bush.png').convert_alpha()
         self.bush_sprite = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
         self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
@@ -265,8 +266,10 @@ class Settings:
 
         self.FAKE_RAYS = int(self.NUM_RAYS * 2)
 
-        self.test_sprite_v = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in range(8)]
-        self.test_sprite_v_thermal = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in range(8)]
+        self.test_sprite_v = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in
+                              range(8)]
+        self.test_sprite_v_thermal = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha()
+                                      for i in range(8)]
         for i in self.test_sprite_v_thermal:
             thermal_texture(i, 80, 80)
         self.tree_sprite = pygame.image.load('resources/images/tree.png').convert_alpha()
@@ -281,8 +284,22 @@ class Settings:
         self.task_2 = 'на начальную точку.'
         self.count_of_targets = '1'
         self.start_point = (self.map_width // 9, self.map_height // 1.1)
-        self.end_point = [(i, j) for j in range(int((self.map_height // 1.1) // self.tile_h), int((self.map_height // 1) // self.tile_h)) for i in range(int((self.map_width // 12) // self.tile_w), int((self.map_width // 7) // self.tile_w))]
+        self.end_point = [(i, j) for j in range(int((self.map_height // 1.1) // self.tile_h),
+                                                int((self.map_height // 1) // self.tile_h)) for i in
+                          range(int((self.map_width // 12) // self.tile_w), int((self.map_width // 7) // self.tile_w))]
+
+        self.shot_anim = [pygame.image.load(f'resources/sprites/explode_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
+                              range(3)]
+        self.shot_anim_thermal = [pygame.image.load(f'resources/sprites/explode_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
+                              range(3)]
+        for i in self.shot_anim_thermal:
+            thermal_texture(i, 200, self.max_t)
+        self.shot_anim_time = 0.3
+        self.shot_frames = int(self.shot_anim_time * self.FPS)
+        self.shot_frames_delta = self.shot_frames // 3
+
         self.sprites = Sprite(self)
+
     def graph_set(self, n):
         self.NUM_RAYS = n
         self.DELTA_ANGLE_optic = self.FOV_optic / self.NUM_RAYS
@@ -463,8 +480,10 @@ class Settings:
         self.center_ray = self.NUM_RAYS // 2 - 1
         self.FAKE_RAYS = int(self.NUM_RAYS * 2)
 
-        self.test_sprite_v = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in range(8)]
-        self.test_sprite_v_thermal = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in range(8)]
+        self.test_sprite_v = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in
+                              range(8)]
+        self.test_sprite_v_thermal = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha()
+                                      for i in range(8)]
         for i in self.test_sprite_v_thermal:
             thermal_texture(i, 60, 60)
         self.destroyed_image = pygame.transform.scale(self.destroyed_image, (self.WIDTH, self.HEIGHT))
@@ -472,10 +491,14 @@ class Settings:
         self.end_point = [(i, j) for j in range(int((self.map_height // 1.1) // self.tile_h),
                                                 int((self.map_height // 1) // self.tile_h)) for i in
                           range(int((self.map_width // 12) // self.tile_w), int((self.map_width // 7) // self.tile_w))]
+
+        self.shot_frames = int(self.shot_anim_time * self.FPS)
+        self.shot_frames_delta = self.shot_frames // 3
         self.sprites = Sprite(self)
 
     def update_sprites(self):
         self.sprites = Sprite(self)
+
 
 def thermal_texture(surface, t, max_t):
     w, h = surface.get_size()
@@ -485,5 +508,5 @@ def thermal_texture(surface, t, max_t):
             r, g, b = surface.get_at((x, y))[0:3]
             color = min(r, g, b)
             color *= abs(t / max_t)
-            color = max(max(color, 0), 5)
+            color = min(max(max(color, 0), 5), 255)
             surface.set_at((x, y), pygame.Color(int(color), int(color), int(color), a))
