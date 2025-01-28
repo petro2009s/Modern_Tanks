@@ -8,6 +8,7 @@ from bin.test_settings import TankSettings
 from bin.buttons import SelectButton, Button
 from bin.damage import Damage
 
+
 class Tank:
     def __init__(self, settings, x, y, movement_angle, minimap_k, x_minimap, y_minimap, apfsds_c=1, he_c=1, heat_c=1,
                  minimap_displaying=False):
@@ -38,6 +39,9 @@ class Tank:
         self.death = False
         self.shot_anim = False
         self.st = True
+        self.smog_anim = False
+        self.is_explosion = False
+        self.explosion_time = None
         self.cause = ''
 
         self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
@@ -61,6 +65,7 @@ class Tank:
         self.shot_time = 2
         self.reload_timer = 0
         self.reload_time = self.s.reload_time
+        self.explosion_timer = 0
 
         self.v = 0
         self.count_of_destroyed_targets = '0'
@@ -86,6 +91,7 @@ class Tank:
         self.tryaska = 0
         self.shot_anim_counter = 1
         self.depth_to_shot = 0
+        self.smog_anim_counter = 1
 
         self.stuck = False
         self.side = min(int(self.s.WIDTH * 0.02), int(self.s.tile_w * 0.8))
@@ -165,9 +171,9 @@ class Tank:
                            font_name='resources/fonts/depth_thermal_font.ttf'
                            )
         weapon_text1 = Text(self.s.thermal_x_d * 1.474, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
-                           'О', int(self.s.WIDTH * 0.008),
-                           font_name='resources/fonts/depth_thermal_font.ttf'
-                           )
+                            'О', int(self.s.WIDTH * 0.008),
+                            font_name='resources/fonts/depth_thermal_font.ttf'
+                            )
         weapon_text2 = Text(self.s.thermal_x_d * 1.507, self.s.thermal_y_d_2 * 1.3937, (183, 183, 183),
                             'С', int(self.s.WIDTH * 0.008),
                             font_name='resources/fonts/depth_thermal_font.ttf'
@@ -176,6 +182,8 @@ class Tank:
                             'Н', int(self.s.WIDTH * 0.008),
                             font_name='resources/fonts/depth_thermal_font.ttf'
                             )
+        lock_rect = pygame.Rect(0, 0, self.s.WIDTH * 0.1 / 6, self.s.HEIGHT * 0.15 / 6)
+        lock_rect.center = (self.s.thermal_x_d * 1.29, self.s.thermal_y_d_2 * 1.18)
         while show:
             self.check_anim()
             self.check_mission()
@@ -380,21 +388,24 @@ class Tank:
                 pygame.draw.rect(self.s.display, self.floor_thermal_color, floor)
                 pygame.draw.rect(self.s.display, self.sky_thermal_color, self.sky_thermal_d)
                 if self.zoom:
-                    self.ray_casting(self.s.thermal_x_d,
+                    self.ray_casting(self.s.thermal_x_d * 0.75,
                                      self.s.thermal_y_d, sight_type='4d')
-                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
+                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if
+                                         not obj.death]
                     self.world(temp, self.s.thermal_sight_zoom_d,
                                (self.s.thermal_x_d, self.s.thermal_y_d_2))
                 elif self.extra_zoom:
-                    self.ray_casting(self.s.thermal_x_d,
+                    self.ray_casting(self.s.thermal_x_d * 0.75,
                                      self.s.thermal_y_d, sight_type='4.5d')
-                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
+                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if
+                                         not obj.death]
                     self.world(temp, self.s.thermal_sight_zoom_d,
                                (self.s.thermal_x_d, self.s.thermal_y_d_2))
                 else:
-                    self.ray_casting(self.s.thermal_x_d,
+                    self.ray_casting(self.s.thermal_x_d * 0.75,
                                      self.s.thermal_y_d, sight_type='3d')
-                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
+                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if
+                                         not obj.death]
                     self.world(temp, self.s.thermal_sight_d,
                                (self.s.thermal_x_d * 1.01, self.s.thermal_y_d_2))
                 # optic_sight_button.draw(self.s.display)
@@ -415,6 +426,8 @@ class Tank:
                         ready_text1.draw(self.s.display)
                         ready_text2.draw(self.s.display)
                         ready_text3.draw(self.s.display)
+                    if self.lock:
+                        pygame.draw.rect(self.s.display, (0, 0, 0), lock_rect, int(self.s.WIDTH * 0.004 / 3.7))
                 else:
                     ssu_text.draw(self.s.display)
 
@@ -441,11 +454,14 @@ class Tank:
             pygame.draw.line(self.s.display, (255, 0, 0),
                              (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
                              (x + (self.x + self.sq * math.sin(self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
-                              y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
+                              y + (self.y - self.v * 0.5 * math.cos(
+                                  self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
             pygame.draw.line(self.s.display, (255, 255, 255),
                              (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
-                             (x + (self.x + self.v * 0.5 * math.sin(self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
-                              y + (self.y - self.v * 0.5 * math.cos(self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
+                             (x + (self.x + self.v * 0.5 * math.sin(
+                                 self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
+                              y + (self.y - self.v * 0.5 * math.cos(
+                                  self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
             pygame.draw.line(self.s.display, (0, 0, 255),
                              (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
                              (x + (self.x // self.s.minimap_k + self.s.WIDTH * 0.05 * math.cos(
@@ -472,22 +488,25 @@ class Tank:
 
     def exit(self):
         pygame.display.set_icon(self.s.icon)
-        exit_to_menu_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.51, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1, 'Выйти в меню', self.s.size_text_b, 'resources/images/button_inact.png',
-                              'resources/images/button_active.png',
-                              'resources/sounds/button_menu_sound.mp3')
-        continue_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.32, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1, 'Продолжить', self.s.size_text_b, 'resources/images/button_inact.png',
-                              'resources/images/button_active.png',
-                              'resources/sounds/button_menu_sound.mp3')
+        exit_to_menu_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.51, self.s.WIDTH * 0.33,
+                                     self.s.HEIGHT * 0.1, 'Выйти в меню', self.s.size_text_b,
+                                     'resources/images/button_inact.png',
+                                     'resources/images/button_active.png',
+                                     'resources/sounds/button_menu_sound.mp3')
+        continue_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.32, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1,
+                                 'Продолжить', self.s.size_text_b, 'resources/images/button_inact.png',
+                                 'resources/images/button_active.png',
+                                 'resources/sounds/button_menu_sound.mp3')
         quit_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.69, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1,
                              'Выйти', self.s.size_text_b, 'resources/images/button_inact.png',
                              'resources/images/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
         guidence_text = Text(round(self.s.WIDTH * 0.7), round(self.s.HEIGHT * 0.3), (200, 200, 200), 'Управление:',
-                    int(self.s.WIDTH * 0.01),
-                    is_topleft=True)
+                             int(self.s.WIDTH * 0.01),
+                             is_topleft=True)
         q_text = Text(self.s.WIDTH * 0.7, self.s.HEIGHT * 0.33, (200, 200, 200), 'Q - захват цели',
-                    int(self.s.WIDTH * 0.01),
-                    is_topleft=True)
+                      int(self.s.WIDTH * 0.01),
+                      is_topleft=True)
         e_text = Text(self.s.WIDTH * 0.7, self.s.HEIGHT * 0.36, (200, 200, 200), 'E - замер дистанции',
                       int(self.s.WIDTH * 0.01),
                       is_topleft=True)
@@ -495,12 +514,12 @@ class Tank:
                       int(self.s.WIDTH * 0.01),
                       is_topleft=True)
         lkm_text = Text(self.s.WIDTH * 0.7, self.s.HEIGHT * 0.42, (200, 200, 200), 'ЛКМ - выстрел',
-                      int(self.s.WIDTH * 0.01),
-                      is_topleft=True)
+                        int(self.s.WIDTH * 0.01),
+                        is_topleft=True)
 
         task_text_1 = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.3, (200, 200, 200),
-                         f'Боевая задача: {self.s.task_1}',
-                         int(self.s.WIDTH * 0.01), is_topleft=True)
+                           f'Боевая задача: {self.s.task_1}',
+                           int(self.s.WIDTH * 0.01), is_topleft=True)
         task_text_2 = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.33, (200, 200, 200),
                            f'{self.s.task_2}',
                            int(self.s.WIDTH * 0.01), is_topleft=True)
@@ -552,7 +571,6 @@ class Tank:
                 continue_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
                 exit_to_menu_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
                 quit_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
-
 
             continue_button.draw(self.s.display)
             exit_to_menu_button.draw(self.s.display)
@@ -654,13 +672,15 @@ class Tank:
                 if self.block is False:
                     self.horizontal = min(self.horizontal + self.s.vertical_v * t, self.max_hor_optic)
                     self.thermal_horizontal = min(self.thermal_horizontal + self.s.vertical_v * t, self.max_hor_thermal)
-                    self.thermal_horizontal_d = min((self.thermal_horizontal_d + self.s.vertical_v * t) / 5, self.max_hor_thermal_d)
+                    self.thermal_horizontal_d = min((self.thermal_horizontal_d + self.s.vertical_v * t) / 5,
+                                                    self.max_hor_thermal_d)
                     if self.zoom:
                         self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                                3 * self.horizontal + self.s.HEIGHT // 2)
-                        self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                                       self.s.thermal_y, self.s.thermal_width,
-                                                       3 * self.thermal_horizontal + self.s.thermal_height // 2)
+                        self.sky_thermal = pygame.Rect(
+                            self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                            self.s.thermal_y, self.s.thermal_width,
+                            3 * self.thermal_horizontal + self.s.thermal_height // 2)
                         self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                          self.s.thermal_y_d_2, self.s.thermal_width,
                                                          3 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
@@ -668,18 +688,20 @@ class Tank:
                     elif self.extra_zoom:
                         self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                                6 * self.horizontal + self.s.HEIGHT // 2)
-                        self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                                       self.s.thermal_y, self.s.thermal_width,
-                                                       6 * self.thermal_horizontal + self.s.thermal_height // 2)
+                        self.sky_thermal = pygame.Rect(
+                            self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                            self.s.thermal_y, self.s.thermal_width,
+                            6 * self.thermal_horizontal + self.s.thermal_height // 2)
                         self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                          self.s.thermal_y_d_2, self.s.thermal_width,
                                                          6 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
                     else:
                         self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                                self.horizontal + self.s.HEIGHT // 2)
-                        self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                                       self.s.thermal_y, self.s.thermal_width,
-                                                       self.thermal_horizontal + self.s.thermal_height // 2)
+                        self.sky_thermal = pygame.Rect(
+                            self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                            self.s.thermal_y, self.s.thermal_width,
+                            self.thermal_horizontal + self.s.thermal_height // 2)
                         self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                          self.s.thermal_y_d_2, self.s.thermal_width,
                                                          self.thermal_horizontal_d + self.s.thermal_height_d // 2)
@@ -687,31 +709,35 @@ class Tank:
                 if self.block is False:
                     self.horizontal = max(self.horizontal - self.s.vertical_v * t, self.min_hor_optic)
                     self.thermal_horizontal = max(self.thermal_horizontal - self.s.vertical_v * t, self.min_hor_thermal)
-                    self.thermal_horizontal_d = max((self.thermal_horizontal_d - self.s.vertical_v * t) / 5, self.min_hor_thermal_d)
+                    self.thermal_horizontal_d = max((self.thermal_horizontal_d - self.s.vertical_v * t) / 5,
+                                                    self.min_hor_thermal_d)
                     if self.zoom:
                         self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                                3 * self.horizontal + self.s.HEIGHT // 2)
-                        self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                                       self.s.thermal_y, self.s.thermal_width,
-                                                       3 * self.thermal_horizontal + self.s.thermal_height // 2)
+                        self.sky_thermal = pygame.Rect(
+                            self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                            self.s.thermal_y, self.s.thermal_width,
+                            3 * self.thermal_horizontal + self.s.thermal_height // 2)
                         self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                          self.s.thermal_y_d_2, self.s.thermal_width,
                                                          3 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
                     elif self.extra_zoom:
                         self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                                6 * self.horizontal + self.s.HEIGHT // 2)
-                        self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                                       self.s.thermal_y, self.s.thermal_width,
-                                                       6 * self.thermal_horizontal + self.s.thermal_height // 2)
+                        self.sky_thermal = pygame.Rect(
+                            self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                            self.s.thermal_y, self.s.thermal_width,
+                            6 * self.thermal_horizontal + self.s.thermal_height // 2)
                         self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                          self.s.thermal_y_d_2, self.s.thermal_width,
                                                          6 * self.thermal_horizontal_d + self.s.thermal_height_d // 2)
                     else:
                         self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                                self.horizontal + self.s.HEIGHT // 2)
-                        self.sky_thermal = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                                       self.s.thermal_y, self.s.thermal_width,
-                                                       self.s.thermal_height // 2 + self.thermal_horizontal)
+                        self.sky_thermal = pygame.Rect(
+                            self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                            self.s.thermal_y, self.s.thermal_width,
+                            self.s.thermal_height // 2 + self.thermal_horizontal)
                         self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                          self.s.thermal_y_d_2, self.s.thermal_width,
                                                          self.thermal_horizontal_d + self.s.thermal_height_d // 2)
@@ -720,10 +746,14 @@ class Tank:
                     dif_x = pygame.mouse.get_pos()[0] - self.s.WIDTH // 2
                     dif_y = pygame.mouse.get_pos()[1] - self.s.HEIGHT // 2
                     if self.block is False:
-                        self.horizontal = min(self.horizontal + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01), self.max_hor_optic)
-                        self.thermal_horizontal = min(self.thermal_horizontal + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01), self.max_hor_thermal)
-                        self.thermal_horizontal_d = min(self.thermal_horizontal_d + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01) / 5,
-                                                        self.max_hor_thermal_d)
+                        self.horizontal = min(self.horizontal + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01),
+                                              self.max_hor_optic)
+                        self.thermal_horizontal = min(
+                            self.thermal_horizontal + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01),
+                            self.max_hor_thermal)
+                        self.thermal_horizontal_d = min(
+                            self.thermal_horizontal_d + -dif_y * self.s.vertical_v * t / (self.s.WIDTH * 0.01) / 5,
+                            self.max_hor_thermal_d)
                         if self.zoom:
                             self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                                                    3 * self.horizontal + self.s.HEIGHT // 2)
@@ -885,10 +915,26 @@ class Tank:
             self.block = False
             self.ready = True
             self.reload_timer = 0
+        if self.explosion_time:
+            if self.explosion_timer >= self.explosion_time:
+                self.is_explosion = False
+                self.current_shooted_ammo = int(str(self.current_shooted_ammo_for_tank)[:])
+                if self.is_sprite_depth:
+                    self.true_depth = min(float(self.depth), float(self.depth_sprite))
+                else:
+                    self.true_depth = float(self.depth)
+                self.depth_to_shot = float(str(self.true_depth)[:])
+                self.shot_anim = True
+                self.explosion_time = None
+
+                self.explosion_timer = 0
         if self.is_shot:
             self.shot_timer += 1 / self.s.FPS
         if self.reload:
             self.reload_timer += 1 / self.s.FPS
+        if self.is_explosion:
+            self.explosion_timer += 1 / self.s.FPS
+
     def mapping(self, a, b):
         return (a // self.s.tile_w) * self.s.tile_w, (b // self.s.tile_h) * self.s.tile_h
 
@@ -964,9 +1010,9 @@ class Tank:
                     #                     (dr_x + i * self.s.SCALE_optic,
                     #                      self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2 - proj_height))
                     pos1 = (dr_x + i * self.s.SCALE_optic,
-                                         self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2)
+                            self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2)
                     pos2 = (dr_x + i * self.s.SCALE_optic,
-                                         self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2 - proj_height)
+                            self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2 - proj_height)
                     self.walls.append((depth, wall_column, pos1))
                     self.walls.append((depth, wall_column, pos2))
                 else:
@@ -974,7 +1020,7 @@ class Tank:
                     #                     (dr_x + i * self.s.SCALE_optic,
                     #                      self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2))
                     pos1 = (dr_x + i * self.s.SCALE_optic,
-                                         self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2)
+                            self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2)
                     self.walls.append((depth, wall_column, pos1))
                 if int(cur_angle) == int(self.angle_of_view):
                     self.depth = str(depth)
@@ -1049,9 +1095,9 @@ class Tank:
                     #                     (dr_x + i * self.s.SCALE_optic_zoom,
                     #                      3 * self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2 - proj_height))
                     pos1 = (dr_x + i * self.s.SCALE_optic_zoom,
-                                         3 * self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2)
+                            3 * self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2)
                     pos2 = (dr_x + i * self.s.SCALE_optic_zoom,
-                                         3 * self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2 - proj_height)
+                            3 * self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2 - proj_height)
                     self.walls.append((depth, wall_column, pos1))
                     self.walls.append((depth, wall_column, pos2))
                 else:
@@ -1132,9 +1178,9 @@ class Tank:
                     #                     (dr_x + i * self.s.SCALE_thermal,
                     #                      self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2 - proj_height))
                     pos1 = (dr_x + i * self.s.SCALE_thermal,
-                                         self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2)
+                            self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2)
                     pos2 = (dr_x + i * self.s.SCALE_thermal,
-                                         self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2 - proj_height)
+                            self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2 - proj_height)
                     self.walls.append((depth, wall_column, pos1))
                     self.walls.append((depth, wall_column, pos2))
                 else:
@@ -1214,9 +1260,9 @@ class Tank:
                     #                     (dr_x + i * self.s.SCALE_thermal,
                     #                      3 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2 - proj_height))
                     pos1 = (dr_x + i * self.s.SCALE_thermal,
-                                         3 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2)
+                            3 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2)
                     pos2 = (dr_x + i * self.s.SCALE_thermal,
-                                         3 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2 - proj_height)
+                            3 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2 - proj_height)
                     self.walls.append((depth, wall_column, pos1))
                     self.walls.append((depth, wall_column, pos2))
                 else:
@@ -1224,7 +1270,7 @@ class Tank:
                     #                     (dr_x + i * self.s.SCALE_thermal,
                     #                      3 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2))
                     pos1 = (dr_x + i * self.s.SCALE_thermal,
-                                          3 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2)
+                            3 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2)
                     self.walls.append((depth, wall_column, pos1))
                 if int(cur_angle) == int(self.angle_of_view):
                     self.depth = str(depth)
@@ -1296,17 +1342,17 @@ class Tank:
                                         (dr_x + i * self.s.SCALE_thermal,
                                          6 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2 - proj_height))
                     pos1 = (dr_x + i * self.s.SCALE_thermal,
-                                         6 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2)
+                            6 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2)
                     pos2 = (dr_x + i * self.s.SCALE_thermal,
-                                         6 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2 - proj_height)
+                            6 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2 - proj_height)
                     self.walls.append((depth, wall_column, pos1))
                     self.walls.append((depth, wall_column, pos2))
                 else:
                     self.s.display.blit(wall_column,
                                         (dr_x + i * self.s.SCALE_thermal,
-                                             6 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2))
+                                         6 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2))
                     pos1 = (dr_x + i * self.s.SCALE_thermal,
-                                             6 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2)
+                            6 * self.thermal_horizontal + dr_y + self.s.thermal_height // 2 - proj_height // 2)
                     self.walls.append((depth, wall_column, pos1))
                 if int(cur_angle) == int(self.angle_of_view):
                     self.depth = str(depth)
@@ -1378,9 +1424,9 @@ class Tank:
                     #                     (dr_x + i * self.s.SCALE_thermal_d,
                     #                      self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2 - proj_height))
                     pos1 = (dr_x + i * self.s.SCALE_thermal_d,
-                                         self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2)
+                            self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2)
                     pos2 = (dr_x + i * self.s.SCALE_thermal_d,
-                                         self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2 - proj_height)
+                            self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2 - proj_height)
                     self.walls.append((depth, wall_column, pos1))
                     self.walls.append((depth, wall_column, pos2))
                 else:
@@ -1388,7 +1434,7 @@ class Tank:
                     #                     (dr_x + i * self.s.SCALE_thermal_d,
                     #                      self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2))
                     pos1 = (dr_x + i * self.s.SCALE_thermal_d,
-                                         self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2)
+                            self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2)
                     self.walls.append((depth, wall_column, pos1))
                 if int(cur_angle) == int(self.angle_of_view):
                     self.depth = str(depth)
@@ -1460,9 +1506,9 @@ class Tank:
                     #                     (dr_x + i * self.s.SCALE_thermal_d,
                     #                      6 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2 - proj_height))
                     pos1 = (dr_x + i * self.s.SCALE_thermal_d,
-                                         6 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2)
+                            6 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2)
                     pos2 = (dr_x + i * self.s.SCALE_thermal_d,
-                                         6 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2 - proj_height)
+                            6 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2 - proj_height)
                     self.walls.append((depth, wall_column, pos1))
                     self.walls.append((depth, wall_column, pos2))
                 else:
@@ -1470,7 +1516,7 @@ class Tank:
                     #                     (dr_x + i * self.s.SCALE_thermal_d,
                     #                      6 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2))
                     pos1 = (dr_x + i * self.s.SCALE_thermal_d,
-                                         6 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2)
+                            6 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2)
                     self.walls.append((depth, wall_column, pos1))
                 if int(cur_angle) == int(self.angle_of_view):
                     self.depth = str(depth)
@@ -1542,9 +1588,9 @@ class Tank:
                     #                     (dr_x + i * self.s.SCALE_thermal_d,
                     #                      3 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2 - proj_height))
                     pos1 = (dr_x + i * self.s.SCALE_thermal_d,
-                                         3 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2)
+                            3 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2)
                     pos2 = (dr_x + i * self.s.SCALE_thermal_d,
-                                         3 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2 - proj_height)
+                            3 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2 - proj_height)
                     self.walls.append((depth, wall_column, pos1))
                     self.walls.append((depth, wall_column, pos2))
                 else:
@@ -1552,7 +1598,7 @@ class Tank:
                                         (dr_x + i * self.s.SCALE_thermal_d,
                                          3 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2))
                     pos1 = (dr_x + i * self.s.SCALE_thermal_d,
-                                         3 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2)
+                            3 * self.thermal_horizontal_d + dr_y + self.s.thermal_height_d // 2 - proj_height // 2)
                     self.walls.append((depth, wall_column, pos1))
                 if int(cur_angle) == int(self.angle_of_view):
                     self.depth = str(depth)
@@ -1575,7 +1621,7 @@ class Tank:
         black = pygame.Rect(self.s.WIDTH // 2 + self.s.HEIGHT // 2, 0, self.s.HEIGHT // 2,
                             self.s.HEIGHT)
         black2 = pygame.Rect(0, 0, (self.s.WIDTH - self.s.HEIGHT) // 2,
-                            self.s.HEIGHT)
+                             self.s.HEIGHT)
         floor = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,
                             self.s.HEIGHT)
         ammo_text = Text(self.s.WIDTH * 0.48, self.s.HEIGHT * 0.98, (255, 0, 0),
@@ -1605,6 +1651,7 @@ class Tank:
         pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
         while show:
             self.check_anim()
+            self.check_smog()
             self.check_mission()
             self.movement_check()
             self.check_is_done()
@@ -1663,18 +1710,22 @@ class Tank:
                     if event.button == pygame.BUTTON_LEFT:
                         # print(1)
                         if self.ready:
-                            self.current_shooted_ammo = int(str(self.current_ammo_in_gun)[:])
+                            self.ammo_list[self.current_ammo_in_gun] -= 1
+
                             self.current_shooted_ammo_for_tank = int(str(self.current_ammo_in_gun)[:])
-                            self.ammo_list[self.current_ammo] -= 1
+                            self.current_ammo_in_gun = None
                             self.ready = False
                             self.is_shot = True
                             self.block = True
+                            self.smog_anim = True
+                            self.is_explosion = True
                             if self.is_sprite_depth:
                                 self.true_depth = min(float(self.depth), float(self.depth_sprite))
                             else:
                                 self.true_depth = float(self.depth)
-                            self.depth_to_shot = float(str(self.true_depth)[:])
-                            self.shot_anim = True
+                            depth = int(float(self.true_depth) * (7 / self.side))
+                            self.explosion_time = depth / self.s.ammo_v[self.current_shooted_ammo_for_tank]
+
                             self.s.shoot_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
                             self.s.shoot_sound.play()
 
@@ -1691,8 +1742,14 @@ class Tank:
                 temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects if not obj.death]
                 self.world(temp, self.s.optic_sight_zoom,
                            (self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0))
+            self.shot(self.s.WIDTH // 2, self.s.HEIGHT // 2)
+            self.smog()
             pygame.draw.rect(self.s.display, (0, 0, 0), black)
             pygame.draw.rect(self.s.display, (0, 0, 0), black2)
+            if self.zoom:
+                self.s.display.blit(self.s.optic_sight_zoom, (self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0))
+            else:
+                self.s.display.blit(self.s.optic_sight, (self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0))
             self.draw_minimap(self.x_minimap, self.y_minimap)
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
@@ -1703,8 +1760,12 @@ class Tank:
             ammo_text.draw(self.s.display)
 
             if self.ready:
-                pygame.draw.circle(self.s.display, (255, 0, 0), (self.s.WIDTH * 0.45, self.s.HEIGHT * 0.933), self.s.WIDTH * 0.006)
-            self.shot(self.s.WIDTH // 2, self.s.HEIGHT // 2)
+                pygame.draw.circle(self.s.display, (255, 0, 0), (self.s.WIDTH * 0.45, self.s.HEIGHT * 0.933),
+                                   self.s.WIDTH * 0.006)
+            if self.lock:
+                pygame.draw.circle(self.s.display, (255, 0, 0), (self.s.WIDTH * 0.55, self.s.HEIGHT * 0.933),
+                                   self.s.WIDTH * 0.006)
+
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
         self.optic = False
@@ -1718,9 +1779,9 @@ class Tank:
 
             if ((self.x // self.s.tile_w), (self.y // self.s.tile_h)) in self.s.end_point:
                 end_text_bl = Text(self.s.WIDTH * 0.5028, self.s.HEIGHT * 0.1052, (0, 0, 0), 'Миссия выполнена!',
-                                     int(self.s.WIDTH * 0.052))
+                                   int(self.s.WIDTH * 0.052))
                 end_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.1, (200, 200, 200), 'Миссия выполнена!',
-                                  int(self.s.WIDTH * 0.052))
+                                int(self.s.WIDTH * 0.052))
 
                 done_text_bl = Text(self.s.WIDTH * 0.032, self.s.HEIGHT * 0.253, (0, 0, 0),
                                     f'Боевая задача {self.done}:', int(self.s.WIDTH * 0.025),
@@ -1823,6 +1884,7 @@ class Tank:
 
                     pygame.display.flip()
                     self.s.clock.tick(self.s.FPS)
+
     def shot(self, x, y):
         if self.shot_anim:
             shot_frames_delta = self.s.shot_he_frames_delta if self.current_shooted_ammo_for_tank == 1 else self.s.shot_frames_delta
@@ -1861,7 +1923,7 @@ class Tank:
 
                         PROJ_COEFF = self.s.PROJ_COEFF_thermal_d
                         horizontal = 1 * self.thermal_horizontal_d
-                print(self.shot_anim_counter, shot_frames_delta, self.s.shot_he_frames, self.s.shot_he_frames_delta)
+                # print(self.shot_anim_counter, shot_frames_delta, self.s.shot_he_frames, self.s.shot_he_frames_delta)
                 if self.thermal or self.thermal_d:
                     if self.current_shooted_ammo_for_tank == 1:
                         frame = self.s.shot_he_anim_thermal[self.shot_anim_counter // shot_frames_delta - 1]
@@ -1881,12 +1943,44 @@ class Tank:
                 self.s.display.blit(frame, rect)
             self.shot_anim_counter += 1
 
+    def smog(self):
+        if self.smog_anim:
+            if self.smog_anim_counter % self.s.shot_smog_frames_delta == 0:
+                if self.thermal or self.thermal_d:
+
+                    frame = self.s.shot_smog_anim_thermal[self.smog_anim_counter // self.s.shot_smog_frames_delta - 1]
+
+                else:
+                    frame = self.s.shot_smog_anim[self.smog_anim_counter // self.s.shot_smog_frames_delta - 1]
+                if self.zoom:
+                    w = 3 * self.s.WIDTH
+                    h = 3 * self.s.HEIGHT
+
+                elif self.extra_zoom:
+                    w = 6 * self.s.WIDTH
+                    h = 6 * self.s.HEIGHT
+                else:
+                    w = self.s.WIDTH
+                    h = self.s.HEIGHT
+                frame = pygame.transform.scale(frame, (w, h))
+                x = self.s.WIDTH // 2 - w // 2
+                y = self.s.HEIGHT // 2 - h // 2
+                # print(x, y)
+                self.s.display.blit(frame, (x, y))
+            self.smog_anim_counter += 1
+
     def check_anim(self):
         shot_frames = self.s.shot_he_frames if self.current_shooted_ammo_for_tank == 1 else self.s.shot_frames
 
         if self.shot_anim_counter > shot_frames:
             self.shot_anim = False
             self.shot_anim_counter = 0
+
+    def check_smog(self):
+        if self.smog_anim_counter > self.s.shot_smog_frames:
+            self.smog_anim = False
+            self.smog_anim_counter = 0
+
     def thermal_sight(self):
         show = True
         pygame.display.set_icon(self.s.icon)
@@ -1941,6 +2035,7 @@ class Tank:
                             self.s.HEIGHT)
         black = pygame.Rect(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2, 0, self.s.thermal_width,
                             self.s.HEIGHT)
+
         z = pygame.Rect(self.s.thermal_x + self.s.thermal_base_width * 1.1, 0,
                         self.s.WIDTH - self.s.thermal_x - self.s.thermal_base_width,
                         self.s.HEIGHT)
@@ -1948,9 +2043,9 @@ class Tank:
                         (self.s.WIDTH - self.s.thermal_base_width) // 2,
                         self.s.HEIGHT)
         weapon_text1 = Text(self.s.WIDTH * 0.682, self.s.HEIGHT * 0.828, (183, 183, 183),
-                           'О', int(self.s.WIDTH * 0.03),
-                           font_name='resources/fonts/depth_thermal_font.ttf'
-                           )
+                            'О', int(self.s.WIDTH * 0.03),
+                            font_name='resources/fonts/depth_thermal_font.ttf'
+                            )
         weapon_text2 = Text(self.s.WIDTH * 0.714, self.s.HEIGHT * 0.828, (183, 183, 183),
                             'С', int(self.s.WIDTH * 0.03),
                             font_name='resources/fonts/depth_thermal_font.ttf'
@@ -1986,7 +2081,7 @@ class Tank:
         pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
         while show:
             self.check_anim()
-
+            self.check_smog()
             self.check_mission()
             self.movement_check()
             self.check_is_done()
@@ -2072,7 +2167,8 @@ class Tank:
                         self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
                         self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
                         self.lock = True if self.lock is False else False
-                    if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and self.ammo_list[self.current_ammo] > 0:
+                    if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
+                            self.ammo_list[self.current_ammo] > 0:
                         self.reload = True
                         self.block = True
                         self.current_ammo_in_gun = int(str(self.current_ammo)[:])
@@ -2085,21 +2181,31 @@ class Tank:
                         # print(1)
                         if self.ready:
                             self.ammo_list[self.current_ammo_in_gun] -= 1
-                            self.current_shooted_ammo = int(str(self.current_ammo_in_gun)[:])
+
                             self.current_shooted_ammo_for_tank = int(str(self.current_ammo_in_gun)[:])
                             self.current_ammo_in_gun = None
                             self.ready = False
                             self.is_shot = True
                             self.block = True
+                            self.smog_anim = True
+                            self.is_explosion = True
                             if self.is_sprite_depth:
                                 self.true_depth = min(float(self.depth), float(self.depth_sprite))
                             else:
                                 self.true_depth = float(self.depth)
-                            self.depth_to_shot = float(str(self.true_depth)[:])
-                            self.shot_anim = True
+                            depth = int(float(self.true_depth) * (7 / self.side))
+                            self.explosion_time = depth / self.s.ammo_v[self.current_shooted_ammo_for_tank]
+
                             self.s.shoot_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
                             self.s.shoot_sound.play()
-
+                    if event.button == pygame.BUTTON_RIGHT and self.lock_on:
+                        if self.is_sprite_depth:
+                            self.true_depth = min(float(self.depth), float(self.depth_sprite))
+                        else:
+                            self.true_depth = float(self.depth)
+                        self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
+                        self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
+                        self.lock = True if self.lock is False else False
 
             self.movement()
             self.guidance()
@@ -2108,14 +2214,16 @@ class Tank:
                 if self.zoom:
                     self.ray_casting((self.s.WIDTH - self.s.NUM_RAYS * self.s.SCALE_thermal) // 2,
                                      self.s.thermal_y, sight_type='4')
-                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
+                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if
+                                         not obj.death]
                     self.world(temp, self.s.thermal_sight_zoom,
                                (self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
                                 self.s.thermal_y))
                 elif self.extra_zoom:
                     self.ray_casting((self.s.WIDTH - self.s.NUM_RAYS * self.s.SCALE_thermal) // 2,
                                      self.s.thermal_y, sight_type='4.5')
-                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
+                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if
+                                         not obj.death]
                     self.world(temp, self.s.thermal_sight_zoom,
                                (self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
                                 self.s.thermal_y))
@@ -2123,16 +2231,21 @@ class Tank:
                     self.ray_casting((self.s.WIDTH - self.s.NUM_RAYS * self.s.SCALE_thermal) // 2,
                                      self.s.thermal_y, sight_type='3')
 
-                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
-                    self.world(temp, self.s.thermal_sight, (self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
-                                     self.s.thermal_y))
+                    temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if
+                                         not obj.death]
+                    self.world(temp, self.s.thermal_sight,
+                               (self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                                self.s.thermal_y))
 
-                pygame.draw.rect(self.s.display, (150, 150, 150), z)
-                pygame.draw.rect(self.s.display, (150, 150, 150), v)
             # if self.is_sprite_depth:
             #     self.true_depth = min(float(self.depth), float(self.depth_sprite))
             # else:
             #     self.true_depth = float(self.depth)
+            if self.thermal_on:
+                self.shot(self.s.WIDTH // 2, self.s.HEIGHT // 2 * 0.85)
+                self.smog()
+            pygame.draw.rect(self.s.display, (150, 150, 150), z)
+            pygame.draw.rect(self.s.display, (150, 150, 150), v)
             self.s.display.blit(self.s.thermal_image, ((self.s.WIDTH - self.s.thermal_base_width) // 2, 0))
 
             self.draw_minimap(self.x_minimap, self.y_minimap)
@@ -2141,7 +2254,6 @@ class Tank:
             fps_count_text_bl.draw(self.s.display)
             fps_count_text.draw(self.s.display)
             if self.thermal_on:
-                self.shot(self.s.WIDTH // 2, self.s.HEIGHT // 2 * 0.85)
 
                 if self.zoom or self.extra_zoom:
                     depth_text1.draw(self.s.display)
@@ -2240,25 +2352,28 @@ class Tank:
             self.s.explode_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
             self.s.explode_sound.play()
             death_text_bl = Text(self.s.WIDTH * 0.5028, self.s.HEIGHT * 0.1052, (0, 0, 0), 'Вас уничтожили!',
-                         int(self.s.WIDTH * 0.052))
+                                 int(self.s.WIDTH * 0.052))
             death_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.1, (200, 200, 200), 'Вас уничтожили!',
-                          int(self.s.WIDTH * 0.052))
-            cause_text_bl = Text(self.s.WIDTH * 0.032, self.s.HEIGHT * 0.173, (0, 0, 0), f'Причина смерти: {self.cause}.', int(self.s.WIDTH * 0.025),
-                      is_topleft=True)
-            cause_text = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.17, (200, 200, 200), f'Причина смерти: {self.cause}.',
-                   int(self.s.WIDTH * 0.025), is_topleft=True)
-            done_text_bl = Text(self.s.WIDTH * 0.032, self.s.HEIGHT * 0.253, (0, 0, 0),
-                                 f'Боевая задача {self.done}:', int(self.s.WIDTH * 0.025),
+                              int(self.s.WIDTH * 0.052))
+            cause_text_bl = Text(self.s.WIDTH * 0.032, self.s.HEIGHT * 0.173, (0, 0, 0),
+                                 f'Причина смерти: {self.cause}.', int(self.s.WIDTH * 0.025),
                                  is_topleft=True)
-            done_text = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.25, (200, 200, 200),
-                              f'Боевая задача {self.done}:',
+            cause_text = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.17, (200, 200, 200),
+                              f'Причина смерти: {self.cause}.',
                               int(self.s.WIDTH * 0.025), is_topleft=True)
-            destroyed_targets_text_bl = Text(self.s.WIDTH * 0.072, self.s.HEIGHT * 0.333, (0, 0, 0),
-                                f'Уничтожено целей: {self.count_of_destroyed_targets} из {self.count_of_targets}.', int(self.s.WIDTH * 0.025),
+            done_text_bl = Text(self.s.WIDTH * 0.032, self.s.HEIGHT * 0.253, (0, 0, 0),
+                                f'Боевая задача {self.done}:', int(self.s.WIDTH * 0.025),
                                 is_topleft=True)
-            destroyed_targets_text = Text(self.s.WIDTH * 0.07, self.s.HEIGHT * 0.33, (200, 200, 200),
-                             f'Уничтожено целей: {self.count_of_destroyed_targets} из {self.count_of_targets}.',
+            done_text = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.25, (200, 200, 200),
+                             f'Боевая задача {self.done}:',
                              int(self.s.WIDTH * 0.025), is_topleft=True)
+            destroyed_targets_text_bl = Text(self.s.WIDTH * 0.072, self.s.HEIGHT * 0.333, (0, 0, 0),
+                                             f'Уничтожено целей: {self.count_of_destroyed_targets} из {self.count_of_targets}.',
+                                             int(self.s.WIDTH * 0.025),
+                                             is_topleft=True)
+            destroyed_targets_text = Text(self.s.WIDTH * 0.07, self.s.HEIGHT * 0.33, (200, 200, 200),
+                                          f'Уничтожено целей: {self.count_of_destroyed_targets} из {self.count_of_targets}.',
+                                          int(self.s.WIDTH * 0.025), is_topleft=True)
             fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                      str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                                      is_topleft=True)
@@ -2266,21 +2381,23 @@ class Tank:
                                   str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                                   is_topleft=True)
             destroyed_text_bl = Text(self.s.WIDTH * 0.072, self.s.HEIGHT * 0.413, (0, 0, 0),
-                                f'Техника потеряна.', int(self.s.WIDTH * 0.025),
-                                is_topleft=True)
-            destroyed_text = Text(self.s.WIDTH * 0.07, self.s.HEIGHT * 0.41, (200, 200, 200),
                                      f'Техника потеряна.', int(self.s.WIDTH * 0.025),
                                      is_topleft=True)
+            destroyed_text = Text(self.s.WIDTH * 0.07, self.s.HEIGHT * 0.41, (200, 200, 200),
+                                  f'Техника потеряна.', int(self.s.WIDTH * 0.025),
+                                  is_topleft=True)
             pygame.display.set_icon(self.s.icon)
-            exit_to_menu_button = Button(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336, self.s.HEIGHT * 0.0925,
-                              'Выйти в меню', self.s.size_text_b, 'resources/images/button_inact.png',
-                              'resources/images/button_active.png',
-                              'resources/sounds/button_menu_sound.mp3')
+            exit_to_menu_button = Button(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
+                                         self.s.HEIGHT * 0.0925,
+                                         'Выйти в меню', self.s.size_text_b, 'resources/images/button_inact.png',
+                                         'resources/images/button_active.png',
+                                         'resources/sounds/button_menu_sound.mp3')
 
-            quit_button = Button(self.s.WIDTH * 0.081, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336, self.s.HEIGHT * 0.0925,
-                             'Выйти', self.s.size_text_b, 'resources/images/button_inact.png',
-                             'resources/images/button_active.png',
-                             'resources/sounds/button_menu_sound.mp3')
+            quit_button = Button(self.s.WIDTH * 0.081, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
+                                 self.s.HEIGHT * 0.0925,
+                                 'Выйти', self.s.size_text_b, 'resources/images/button_inact.png',
+                                 'resources/images/button_active.png',
+                                 'resources/sounds/button_menu_sound.mp3')
 
             background = pygame.Surface((self.s.WIDTH * 0.45, self.s.HEIGHT * 0.64))
             background.set_alpha(128)

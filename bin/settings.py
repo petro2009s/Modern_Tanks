@@ -298,6 +298,7 @@ class Settings:
         self.shot_frames = int(self.shot_anim_time * self.FPS)
         self.shot_frames_delta = self.shot_frames // 3
         self.shot_frames = int(self.shot_frames_delta * 3)
+
         self.shot_he_anim = [pygame.image.load(f'resources/sprites/explode2_sprite/frame_{str(i + 1)}.png').convert_alpha()
                           for i in
                           range(5)]
@@ -308,9 +309,38 @@ class Settings:
             thermal_texture(i, 200, self.max_t)
         self.shot_he_anim_time = 0.4
         self.shot_he_frames = int(self.shot_he_anim_time * self.FPS)
-        self.shot_he_frames_delta = self.shot_frames // 5
+        self.shot_he_frames_delta = self.shot_he_frames // 5
         self.shot_he_frames = int(self.shot_he_frames_delta * 5)
 
+        self.shot_smog_anim = [
+            pygame.image.load(f'resources/sprites/smog_sprite/frame_{str(i + 1)}.png').convert_alpha()
+            for i in
+            range(10)]
+        self.shot_smog_anim_thermal = [
+            pygame.image.load(f'resources/sprites/smog_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
+            range(10)]
+        for i in self.shot_smog_anim_thermal:
+            thermal_texture(i, 100, self.max_t)
+        self.shot_smog_anim_time = 0.3
+        self.shot_smog_frames = int(self.shot_smog_anim_time * self.FPS)
+        self.shot_smog_frames_delta = self.shot_smog_frames // 10
+        self.shot_smog_frames = int(self.shot_smog_frames_delta * 10)
+
+        self.bmp_death_anim = [
+            pygame.image.load(f'resources/sprites/big_explode_sprite/frame_{str(i + 1)}.png').convert_alpha()
+            for i in
+            range(14)]
+        self.bmp_death_anim_thermal = [
+            pygame.image.load(f'resources/sprites/big_explode_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
+            range(14)]
+        for i in self.bmp_death_anim_thermal:
+            thermal_texture(i, 100, self.max_t)
+        self.bmp_death_anim_time = 0.8
+        self.bmp_death_frames = int(self.bmp_death_anim_time * self.FPS)
+        self.bmp_death_frames_delta = self.bmp_death_frames // 14
+        self.bmp_death_frames = int(self.bmp_death_frames_delta * 14)
+
+        self.ammo_v = {0: 1500, 1: 670, 2: 800}
         self.sprites = Sprite(self)
 
     def graph_set(self, n):
@@ -507,6 +537,14 @@ class Settings:
 
         self.shot_frames = int(self.shot_anim_time * self.FPS)
         self.shot_frames_delta = self.shot_frames // 3
+
+        self.shot_he_frames = int(self.shot_he_anim_time * self.FPS)
+        self.shot_he_frames_delta = self.shot_he_frames // 5
+        self.shot_he_frames = int(self.shot_he_frames_delta * 5)
+
+        self.shot_smog_frames = int(self.shot_smog_anim_time * self.FPS)
+        self.shot_smog_frames_delta = self.shot_smog_frames // 10
+        self.shot_smog_frames = int(self.shot_smog_frames_delta * 10)
         self.sprites = Sprite(self)
 
     def update_sprites(self):
