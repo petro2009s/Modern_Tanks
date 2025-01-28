@@ -56,7 +56,7 @@ class Tank:
         self.current_ammo = 0
         self.current_ammo_in_gun = 0
         self.current_shooted_ammo = None
-
+        self.current_shooted_ammo_for_tank = None
         self.shot_timer = 0
         self.shot_time = 2
         self.reload_timer = 0
@@ -755,8 +755,8 @@ class Tank:
                             self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                                              self.s.thermal_y_d_2, self.s.thermal_width,
                                                              self.thermal_horizontal_d / 2 + self.s.thermal_height_d // 2)
-                    pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
-                    self.angle_of_view += dif_x * self.s.tower_v * t / (self.s.WIDTH * 0.07)
+                        pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
+                        self.angle_of_view += dif_x * self.s.tower_v * t / (self.s.WIDTH * 0.07)
             if self.type == 0:
                 self.horizontal = self.tryaska
                 self.thermal_horizontal = self.tryaska
@@ -1602,6 +1602,7 @@ class Tank:
             self.sky_thermal_d = pygame.Rect(self.s.thermal_x_d,
                                              self.s.thermal_y_d_2, self.s.thermal_width,
                                              3 * self.thermal_horizontal_d + self.s.thermal_height_d * 5 // 2)
+        pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
         while show:
             self.check_anim()
             self.check_mission()
@@ -1663,6 +1664,7 @@ class Tank:
                         # print(1)
                         if self.ready:
                             self.current_shooted_ammo = int(str(self.current_ammo_in_gun)[:])
+                            self.current_shooted_ammo_for_tank = int(str(self.current_ammo_in_gun)[:])
                             self.ammo_list[self.current_ammo] -= 1
                             self.ready = False
                             self.is_shot = True
@@ -1680,12 +1682,12 @@ class Tank:
             self.guidance()
             pygame.draw.rect(self.s.display, (135, 206, 235), self.sky)
             if not self.zoom:
-                self.ray_casting(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, sight_type='1')
+                self.ray_casting(self.s.WIDTH // 2 - self.s.NUM_RAYS * self.s.SCALE_optic // 2, 0, sight_type='1')
                 temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects if not obj.death]
                 self.world(temp, self.s.optic_sight,
                            (self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0))
             else:
-                self.ray_casting(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, sight_type='2')
+                self.ray_casting(self.s.WIDTH // 2 - self.s.NUM_RAYS * self.s.SCALE_optic_zoom // 2, 0, sight_type='2')
                 temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects if not obj.death]
                 self.world(temp, self.s.optic_sight_zoom,
                            (self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0))
@@ -1823,7 +1825,8 @@ class Tank:
                     self.s.clock.tick(self.s.FPS)
     def shot(self, x, y):
         if self.shot_anim:
-            if self.shot_anim_counter % self.s.shot_frames_delta == 0:
+            shot_frames_delta = self.s.shot_he_frames_delta if self.current_shooted_ammo_for_tank == 1 else self.s.shot_frames_delta
+            if self.shot_anim_counter % shot_frames_delta == 0:
                 if self.zoom:
                     if self.thermal:
                         PROJ_COEFF = self.s.PROJ_COEFF_thermal_zoom
@@ -1858,22 +1861,30 @@ class Tank:
 
                         PROJ_COEFF = self.s.PROJ_COEFF_thermal_d
                         horizontal = 1 * self.thermal_horizontal_d
-
+                print(self.shot_anim_counter, shot_frames_delta, self.s.shot_he_frames, self.s.shot_he_frames_delta)
                 if self.thermal or self.thermal_d:
-                    frame = self.s.shot_anim_thermal[self.shot_anim_counter // self.s.shot_frames_delta - 1]
+                    if self.current_shooted_ammo_for_tank == 1:
+                        frame = self.s.shot_he_anim_thermal[self.shot_anim_counter // shot_frames_delta - 1]
+                    else:
+                        frame = self.s.shot_anim_thermal[self.shot_anim_counter // shot_frames_delta - 1]
                 else:
-                    frame = self.s.shot_anim[self.shot_anim_counter // self.s.shot_frames_delta - 1]
+                    if self.current_shooted_ammo_for_tank == 1:
+                        frame = self.s.shot_he_anim[self.shot_anim_counter // shot_frames_delta - 1]
+                    else:
+                        frame = self.s.shot_anim[self.shot_anim_counter // shot_frames_delta - 1]
                 proj_height = min(int(PROJ_COEFF / self.depth_to_shot), 5 * self.s.HEIGHT)
 
                 frame = pygame.transform.scale(frame, (proj_height, proj_height))
                 rect = frame.get_rect()
                 rect.center = (x, y)
-                print(proj_height, horizontal)
+
                 self.s.display.blit(frame, rect)
             self.shot_anim_counter += 1
 
     def check_anim(self):
-        if self.shot_anim_counter > self.s.shot_frames:
+        shot_frames = self.s.shot_he_frames if self.current_shooted_ammo_for_tank == 1 else self.s.shot_frames
+
+        if self.shot_anim_counter > shot_frames:
             self.shot_anim = False
             self.shot_anim_counter = 0
     def thermal_sight(self):
@@ -1972,6 +1983,7 @@ class Tank:
         self.thermal = True
         if self.menu:
             show = False
+        pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
         while show:
             self.check_anim()
 
@@ -2074,6 +2086,7 @@ class Tank:
                         if self.ready:
                             self.ammo_list[self.current_ammo_in_gun] -= 1
                             self.current_shooted_ammo = int(str(self.current_ammo_in_gun)[:])
+                            self.current_shooted_ammo_for_tank = int(str(self.current_ammo_in_gun)[:])
                             self.current_ammo_in_gun = None
                             self.ready = False
                             self.is_shot = True
@@ -2093,21 +2106,21 @@ class Tank:
             self.is_sprite_depth = False
             if self.thermal_on:
                 if self.zoom:
-                    self.ray_casting(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                    self.ray_casting((self.s.WIDTH - self.s.NUM_RAYS * self.s.SCALE_thermal) // 2,
                                      self.s.thermal_y, sight_type='4')
                     temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
                     self.world(temp, self.s.thermal_sight_zoom,
                                (self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
                                 self.s.thermal_y))
                 elif self.extra_zoom:
-                    self.ray_casting(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                    self.ray_casting((self.s.WIDTH - self.s.NUM_RAYS * self.s.SCALE_thermal) // 2,
                                      self.s.thermal_y, sight_type='4.5')
                     temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]
                     self.world(temp, self.s.thermal_sight_zoom,
                                (self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
                                 self.s.thermal_y))
                 else:
-                    self.ray_casting(self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                    self.ray_casting((self.s.WIDTH - self.s.NUM_RAYS * self.s.SCALE_thermal) // 2,
                                      self.s.thermal_y, sight_type='3')
 
                     temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects_thermal if not obj.death]

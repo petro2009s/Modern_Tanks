@@ -13,15 +13,15 @@ class Sprite:
                              'tree_thermal': self.s.tree_sprite_thermal,
                              'tree': self.s.tree_sprite}
         self.list_of_objects_thermal = [
-            SpriteObject(self.sprite_types['bush_thermal'], True, (45.1, 7.1), 0.7, 1, self.s, 1, self, 'oth', 0),
-            SpriteObject(self.sprite_types['bush_thermal'], True, (47.1, 9.1), 0.7, 1, self.s, 1, self, 'oth', 1),
-            SpriteObject(self.sprite_types['bmp_thermal'], False, (54, 17), 0.7, 1, self.s, 7, self, 'bmp', 2, k=1.77, v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100),
-            SpriteObject(self.sprite_types['tree_thermal'], True, (50, 18), 0, 2, self.s, 1, self, 'oth', 3)]
+            SpriteObject(self.sprite_types['bush_thermal'], True, (45.1, 7.1), 0.7, 1, self.s, 3, self, 'oth', 0),
+            SpriteObject(self.sprite_types['bush_thermal'], True, (47.1, 9.1), 0.7, 1, self.s, 3, self, 'oth', 1),
+            SpriteObject(self.sprite_types['bmp_thermal'], False, (54, 17), 0.7, 1, self.s, 6, self, 'bmp', 2, k=1.77, v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100),
+            SpriteObject(self.sprite_types['tree_thermal'], True, (50, 18), 0, 2, self.s, 3, self, 'oth', 3)]
         self.list_of_objects = [
-            SpriteObject(self.sprite_types['bush'], True, (45.1, 7.1), 0.7, 1, self.s, 1, self, 'oth', 0),
-            SpriteObject(self.sprite_types['bush'], True, (47.1, 9.1), 0.7, 1, self.s, 1, self, 'oth', 1),
-            SpriteObject(self.sprite_types['bmp'], False, (54, 17), 0.7, 1, self.s, 7, self, 'bmp',  2, k=1.77, v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100),
-            SpriteObject(self.sprite_types['tree'], True, (50, 18), 0, 2, self.s, 1, self, 'oth', 3)]
+            SpriteObject(self.sprite_types['bush'], True, (45.1, 7.1), 0.7, 1, self.s, 3, self, 'oth', 0),
+            SpriteObject(self.sprite_types['bush'], True, (47.1, 9.1), 0.7, 1, self.s, 3, self, 'oth', 1),
+            SpriteObject(self.sprite_types['bmp'], False, (54, 17), 0.7, 1, self.s, 6, self, 'bmp',  2, k=1.77, v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100),
+            SpriteObject(self.sprite_types['tree'], True, (50, 18), 0, 2, self.s, 3, self, 'oth', 3)]
         self.all_list = self.list_of_objects + self.list_of_objects_thermal
         self.collision_set = {(54, 17)}
 
@@ -61,7 +61,7 @@ class SpriteObject:
                 horizontal = 3 * tank.thermal_horizontal
                 SCALE = self.s.SCALE_thermal
                 HALF_FOV = self.s.HALF_FOV_thermal_zoom
-                drx, dry = (self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                drx, dry = ((self.s.WIDTH - self.s.NUM_RAYS * self.s.SCALE_thermal) // 2,
                             self.s.thermal_y)
                 height = self.s.thermal_height
             elif tank.optic:
@@ -71,7 +71,7 @@ class SpriteObject:
                 SCALE = self.s.SCALE_optic
                 height = self.s.HEIGHT
                 HALF_FOV = self.s.HALF_FOV_optic_zoom
-                drx, dry = (self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0)
+                drx, dry = (self.s.WIDTH // 2 - self.s.NUM_RAYS * self.s.SCALE_optic_zoom // 2, 0)
             elif tank.thermal_d:
                 DELTA_ANGLE = self.s.DELTA_ANGLE_thermal_zoom
                 PROJ_COEFF = self.s.PROJ_COEFF_thermal_zoom_d
@@ -91,7 +91,7 @@ class SpriteObject:
                 SCALE = self.s.SCALE_thermal
                 height = self.s.thermal_height
                 HALF_FOV = self.s.HALF_FOV_thermal_zoom_extra
-                drx, dry = (self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                drx, dry = ((self.s.WIDTH - self.s.NUM_RAYS * self.s.SCALE_thermal) // 2,
                             self.s.thermal_y)
             elif tank.thermal_d:
                 DELTA_ANGLE = self.s.DELTA_ANGLE_thermal_zoom_extra
@@ -111,7 +111,7 @@ class SpriteObject:
                 horizontal = 1 * tank.thermal_horizontal
                 SCALE = self.s.SCALE_thermal
                 height = self.s.thermal_height
-                drx, dry = (self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
+                drx, dry = ((self.s.WIDTH - self.s.NUM_RAYS * self.s.SCALE_thermal) // 2,
                             self.s.thermal_y)
                 HALF_FOV = self.s.HALF_FOV_thermal
             elif tank.optic:
@@ -120,7 +120,7 @@ class SpriteObject:
                 horizontal = 1 * tank.horizontal
                 SCALE = self.s.SCALE_optic
                 height = self.s.HEIGHT
-                drx, dry = (self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0)
+                drx, dry = (self.s.WIDTH // 2 - self.s.NUM_RAYS * self.s.SCALE_optic // 2, 0)
                 HALF_FOV = self.s.HALF_FOV_optic
             elif tank.thermal_d:
                 # print(1)
@@ -145,7 +145,7 @@ class SpriteObject:
         #         self.x - tank.x > 0 and self.y - tank.y < 0):
         #     gamma += math.pi
         delta_rays = int(gamma / (DELTA_ANGLE * 3.14 / 180))
-        print(delta_rays)
+        # print(delta_rays)
         current_ray = self.s.center_ray + delta_rays
         dist *= math.cos(math.radians(HALF_FOV - current_ray * DELTA_ANGLE))
         fake_ray = current_ray + self.s.FAKE_RAYS
@@ -168,14 +168,14 @@ class SpriteObject:
                 drx + current_ray * SCALE - half_proj_height * self.k, horizontal + dry + height // 2 - half_proj_height + shift)
 
             # print(self.s.center_ray - self.a1 * (6 - HALF_FOV), current_ray, self.s.center_ray + self.a1 * (6 - HALF_FOV), self.s.center_ray - self.a1 * (6 - HALF_FOV) <= current_ray <= self.s.center_ray + self.a1 * (6 - HALF_FOV))
-            if self.type == 'bmp':
-                print((self.s.center_ray - self.a1 * (7 - HALF_FOV)) * 1.15, current_ray, (self.s.center_ray + self.a1 * (7 - HALF_FOV)) * 0.8)
-            if (self.s.center_ray - self.a1 * (7 - HALF_FOV)) <= current_ray <= (self.s.center_ray + self.a1 * (7 - HALF_FOV)) * 0.75:
+            if self.type == 'tree':
+                print(self.s.HEIGHT // 2 * 0.6 - horizontal, sprite_pos[1],  sprite_pos[1] + proj_height, (self.s.HEIGHT // 2 * 0.6 - horizontal) )
+            if (self.s.center_ray - self.a1 * (7 - HALF_FOV)) <= current_ray <= (self.s.center_ray + self.a1 * (7 - HALF_FOV)) * 0.93:
                 print('ffffff')
                 # print(horizontal)
-                if height // 2 * 1.3 - horizontal >= \
+                if self.s.HEIGHT // 2 * 0.6 - horizontal >= \
                     sprite_pos[1] and (
-                    sprite_pos[1] + proj_height) >= (height // 2 * 0.7 - horizontal):
+                    sprite_pos[1] + proj_height) >= (self.s.HEIGHT // 2 * 0.6 - horizontal):
                     print(2)
                     tank.depth_sprite = str(dist)
                     tank.is_sprite_depth = True
@@ -191,7 +191,7 @@ class SpriteObject:
                 if tank.lock:
                     # print('ppppp', tank.thermal_horizontal)
                     # print(self.x + self.s.tile_w // 3, self.y - self.s.tile_h // 3, 12122121)
-                    tank.lock_x, tank.lock_y = self.x + self.s.tile_w // 5 * self.k, self.y - self.s.tile_h // 2
+                    tank.lock_x, tank.lock_y = self.x, self.y
             if self.movement_angle < 0:
                 o = pygame.transform.flip(self.object, True, False)
                 sprite = pygame.transform.scale(o, (proj_height * self.k, proj_height))

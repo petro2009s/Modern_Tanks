@@ -257,7 +257,7 @@ class Settings:
         self.gunner_site_base2 = pygame.image.load('resources/images/gunner_site2.png').convert_alpha()
         self.gunner_site2 = pygame.transform.scale(self.gunner_site_base2,
                                                    (self.WIDTH, self.HEIGHT))
-        self.reload_time = 1
+        self.reload_time = 6
         self.test_sprite = pygame.image.load('resources/images/bush.png').convert_alpha()
         self.bush_sprite = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
         self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
@@ -288,15 +288,28 @@ class Settings:
                                                 int((self.map_height // 1) // self.tile_h)) for i in
                           range(int((self.map_width // 12) // self.tile_w), int((self.map_width // 7) // self.tile_w))]
 
-        self.shot_anim = [pygame.image.load(f'resources/sprites/explode_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
+        self.shot_anim = [pygame.image.load(f'resources/sprites/explode1_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
                               range(3)]
-        self.shot_anim_thermal = [pygame.image.load(f'resources/sprites/explode_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
+        self.shot_anim_thermal = [pygame.image.load(f'resources/sprites/explode1_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
                               range(3)]
         for i in self.shot_anim_thermal:
             thermal_texture(i, 200, self.max_t)
         self.shot_anim_time = 0.3
         self.shot_frames = int(self.shot_anim_time * self.FPS)
         self.shot_frames_delta = self.shot_frames // 3
+        self.shot_frames = int(self.shot_frames_delta * 3)
+        self.shot_he_anim = [pygame.image.load(f'resources/sprites/explode2_sprite/frame_{str(i + 1)}.png').convert_alpha()
+                          for i in
+                          range(5)]
+        self.shot_he_anim_thermal = [
+            pygame.image.load(f'resources/sprites/explode2_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
+            range(5)]
+        for i in self.shot_he_anim_thermal:
+            thermal_texture(i, 200, self.max_t)
+        self.shot_he_anim_time = 0.4
+        self.shot_he_frames = int(self.shot_he_anim_time * self.FPS)
+        self.shot_he_frames_delta = self.shot_frames // 5
+        self.shot_he_frames = int(self.shot_he_frames_delta * 5)
 
         self.sprites = Sprite(self)
 
