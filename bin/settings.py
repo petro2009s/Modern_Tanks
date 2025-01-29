@@ -236,7 +236,6 @@ class Settings:
 
         self.thermal_width_d = self.WIDTH * 5 / 37
         self.thermal_height_d = self.HEIGHT * 0.8 / 20.5
-        print(self.thermal_width_d, 'gfhfd')
 
         self.PROJ_COEFF_thermal_d = 30 * self.thermal_height
         self.PROJ_COEFF_thermal_zoom_extra_d = 180 * self.thermal_height
