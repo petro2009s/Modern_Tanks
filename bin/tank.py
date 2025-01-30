@@ -188,6 +188,7 @@ class Tank:
         lock_rect.center = (self.s.thermal_x_d * 1.29, self.s.thermal_y_d_2 * 1.18)
         while show:
             self.check_anim()
+            self.check_smog()
             self.check_mission()
             self.movement_check()
             self.check_is_done()
@@ -328,7 +329,8 @@ class Tank:
                     self.world(temp, self.s.thermal_sight_d,
                                (self.s.thermal_x_d * 1.01, self.s.thermal_y_d_2))
 
-                self.shot(self.s.thermal_x_d * 1.3, self.s.thermal_y_d_2 * 1.2)
+                self.shot(self.s.WIDTH // 2, self.s.HEIGHT // 2 * 0.85)
+                self.smog()
 
                 if self.zoom or self.extra_zoom:
 
@@ -438,8 +440,8 @@ class Tank:
                                  'resources/images/buttons/button_active.png',
                                  'resources/sounds/button_menu_sound.mp3')
         quit_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.69, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1,
-                             'Выйти', self.s.size_text_b, 'resources/images/button_inact.png',
-                             'resources/images/button_active.png',
+                             'Выйти', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                             'resources/images/buttons/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
         guidence_text = Text(round(self.s.WIDTH * 0.7), round(self.s.HEIGHT * 0.3), (200, 200, 200), 'Управление:',
                              int(self.s.WIDTH * 0.01),
@@ -1549,6 +1551,16 @@ class Tank:
                         self.zoom = True if self.zoom is False else False
                         self.set_sky()
 
+                    if event.key == pygame.K_q and self.lock_on:
+                        if self.is_sprite_depth:
+                            self.true_depth = min(float(self.depth), float(self.depth_sprite))
+                        else:
+                            self.true_depth = float(self.depth)
+
+                        self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
+                        self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
+                        self.lock = True if self.lock is False else False
+
                     self.ammo(event, [ammo_text])
 
                     if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
@@ -1581,6 +1593,17 @@ class Tank:
 
                             self.s.shoot_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
                             self.s.shoot_sound.play()
+
+                    if event.button == pygame.BUTTON_RIGHT and self.lock_on:
+                        if self.is_sprite_depth:
+                            self.true_depth = min(float(self.depth), float(self.depth_sprite))
+
+                        else:
+                            self.true_depth = float(self.depth)
+
+                        self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
+                        self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
+                        self.lock = True if self.lock is False else False
 
             self.movement()
             self.guidance()
