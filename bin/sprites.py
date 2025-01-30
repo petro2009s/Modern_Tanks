@@ -122,7 +122,7 @@ class SpriteObject:
                             tank.depth_sprite = str(dist)
                             tank.is_sprite_depth = True
 
-                            if tank.current_shooted_ammo is not None:
+                            if tank.current_shooted_ammo is not None and tank.shot_anim is True:
                                 self.minus_hp(tank)
                                 self.check_death(tank)
                                 tank.current_shooted_ammo = None
