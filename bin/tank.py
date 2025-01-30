@@ -355,7 +355,7 @@ class Tank:
                 else:
                     ssu_text.draw(self.s.display)
 
-            self.s.display.blit(self.s.gunner_site2)
+            self.s.display.blit(self.s.gunner_site2, (0, 0))
 
             self.draw_minimap(self.x_minimap, self.y_minimap)
 
