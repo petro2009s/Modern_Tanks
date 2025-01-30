@@ -4,7 +4,7 @@ import os
 import screeninfo
 from bin.bd import DBController
 from bin.map import Map
-from bin.sprites import Sprite
+from bin.sprites import Sprite, SpriteObject
 import math
 
 
@@ -338,6 +338,26 @@ class Settings:
         self.bmp_death_frames = int(self.bmp_death_anim_time * self.FPS)
         self.bmp_death_frames_delta = self.bmp_death_frames // 14
         self.bmp_death_frames = int(self.bmp_death_frames_delta * 14)
+
+        self.sprite_types = {'bush_thermal': self.bush_sprite_thermal,
+                             'bush': self.bush_sprite,
+                             'bmp': self.test_sprite_v,
+                             'bmp_thermal': self.test_sprite_v_thermal,
+                             'tree_thermal': self.tree_sprite_thermal,
+                             'tree': self.tree_sprite}
+        self.list_of_objects_thermal = [
+            SpriteObject(self.sprite_types['bush_thermal'], True, (45.1, 7.1), 0.7, 1, self, 3, self, 'oth', 0),
+            SpriteObject(self.sprite_types['bush_thermal'], True, (47.1, 9.1), 0.7, 1, self, 3, self, 'oth', 1),
+            SpriteObject(self.sprite_types['bmp_thermal'], False, (54, 17), 0.7, 1, self, 6, self, 'bmp', 2, k=1.77,
+                         v=-0.03 * self.tile_w * self.FPS / 60, hp=100, death_anim=True),
+            SpriteObject(self.sprite_types['tree_thermal'], True, (50, 18), 0, 2, self, 3, self, 'oth', 3)]
+
+        self.list_of_objects = [
+            SpriteObject(self.sprite_types['bush'], True, (45.1, 7.1), 0.7, 1, self, 3, self, 'oth', 0),
+            SpriteObject(self.sprite_types['bush'], True, (47.1, 9.1), 0.7, 1, self, 3, self, 'oth', 1),
+            SpriteObject(self.sprite_types['bmp'], False, (54, 17), 0.7, 1, self, 6, self, 'bmp', 2, k=1.77,
+                         v=-0.03 * self.tile_w * self.FPS / 60, hp=100, death_anim=True),
+            SpriteObject(self.sprite_types['tree'], True, (50, 18), 0, 2, self, 3, self, 'oth', 3)]
 
         self.ammo_v = {0: 1500, 1: 670, 2: 800}
         self.sprites = Sprite(self)

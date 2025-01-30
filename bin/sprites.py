@@ -5,73 +5,61 @@ import pygame.transform
 
 class Sprite:
     def __init__(self, s):
+        # настройки
         self.s = s
-
-        self.sprite_types = {'bush_thermal': self.s.bush_sprite_thermal,
-                             'bush': self.s.bush_sprite,
-                             'bmp': self.s.test_sprite_v,
-                             'bmp_thermal': self.s.test_sprite_v_thermal,
-                             'tree_thermal': self.s.tree_sprite_thermal,
-                             'tree': self.s.tree_sprite}
-
-        self.list_of_objects_thermal = [
-            SpriteObject(self.sprite_types['bush_thermal'], True, (45.1, 7.1), 0.7, 1, self.s, 3, self, 'oth', 0),
-            SpriteObject(self.sprite_types['bush_thermal'], True, (47.1, 9.1), 0.7, 1, self.s, 3, self, 'oth', 1),
-            SpriteObject(self.sprite_types['bmp_thermal'], False, (54, 17), 0.7, 1, self.s, 6, self, 'bmp', 2, k=1.77,
-                         v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True),
-            SpriteObject(self.sprite_types['tree_thermal'], True, (50, 18), 0, 2, self.s, 3, self, 'oth', 3)]
-
-        self.list_of_objects = [
-            SpriteObject(self.sprite_types['bush'], True, (45.1, 7.1), 0.7, 1, self.s, 3, self, 'oth', 0),
-            SpriteObject(self.sprite_types['bush'], True, (47.1, 9.1), 0.7, 1, self.s, 3, self, 'oth', 1),
-            SpriteObject(self.sprite_types['bmp'], False, (54, 17), 0.7, 1, self.s, 6, self, 'bmp', 2, k=1.77,
-                         v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True),
-            SpriteObject(self.sprite_types['tree'], True, (50, 18), 0, 2, self.s, 3, self, 'oth', 3)]
-
+        # типы спрайтов
+        self.sprite_types = self.s.sprite_types
+        # списки со всеми спрайтами на карте
+        self.list_of_objects_thermal = self.s.list_of_objects_thermal
+        self.list_of_objects = self.s.list_of_objects
         self.all_list = self.list_of_objects + self.list_of_objects_thermal
-
+        # коллизии
         self.collision_set = {}
         for i in self.list_of_objects:
-            self.collision_set[i.num] = i.coords
+            if i.type != 'oth':
+                self.collision_set[i.num] = i.coords
 
 
 class SpriteObject:
     def __init__(self, object, stat, pos, shift, scale, s, a1, sprites, type, num, k=1, v=0, hp=10, death_anim=None):
+        # настройки и спрайты
         self.s = s
         self.sprites = sprites
-
+        # тип, номер и хп
         self.num = num
         self.type = type
         self.hp = hp
-
+        # координаты спрайта
         self.pos = self.x, self.y = pos[0] * self.s.tile_w, pos[1] * self.s.tile_h
         self.coords = pos
-
+        # направление движения и скорость
         self.movement_angle = 1
         self.v = v
-
+        # параметры отображения спрайта
         self.object = object
         self.stat = stat
         self.shift = shift
         self.scale = scale
         self.k = k
         self.a1 = a1
-
+        # переменные для анимаций и смерти
         self.death = False
         self.is_death_anim = None
         self.death_anim_counter = None
-
+        # параметры отображения объемного спрайта
         if not stat:
             self.sprite_angles = [frozenset(range(i, i + 45)) for i in range(0, 360, 45)]
             self.sprite_pos = {angles: pos for angles, pos in zip(self.sprite_angles, self.object)}
+        # анимация смерти
         if death_anim:
             if self.type == 'bmp':
                 self.is_death_anim = False
                 self.death_anim_counter = 1
 
+    # отображение спрайта
     def object_locate(self, tank):
         if not self.death:
-
+            # параметры отображения
             fake_walls0 = [tank.walls[0] for i in range(self.s.FAKE_RAYS)]
             fake_walls1 = [tank.walls[-1] for i in range(self.s.FAKE_RAYS)]
             fake_walls = fake_walls0 + tank.walls + fake_walls1
@@ -92,13 +80,14 @@ class SpriteObject:
             dist *= math.cos(math.radians(HALF_FOV - current_ray * DELTA_ANGLE))
 
             fake_ray = current_ray + self.s.FAKE_RAYS
+            # проверка на наличие в кадре
             if 0 <= fake_ray <= self.s.NUM_RAYS - 1 + 2 * self.s.FAKE_RAYS and dist < fake_walls[fake_ray][0]:
-
+                #
                 proj_height = min(int(PROJ_COEFF / dist * self.scale), 5 * self.s.HEIGHT)
                 half_proj_height = proj_height // 2
 
                 shift = half_proj_height * self.shift
-
+                # объемный спрайт
                 if not self.stat:
                     if theta < 0:
                         theta += 2 * math.pi
@@ -112,7 +101,7 @@ class SpriteObject:
                     sprite_pos = (
                         drx + current_ray * SCALE - half_proj_height * self.k,
                         horizontal + dry + height // 2 - half_proj_height + shift)
-
+                    # проверка того, что перекрестие на спрайте
                     if (self.s.center_ray - self.a1 * (7 - HALF_FOV) * proj_height * self.k / 300) <= current_ray <= (
                             self.s.center_ray + self.a1 * (7 - HALF_FOV) * proj_height * self.k / 300):
                         if self.s.HEIGHT // 2 * k - horizontal >= \
@@ -121,21 +110,21 @@ class SpriteObject:
 
                             tank.depth_sprite = str(dist)
                             tank.is_sprite_depth = True
-
+                            # выстрел по спрайту
                             if tank.current_shooted_ammo is not None and tank.shot_anim is True:
                                 self.minus_hp(tank)
                                 self.check_death(tank)
                                 tank.current_shooted_ammo = None
-
+                        # захват спрайта
                         if tank.lock:
                             tank.lock_x, tank.lock_y = self.x, self.y
-
+                    # проверка направления движения
                     if self.movement_angle < 0:
                         o = pygame.transform.flip(self.object, True, False)
                         sprite = pygame.transform.scale(o, (proj_height * self.k, proj_height))
                     else:
                         sprite = pygame.transform.scale(self.object, (proj_height * self.k, proj_height))
-
+                # анимация смерти
                 else:
                     self.check_death_anim()
 
@@ -149,10 +138,11 @@ class SpriteObject:
                         drx + current_ray * SCALE - half_proj_height * 2.07 * 2,
                         horizontal + dry + height // 2 - half_proj_height * 2)
                     sprite = pygame.transform.scale(sprite, (proj_height * 2.07 * 2, proj_height * 2))
-
+                # возвращение кортежа с параметрами спрайта
                 return (dist, sprite, sprite_pos)
         return (False,)
 
+    # движение бмп
     def bmp_movement(self, tank):
         if self.v != 0:
             dx = self.v * self.movement_angle
@@ -166,6 +156,7 @@ class SpriteObject:
                 self.x += dx
                 self.sprites.collision_set[self.num] = (self.x // self.s.tile_w, self.y // self.s.tile_h)
 
+    # проверка анимации смерти
     def check_death_anim(self):
         for i in range(len(self.sprites.all_list)):
             if self.sprites.all_list[i].num == self.num:
@@ -174,6 +165,7 @@ class SpriteObject:
                     self.sprites.all_list[i].death = True
                     self.sprites.all_list[i].death_anim_counter = 0
 
+    # анимация смерти
     def death_anim(self, tank):
         for i in range(len(self.sprites.all_list)):
             if self.sprites.all_list[i].num == self.num:
@@ -188,6 +180,7 @@ class SpriteObject:
 
         return False
 
+    # попадание по спрайту
     def minus_hp(self, tank):
         if float(tank.depth_sprite) * 1.4 >= (int(tank.depth_m) + 1) * tank.side / 7 >= float(tank.depth_sprite) * 0.4:
             for i in range(len(self.sprites.all_list)):
@@ -201,6 +194,7 @@ class SpriteObject:
                         elif tank.current_shooted_ammo == 2:
                             self.sprites.all_list[i].hp -= 110
 
+    # проверка смерти спрайта
     def check_death(self, tank):
         for i in range(len(self.sprites.all_list)):
             if self.sprites.all_list[i].hp <= 0:
@@ -212,6 +206,7 @@ class SpriteObject:
                     tank.count_of_destroyed_targets = str(float(tank.count_of_destroyed_targets) + 0.5)
         tank.count_of_destroyed_targets = str(int(float(tank.count_of_destroyed_targets)))
 
+    # все основные параметры танка
     def all_current_parametres(self, tank):
         if tank.zoom:
             if tank.thermal:
