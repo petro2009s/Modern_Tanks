@@ -11,20 +11,20 @@ from bin.damage import Damage
 class Tank:
     def __init__(self, settings, x, y, movement_angle, minimap_k, x_minimap, y_minimap, apfsds_c=1, he_c=1, heat_c=1,
                  minimap_displaying=False):
-
+        # настройки
         self.s = settings
-
+        # звуки
         self.s.music_menu.stop()
         self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
         if self.s.volume_music == 0:
             self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100 * 0.5)
         self.s.background_sound.play(-1)
-
+        # иконка
         pygame.display.set_icon(self.s.icon)
-
+        # координаты
         self.x = x
         self.y = y
-
+        # все временные параметры
         self.stab = False
         self.optic = False
         self.thermal = False
@@ -47,12 +47,12 @@ class Tank:
         self.smog_anim = False
         self.is_explosion = False
         self.explosion_time = None
-
+        # параметры миникарты
         self.x_minimap = x_minimap
         self.y_minimap = y_minimap
         self.minimap_k = minimap_k
         self.minimap_displaying = minimap_displaying
-
+        # параметры боеприпасов
         self.apfsds_c, self.he_c, self.heat_c = apfsds_c, he_c, heat_c
         self.ammo_list = [self.apfsds_c, self.he_c, self.heat_c]
         self.ammo_list_text = ['БР', 'ОФ', 'КС']
@@ -60,59 +60,59 @@ class Tank:
         self.current_ammo_in_gun = 0
         self.current_shooted_ammo = None
         self.current_shooted_ammo_for_tank = None
-
+        # все счетчики времени и время
         self.shot_timer = 0
         self.shot_time = 0.5
         self.reload_timer = 0
         self.reload_time = self.s.reload_time
         self.explosion_timer = 0
-
+        # боевая задача
         self.count_of_destroyed_targets = '0'
         self.count_of_targets = self.s.count_of_targets
         self.done = 'не выполнена'
         self.cause = ''
-
+        # дальность
         self.depth = '0000'
         self.depth_m = '0000'
         self.depth_sprite = '0000'
         self.true_depth = '0000'
-
+        # параметры отображения и скорость
         self.angle_of_view = 0
         self.v = 0
         self.movement_angle = movement_angle
         self.walls = []
-
+        # смещение горизонталей
         self.horizontal = -self.s.HEIGHT * 0.085
         self.thermal_horizontal = -self.s.HEIGHT * 0.12
         self.thermal_horizontal_d = -self.s.HEIGHT * 0.03
-
+        # минимальный угол по вертикали
         self.min_hor_thermal = -self.s.HEIGHT * 0.2
         self.min_hor_thermal_d = -self.s.HEIGHT * 0.06
         self.min_hor_optic = -self.s.HEIGHT * 0.15
-
+        # максимальный угол по вертикали
         self.max_hor_thermal = self.s.HEIGHT * 0.5
         self.max_hor_thermal_d = self.s.HEIGHT * 0.15
         self.max_hor_optic = self.s.HEIGHT * 0.375
-
+        # коордринаты захваченной цели
         self.lock_x = 0
         self.lock_y = 0
-
+        # тряска прицела
         self.type = 1
         self.tryaska = 0
-
+        # счетчики для анимаций
         self.shot_anim_counter = 1
         self.depth_to_shot = 0
         self.smog_anim_counter = 1
         self.proj_height = 1
-
+        # параметры для коллизий
         self.stuck = False
         self.side = min(int(self.s.WIDTH * 0.02), int(self.s.tile_w * 0.8))
-
+        # небо
         self.set_sky()
-
+        # цвет неба
         self.sky_thermal_color = (135 * (20 / self.s.max_t), 135 * (20 / self.s.max_t), 135 * (20 / self.s.max_t))
         self.floor_thermal_color = (45 * (20 / self.s.max_t), 45 * (20 / self.s.max_t), 45 * (20 / self.s.max_t))
-
+        # урон по танку
         self.damage = Damage(self)
 
     def start(self):
