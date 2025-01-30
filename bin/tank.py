@@ -256,7 +256,7 @@ class Tank:
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.s.display.blit(self.s.gunner_site2)
+                        self.s.display.blit(self.s.gunner_site2, (0, 0))
                         self.exit()
 
                     if event.key == pygame.K_e and self.rangefinder_suo:
