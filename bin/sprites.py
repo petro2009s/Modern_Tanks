@@ -10,8 +10,19 @@ class Sprite:
         # типы спрайтов
         self.sprite_types = self.s.sprite_types
         # списки со всеми спрайтами на карте
-        self.list_of_objects_thermal = self.s.list_of_objects_thermal
-        self.list_of_objects = self.s.list_of_objects
+        self.list_of_objects_thermal = [
+            SpriteObject(self.sprite_types['bush_thermal'], True, (45.1, 7.1), 0.7, 1, self.s, 3, self, 'oth', 0),
+            SpriteObject(self.sprite_types['bush_thermal'], True, (47.1, 9.1), 0.7, 1, self.s, 3, self, 'oth', 1),
+            SpriteObject(self.sprite_types['bmp_thermal'], False, (54, 17), 0.7, 1, self.s, 6, self, 'bmp', 2, k=1.77,
+                         v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True),
+            SpriteObject(self.sprite_types['tree_thermal'], True, (50, 18), 0, 2, self.s, 3, self, 'oth', 3)]
+
+        self.list_of_objects = [
+            SpriteObject(self.sprite_types['bush'], True, (45.1, 7.1), 0.7, 1, self.s, 3, self, 'oth', 0),
+            SpriteObject(self.sprite_types['bush'], True, (47.1, 9.1), 0.7, 1, self.s, 3, self, 'oth', 1),
+            SpriteObject(self.sprite_types['bmp'], False, (54, 17), 0.7, 1, self.s, 6, self, 'bmp', 2, k=1.77,
+                         v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True),
+            SpriteObject(self.sprite_types['tree'], True, (50, 18), 0, 2, self.s, 3, self, 'oth', 3)]
         self.all_list = self.list_of_objects + self.list_of_objects_thermal
         # коллизии
         self.collision_set = {}

@@ -412,18 +412,30 @@ class Tank:
             rect2.center = (x + self.pos(k=self.s.minimap_k)[0],
                             y + self.pos(k=self.s.minimap_k)[1])
             self.s.display.blit(image, rect2)
+    def draw_tank(self, x, y):
+        image = pygame.transform.rotate(self.s.minimap_tank_b_scope, -self.movement_angle)
+        rect = image.get_rect()
+        rect.center = (x,
+                       y)
+        self.s.display.blit(image, rect)
+
+        image = pygame.transform.rotate(self.s.minimap_tank_tower_scope, 270 - self.angle_of_view)
+        rect2 = image.get_rect()
+        rect2.center = (x,
+                        y)
+        self.s.display.blit(image, rect2)
 
     def exit(self):
         pygame.display.set_icon(self.s.icon)
 
         exit_to_menu_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.51, self.s.WIDTH * 0.33,
                                      self.s.HEIGHT * 0.1, 'Выйти в меню', self.s.size_text_b,
-                                     'resources/images/button_inact.png',
-                                     'resources/images/button_active.png',
+                                     'resources/images/buttons/button_inact.png',
+                                     'resources/images/buttons/button_active.png',
                                      'resources/sounds/button_menu_sound.mp3')
         continue_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.32, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1,
-                                 'Продолжить', self.s.size_text_b, 'resources/images/button_inact.png',
-                                 'resources/images/button_active.png',
+                                 'Продолжить', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                                 'resources/images/buttons/button_active.png',
                                  'resources/sounds/button_menu_sound.mp3')
         quit_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.69, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1,
                              'Выйти', self.s.size_text_b, 'resources/images/button_inact.png',
@@ -1597,6 +1609,8 @@ class Tank:
             fps_count_text_bl.draw(self.s.display)
             fps_count_text.draw(self.s.display)
 
+            self.draw_tank(self.s.WIDTH * 0.85, self.s.HEIGHT // 2)
+
             depth_text.draw(self.s.display)
             ammo_text.draw(self.s.display)
 
@@ -1656,13 +1670,13 @@ class Tank:
 
                 exit_to_menu_button = Button(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
                                              self.s.HEIGHT * 0.0925,
-                                             'Выйти в меню', self.s.size_text_b, 'resources/images/button_inact.png',
-                                             'resources/images/button_active.png',
+                                             'Выйти в меню', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                                             'resources/images/buttons/button_active.png',
                                              'resources/sounds/button_menu_sound.mp3')
                 quit_button = Button(self.s.WIDTH * 0.081, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
                                      self.s.HEIGHT * 0.0925,
-                                     'Выйти', self.s.size_text_b, 'resources/images/button_inact.png',
-                                     'resources/images/button_active.png',
+                                     'Выйти', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                                     'resources/images/buttons/button_active.png',
                                      'resources/sounds/button_menu_sound.mp3')
 
                 img = pygame.transform.scale(self.s.menu3, (self.s.WIDTH, self.s.HEIGHT))
@@ -2073,6 +2087,8 @@ class Tank:
             fps_count_text_bl.draw(self.s.display)
             fps_count_text.draw(self.s.display)
 
+            self.draw_tank(self.s.WIDTH * 0.9, self.s.HEIGHT // 2)
+
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
         self.thermal = False
@@ -2209,13 +2225,13 @@ class Tank:
 
             exit_to_menu_button = Button(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
                                          self.s.HEIGHT * 0.0925,
-                                         'Выйти в меню', self.s.size_text_b, 'resources/images/button_inact.png',
-                                         'resources/images/button_active.png',
+                                         'Выйти в меню', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                                         'resources/images/buttons/button_active.png',
                                          'resources/sounds/button_menu_sound.mp3')
             quit_button = Button(self.s.WIDTH * 0.081, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
                                  self.s.HEIGHT * 0.0925,
-                                 'Выйти', self.s.size_text_b, 'resources/images/button_inact.png',
-                                 'resources/images/button_active.png',
+                                 'Выйти', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                                 'resources/images/buttons/button_active.png',
                                  'resources/sounds/button_menu_sound.mp3')
 
             background = pygame.Surface((self.s.WIDTH * 0.45, self.s.HEIGHT * 0.64))

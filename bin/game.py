@@ -32,18 +32,18 @@ class Game:
                       int(self.s.WIDTH * 0.052))
 
         play_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.32, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1,
-                             'Играть', self.s.size_text_b, 'resources/images/button_inact.png',
-                             'resources/images/button_active.png',
+                             'Играть', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                             'resources/images/buttons/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
 
         settings_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.51, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1,
-                                 'Настройки', self.s.size_text_b, 'resources/images/button_inact.png',
-                                 'resources/images/button_active.png',
+                                 'Настройки', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                                 'resources/images/buttons/button_active.png',
                                  'resources/sounds/button_menu_sound.mp3')
 
         quit_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.69, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1,
-                             'Выйти', self.s.size_text_b, 'resources/images/button_inact.png',
-                             'resources/images/button_active.png',
+                             'Выйти', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                             'resources/images/buttons/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
@@ -114,9 +114,9 @@ class Game:
                              int(self.s.WIDTH * 0.03125))
 
         screen_size_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.204, (0, 0, 0), 'Разрешение экрана',
-                              int(self.s.WIDTH * 0.0208))
+                                   int(self.s.WIDTH * 0.0208))
         screen_size_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.2, (200, 200, 200), 'Разрешение экрана',
-                           int(self.s.WIDTH * 0.0208))
+                                int(self.s.WIDTH * 0.0208))
 
         fullscreen_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.404, (0, 0, 0), 'Полноэкранный режим',
                                   int(self.s.WIDTH * 0.0208))
@@ -124,13 +124,13 @@ class Game:
                                int(self.s.WIDTH * 0.0208))
 
         screen_choice_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.604, (0, 0, 0), 'Выбор монитора',
-                                  int(self.s.WIDTH * 0.0208))
+                                     int(self.s.WIDTH * 0.0208))
         screen_choice_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.6, (200, 200, 200), 'Выбор монитора',
-                               int(self.s.WIDTH * 0.0208))
+                                  int(self.s.WIDTH * 0.0208))
         screen_text_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.704, (0, 0, 0),
-                            f"Монитор {self.s.monitor_on_text + 1}", int(self.s.WIDTH * 0.0258))
+                              f"Монитор {self.s.monitor_on_text + 1}", int(self.s.WIDTH * 0.0258))
         screen_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.7, (200, 200, 200),
-                         f"Монитор {self.s.monitor_on_text + 1}", int(self.s.WIDTH * 0.0258))
+                           f"Монитор {self.s.monitor_on_text + 1}", int(self.s.WIDTH * 0.0258))
 
         gr_text_bl = Text(self.s.WIDTH * 0.184, self.s.HEIGHT * 0.204, (0, 0, 0), 'Разрешение рендера',
                           int(self.s.WIDTH * 0.0208))
@@ -142,9 +142,9 @@ class Game:
         size_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.3, (200, 200, 200),
                          "*".join(list(map(str, self.s.size_on_text))), int(self.s.WIDTH * 0.03125))
         minimap_text_bl = Text(self.s.WIDTH * 0.184, self.s.HEIGHT * 0.404, (0, 0, 0), 'Отображение мини-карты',
-                         int(self.s.WIDTH * 0.0208))
+                               int(self.s.WIDTH * 0.0208))
         minimap_text = Text(self.s.WIDTH * 0.182, self.s.HEIGHT * 0.4, (200, 200, 200), 'Отображение мини-карты',
-                      int(self.s.WIDTH * 0.0208))
+                            int(self.s.WIDTH * 0.0208))
 
         fps_text_bl = Text(self.s.WIDTH * 0.184, self.s.HEIGHT * 0.604, (0, 0, 0), 'Частота кадров',
                            int(self.s.WIDTH * 0.0208))
@@ -182,13 +182,13 @@ class Game:
                                  int(self.s.WIDTH * 0.0417))
 
         apply_button = Button(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336, self.s.HEIGHT * 0.0925,
-                              'Применить', self.s.size_text_b, 'resources/images/button_inact.png',
-                              'resources/images/button_active.png',
+                              'Применить', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                              'resources/images/buttons/button_active.png',
                               'resources/sounds/button_menu_sound.mp3')
 
         back_button = Button(self.s.WIDTH * 0.081, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336, self.s.HEIGHT * 0.0925,
-                             'Назад', self.s.size_text_b, 'resources/images/button_inact.png',
-                             'resources/images/button_active.png',
+                             'Назад', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                             'resources/images/buttons/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
 
         gr_low = SelectButton(self.s.WIDTH * 0.041, self.s.HEIGHT * 0.23, int(self.s.WIDTH * 0.09),
@@ -202,11 +202,11 @@ class Game:
                                font_size=int(self.s.size_text_b * 0.833))
 
         minimap_on = SelectButton(self.s.WIDTH * 0.041, self.s.HEIGHT * 0.43, int(self.s.WIDTH * 0.139),
-                                self.s.HEIGHT * 0.139, 'Включить', sound='resources/sounds/button_menu_sound.mp3',
-                                font_size=int(self.s.size_text_b * 0.833))
+                                  self.s.HEIGHT * 0.139, 'Включить', sound='resources/sounds/button_menu_sound.mp3',
+                                  font_size=int(self.s.size_text_b * 0.833))
         minimap_off = SelectButton(self.s.WIDTH * 0.1849, self.s.HEIGHT * 0.43, int(self.s.WIDTH * 0.139),
-                                self.s.HEIGHT * 0.139, 'Выключить', sound='resources/sounds/button_menu_sound.mp3',
-                                font_size=int(self.s.size_text_b * 0.833))
+                                   self.s.HEIGHT * 0.139, 'Выключить', sound='resources/sounds/button_menu_sound.mp3',
+                                   font_size=int(self.s.size_text_b * 0.833))
 
         fps_low = SelectButton(self.s.WIDTH * 0.041, self.s.HEIGHT * 0.63, int(self.s.WIDTH * 0.09),
                                self.s.HEIGHT * 0.139, '30', sound='resources/sounds/button_menu_sound.mp3',
@@ -226,41 +226,41 @@ class Game:
                                 font_size=int(self.s.size_text_b * 0.833))
 
         plus_screen_size = Button(self.s.WIDTH * 0.579, self.s.HEIGHT * 0.263, self.s.WIDTH * 0.0417,
-                              self.s.HEIGHT * 0.074, '', 1, 'resources/images/plus.png',
-                             'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                                  self.s.HEIGHT * 0.074, '', 1, 'resources/images/buttons/plus.png',
+                                  'resources/images/buttons/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
 
         minus_screen_size = Button(self.s.WIDTH * 0.377, self.s.HEIGHT * 0.263, self.s.WIDTH * 0.0417,
-                                self.s.HEIGHT * 0.074, '', 1, 'resources/images/minus.png',
-                              'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                                   self.s.HEIGHT * 0.074, '', 1, 'resources/images/buttons/minus.png',
+                                   'resources/images/buttons/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
 
         plus_screen = Button(self.s.WIDTH * 0.579, self.s.HEIGHT * 0.663, self.s.WIDTH * 0.0417,
-                             self.s.HEIGHT * 0.074, '', 1, 'resources/images/plus.png',
-                             'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                             self.s.HEIGHT * 0.074, '', 1, 'resources/images/buttons/plus.png',
+                             'resources/images/buttons/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
 
         minus_screen = Button(self.s.WIDTH * 0.377, self.s.HEIGHT * 0.663, self.s.WIDTH * 0.0417,
-                              self.s.HEIGHT * 0.074, '', 1, 'resources/images/minus.png',
-                              'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                              self.s.HEIGHT * 0.074, '', 1, 'resources/images/buttons/minus.png',
+                              'resources/images/buttons/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
 
         plus_general = Button(self.s.WIDTH * 0.8333, self.s.HEIGHT * 0.263, self.s.WIDTH * 0.0417,
-                              self.s.HEIGHT * 0.074, '', 1, 'resources/images/plus.png',
-                              'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                              self.s.HEIGHT * 0.074, '', 1, 'resources/images/buttons/plus.png',
+                              'resources/images/buttons/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
         minus_general = Button(self.s.WIDTH * 0.677, self.s.HEIGHT * 0.263, self.s.WIDTH * 0.0417,
-                               self.s.HEIGHT * 0.074, '', 1, 'resources/images/minus.png',
-                               'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                               self.s.HEIGHT * 0.074, '', 1, 'resources/images/buttons/minus.png',
+                               'resources/images/buttons/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
 
         plus_music = Button(self.s.WIDTH * 0.8333, self.s.HEIGHT * 0.463, self.s.WIDTH * 0.0417,
-                            self.s.HEIGHT * 0.074, '', 1, 'resources/images/plus.png',
-                            'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                            self.s.HEIGHT * 0.074, '', 1, 'resources/images/buttons/plus.png',
+                            'resources/images/buttons/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
         minus_music = Button(self.s.WIDTH * 0.677, self.s.HEIGHT * 0.463, self.s.WIDTH * 0.0417,
-                             self.s.HEIGHT * 0.074, '', 1, 'resources/images/minus.png',
-                             'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                             self.s.HEIGHT * 0.074, '', 1, 'resources/images/buttons/minus.png',
+                             'resources/images/buttons/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
 
         plus_sound = Button(self.s.WIDTH * 0.8333, self.s.HEIGHT * 0.663, self.s.WIDTH * 0.0417,
-                            self.s.HEIGHT * 0.074, '', 1, 'resources/images/plus.png',
-                            'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                            self.s.HEIGHT * 0.074, '', 1, 'resources/images/buttons/plus.png',
+                            'resources/images/buttons/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
         minus_sound = Button(self.s.WIDTH * 0.677, self.s.HEIGHT * 0.663, self.s.WIDTH * 0.0417,
-                             self.s.HEIGHT * 0.074, '', 1, 'resources/images/minus.png',
-                             'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                             self.s.HEIGHT * 0.074, '', 1, 'resources/images/buttons/minus.png',
+                             'resources/images/buttons/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
 
         gr_list = [gr_low, gr_mid, gr_high]
         minimap_list = [minimap_on, minimap_off]
@@ -279,7 +279,8 @@ class Game:
         background.set_alpha(128)
         background.fill((37, 46, 37))
 
-        all_list = [back_button, gr_high, gr_low, gr_mid, minimap_on, minimap_off, fps_high, fps_low, fps_mid, gr_text_bl,
+        all_list = [back_button, gr_high, gr_low, gr_mid, minimap_on, minimap_off, fps_high, fps_low, fps_mid,
+                    gr_text_bl,
                     gr_text, minimap_text_bl, minimap_text, fps_text_bl, fps_text, header_bl, header, fps_count_text_bl,
                     fps_count_text, screen_choice_text_bl, screen_choice_text, screen_size_text_bl, screen_size_text,
                     plus_music, minus_music, plus_sound, minus_sound, volume_header_bl, volume_header, music_text_bl,
@@ -289,8 +290,7 @@ class Game:
                     plus_general, minus_general, screen_text_bl, screen_text, fullscreen_text_bl, fullscreen_text,
                     plus_screen, minus_screen, plus_screen_size, minus_screen_size, size_text_bl, size_text,
                     apply_button, full_on, full_off]
-        set_list = ['low', 'mid', 'high']
-        v = {'0': False, '1': True}
+
         while sett:
             back_button.check(pygame.mouse.get_pos())
 
@@ -411,7 +411,6 @@ class Game:
                             size_text.set_another_text("*".join(list(map(str, self.s.size_on_text))))
                             size_text_bl.set_another_text("*".join(list(map(str, self.s.size_on_text))))
 
-
                     if event.button == minus_screen:
                         if self.s.monitor_on_text != 0:
                             self.s.monitor_on_text -= 1
@@ -503,6 +502,7 @@ class Game:
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
         self.s.update_db()
+
     def game_menu(self):
         pygame.display.set_icon(self.s.icon)
         gm = True
@@ -547,32 +547,32 @@ class Game:
 
         apfsds_txt = SelectButton(self.s.WIDTH * 0.05, self.s.HEIGHT * 0.63, w=self.s.WIDTH * 0.083,
                                   h=self.s.HEIGHT * 0.042, w_r=self.s.WIDTH * 0.092, h_r=self.s.HEIGHT * 0.074,
-                                  text='БОПС', im='resources/images/apfsds.png', font_size=self.s.size_text_b)
+                                  text='БОПС', im='resources/images/ammo/apfsds.png', font_size=self.s.size_text_b)
         he_txt = SelectButton(self.s.WIDTH * 0.185, self.s.HEIGHT * 0.63, w=self.s.WIDTH * 0.083,
                               h=self.s.HEIGHT * 0.042, w_r=self.s.WIDTH * 0.092, h_r=self.s.HEIGHT * 0.074,
-                              text='ОФС', im='resources/images/he.png', font_size=self.s.size_text_b)
+                              text='ОФС', im='resources/images/ammo/he.png', font_size=self.s.size_text_b)
         heat_txt = SelectButton(self.s.WIDTH * 0.32, self.s.HEIGHT * 0.63, w=self.s.WIDTH * 0.083,
                                 h=self.s.HEIGHT * 0.042, w_r=self.s.WIDTH * 0.092, h_r=self.s.HEIGHT * 0.074,
-                                text='КС', im='resources/images/heat.png', font_size=self.s.size_text_b)
+                                text='КС', im='resources/images/ammo/heat.png', font_size=self.s.size_text_b)
 
         plus1 = Button(round(self.s.WIDTH // 2 * 0.25), round(self.s.HEIGHT * 0.725), self.s.WIDTH * 0.03125,
-                       self.s.HEIGHT * 0.055, '', 1, 'resources/images/plus.png',
-                       'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                       self.s.HEIGHT * 0.055, '', 1, 'resources/images/buttons/plus.png',
+                       'resources/images/buttons/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
         plus2 = Button(round(self.s.WIDTH // 2 * 0.52), round(self.s.HEIGHT * 0.725), self.s.WIDTH * 0.03125,
-                       self.s.HEIGHT * 0.055, '', 1, 'resources/images/plus.png',
-                       'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                       self.s.HEIGHT * 0.055, '', 1, 'resources/images/buttons/plus.png',
+                       'resources/images/buttons/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
         plus3 = Button(round(self.s.WIDTH // 2 * 0.79), round(self.s.HEIGHT * 0.725), self.s.WIDTH * 0.03125,
-                       self.s.HEIGHT * 0.055, '', 1, 'resources/images/plus.png',
-                       'resources/images/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                       self.s.HEIGHT * 0.055, '', 1, 'resources/images/buttons/plus.png',
+                       'resources/images/buttons/plus_act.png', 'resources/sounds/button_menu_sound.mp3')
         minus1 = Button(round(self.s.WIDTH // 2 * 0.07), round(self.s.HEIGHT * 0.725), self.s.WIDTH * 0.03125,
-                        self.s.HEIGHT * 0.055, '', 1, 'resources/images/minus.png',
-                        'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                        self.s.HEIGHT * 0.055, '', 1, 'resources/images/buttons/minus.png',
+                        'resources/images/buttons/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
         minus2 = Button(round(self.s.WIDTH // 2 * 0.34), round(self.s.HEIGHT * 0.725), self.s.WIDTH * 0.03125,
-                        self.s.HEIGHT * 0.055, '', 1, 'resources/images/minus.png',
-                        'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                        self.s.HEIGHT * 0.055, '', 1, 'resources/images/buttons/minus.png',
+                        'resources/images/buttons/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
         minus3 = Button(round(self.s.WIDTH // 2 * 0.61), round(self.s.HEIGHT * 0.725), self.s.WIDTH * 0.03125,
-                        self.s.HEIGHT * 0.055, '', 1, 'resources/images/minus.png',
-                        'resources/images/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
+                        self.s.HEIGHT * 0.055, '', 1, 'resources/images/buttons/minus.png',
+                        'resources/images/buttons/minus_act.png', 'resources/sounds/button_menu_sound.mp3')
 
         apfsds_count_txt = Text(round(self.s.WIDTH // 2 * 0.187), round(self.s.HEIGHT * 0.75), (200, 200, 200),
                                 str(APFSDS_COUNT), int(self.s.WIDTH * 0.016))
@@ -592,24 +592,24 @@ class Game:
                              f'3/{str(AMMO)}', int(self.s.WIDTH * 0.016))
 
         back_button = Button(self.s.WIDTH * 0.081, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336, self.s.HEIGHT * 0.0925,
-                             'Назад', self.s.size_text_b, 'resources/images/button_inact.png',
-                             'resources/images/button_active.png',
+                             'Назад', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                             'resources/images/buttons/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
 
         play_button = Button(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336, self.s.HEIGHT * 0.0925,
-                             'Играть', self.s.size_text_b, 'resources/images/button_inact.png',
-                             'resources/images/button_active.png',
+                             'Играть', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                             'resources/images/buttons/button_active.png',
                              'resources/sounds/button_menu_sound.mp3')
         tank1_button = SelectButton(round(self.s.WIDTH // 2 * 0.060), round(self.s.HEIGHT * 0.23),
                                     w=self.s.WIDTH * 0.09375, h=self.s.HEIGHT * 0.085, w_r=self.s.WIDTH * 0.104,
                                     h_r=self.s.HEIGHT * 0.139,
-                                    text='Т-90М', im='resources/images/T-90M_profile.png',
+                                    text='Т-90М', im='resources/images/buttons/T-90M_profile.png',
                                     sound='resources/sounds/button_menu_sound.mp3',
                                     font_size=self.s.size_text_b)
         guide_button = SelectButton(round(self.s.WIDTH // 2 * 0.060), round(self.s.HEIGHT * 0.43),
                                     w=self.s.WIDTH * 0.033, h=self.s.HEIGHT * 0.0925, w_r=self.s.WIDTH * 0.104,
                                     h_r=self.s.HEIGHT * 0.139,
-                                    text='Обучение', im='resources/images/guide.png',
+                                    text='Обучение', im='resources/images/buttons/guide.png',
                                     sound='resources/sounds/button_menu_sound.mp3',
                                     font_size=self.s.size_text_b)
 
@@ -767,9 +767,6 @@ class Game:
                             max_ammo_text.set_another_text(f'{str(CURRENT_AMMO)}/{str(AMMO)}')
 
                     if event.button == play_button:
-                        print(APFSDS_COUNT, HE_COUNT, HEAT_COUNT)
-                        print([i for i, j in self.s.tank_dict.items() if j][0])
-                        print([i for i, j in self.s.lvl_dict.items() if j][0])
                         self.play(APFSDS_COUNT, HE_COUNT, HEAT_COUNT)
 
                 for i in button_list:
@@ -804,7 +801,7 @@ class Game:
 
     def play(self, APFSDS_COUNT, HE_COUNT, HEAT_COUNT):
         pygame.display.set_icon(self.s.icon)
-        print(self.s.WIDTH // 2, self.s.HEIGHT // 2)
-        tank = Tank(self.s, self.s.start_point[0], self.s.start_point[1], 0, self.s.minimap_k, 0, 0, APFSDS_COUNT, HE_COUNT, HEAT_COUNT, self.s.minimap_dict[0])
+        tank = Tank(self.s, self.s.start_point[0], self.s.start_point[1], 0, self.s.minimap_k, 0, 0, APFSDS_COUNT,
+                    HE_COUNT, HEAT_COUNT, self.s.minimap_dict[0])
         tank.start()
         self.s.update_sprites()

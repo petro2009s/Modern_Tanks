@@ -30,7 +30,7 @@ class Settings:
         self.button_color = (50, 60, 50)
         pygame.init()
         self.display = pygame.display.set_mode((self.WIDTH, self.HEIGHT), display=self.monitor)
-        self.icon = pygame.image.load('resources/images/icon_test2_p.png').convert()
+        self.icon = pygame.image.load('resources/images/menu/icon_test2_p.png').convert()
         os.environ['SDL_VIDEO_CENTERED'] = '1'
         if self.bd.select('full_table', '[on]')[0][0]:
             pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.FULLSCREEN, display=self.monitor)
@@ -40,15 +40,15 @@ class Settings:
             else:
                 pygame.display.set_mode((self.WIDTH, self.HEIGHT), display=self.monitor)
 
-        self.menu1 = pygame.image.load('resources/images/menu_p1.png').convert()
-        self.menu2 = pygame.image.load('resources/images/menu_p2.png').convert()
-        self.menu3 = pygame.image.load('resources/images/menu_p3.png').convert()
-        self.menu4 = pygame.image.load('resources/images/menu_p4.png').convert()
-        self.menu5 = pygame.image.load('resources/images/menu_p5.png').convert()
-        self.gif = gif_pygame.load("resources/images/menu_g.gif")
+        self.menu1 = pygame.image.load('resources/images/menu/menu_p1.png').convert()
+        self.menu2 = pygame.image.load('resources/images/menu/menu_p2.png').convert()
+        self.menu3 = pygame.image.load('resources/images/menu/menu_p3.png').convert()
+        self.menu4 = pygame.image.load('resources/images/menu/menu_p4.png').convert()
+        self.menu5 = pygame.image.load('resources/images/menu/menu_p5.png').convert()
+        self.gif = gif_pygame.load("resources/images/menu/menu_g.gif")
         gif_pygame.transform.scale(self.gif, (self.WIDTH, self.HEIGHT))
         pygame.display.set_icon(self.icon)
-        self.cursor_base = pygame.image.load('resources/images/cursor.png').convert_alpha()
+        self.cursor_base = pygame.image.load('resources/images/menu/cursor.png').convert_alpha()
         self.cursor = pygame.transform.scale(self.cursor_base, (self.WIDTH * 0.03125, self.WIDTH * 0.03125))
         self.menu_list = [self.menu1, self.menu2, self.menu3, self.menu4, self.menu5]
         for i in range(len(self.menu_list)):
@@ -100,8 +100,12 @@ class Settings:
         self.map_width = self.tile_w * len(self.world_map[0])
         self.map_height = self.tile_h * len(self.world_map)
         self.map = Map(self.world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
-        self.minimap_tank_base = pygame.image.load('resources/images/tank_minimap_base.png').convert_alpha()
-        self.minimap_tank_tower_base = pygame.image.load('resources/images/tank_minimap_tower.png').convert_alpha()
+        self.minimap_tank_base = pygame.image.load('resources/images/tank/tank_minimap_base.png').convert_alpha()
+        self.minimap_tank_tower_base = pygame.image.load('resources/images/tank/tank_minimap_tower.png').convert_alpha()
+        self.minimap_tank_base_scope = pygame.image.load('resources/images/tank/tank_minimap_base.png').convert_alpha()
+        self.minimap_tank_tower_scope = pygame.image.load('resources/images/tank/tank_minimap_tower.png').convert_alpha()
+        thermal_texture(self.minimap_tank_base_scope, 50, 60)
+        thermal_texture(self.minimap_tank_tower_scope, 50, 60)
         self.minimap_tank_b = pygame.transform.scale(self.minimap_tank_base,
                                                      (self.WIDTH * 0.0625 // self.minimap_k,
                                                       self.WIDTH * 0.0625 // self.minimap_k))
@@ -144,14 +148,14 @@ class Settings:
         else:
             self.SCALE_optic_zoom = int(self.optic_scope_width / self.NUM_RAYS) + 1
 
-        self.optic_sight_base = pygame.image.load('resources/images/sosna-u_optic.png').convert_alpha()
+        self.optic_sight_base = pygame.image.load('resources/images/scopes/sosna-u_optic.png').convert_alpha()
         self.optic_sight = pygame.transform.scale(self.optic_sight_base,
                                                   (self.HEIGHT, self.HEIGHT))
 
-        self.optic_sight_zoom_base = pygame.image.load('resources/images/sosna-u_optic_zoom.png').convert_alpha()
+        self.optic_sight_zoom_base = pygame.image.load('resources/images/scopes/sosna-u_optic_zoom.png').convert_alpha()
         self.optic_sight_zoom = pygame.transform.scale(self.optic_sight_zoom_base,
                                                        (self.HEIGHT, self.HEIGHT))
-        self.gunner_site_base = pygame.image.load('resources/images/gunner_site.png').convert_alpha()
+        self.gunner_site_base = pygame.image.load('resources/images/tank/gunner_site.png').convert_alpha()
         self.gunner_site = pygame.transform.scale(self.gunner_site_base,
                                                   (self.WIDTH, self.HEIGHT))
         self.max_t = 80
@@ -160,8 +164,8 @@ class Settings:
 
         self.texture_scale = self.texture_w // self.tile_w if self.texture_w % self.tile_w == 0 else self.texture_w // self.tile_w + 1
 
-        self.texture_1_base = pygame.image.load('resources/images/forest.png').convert_alpha()
-        self.texture_2_base = pygame.image.load('resources/images/building.png').convert_alpha()
+        self.texture_1_base = pygame.image.load('resources/images/textures/forest.png').convert_alpha()
+        self.texture_2_base = pygame.image.load('resources/images/textures/building.png').convert_alpha()
         self.textures = {'3': pygame.transform.scale(self.texture_1_base,
                                                      (self.texture_w, self.texture_h)),
                          '1': pygame.transform.scale(self.texture_2_base,
@@ -188,7 +192,7 @@ class Settings:
         self.thermal_sight_x = 0.22 * self.WIDTH
         self.thermal_sight_y = 0.25 * self.WIDTH
 
-        self.thermal_base = pygame.image.load('resources/images/sosna-thermal_base.png').convert_alpha()
+        self.thermal_base = pygame.image.load('resources/images/tank/sosna-thermal_base.png').convert_alpha()
         self.thermal_image = pygame.transform.scale(self.thermal_base,
                                                     (self.HEIGHT * 1.225, self.HEIGHT))
 
@@ -217,10 +221,10 @@ class Settings:
         self.DIST_thermal_zoom = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_thermal_zoom * 3.14 / 180))
         self.PROJ_COEFF_thermal_zoom = 285 * self.thermal_height
 
-        self.thermal_sight_base = pygame.image.load('resources/images/sosna_u_thermal.png').convert_alpha()
+        self.thermal_sight_base = pygame.image.load('resources/images/scopes/sosna_u_thermal.png').convert_alpha()
         self.thermal_sight = pygame.transform.scale(self.thermal_sight_base,
                                                     (self.thermal_width, self.thermal_height))
-        self.thermal_sight_zoom_base = pygame.image.load('resources/images/sosna-u_thermal_zoom.png').convert_alpha()
+        self.thermal_sight_zoom_base = pygame.image.load('resources/images/scopes/sosna-u_thermal_zoom.png').convert_alpha()
         self.thermal_sight_zoom = pygame.transform.scale(self.thermal_sight_zoom_base,
                                                          (self.thermal_width, self.thermal_height))
         self.FOV_thermal_zoom_extra = 1.5
@@ -253,11 +257,11 @@ class Settings:
                                                       (self.thermal_width / 4, self.thermal_height / 4))
         self.thermal_sight_zoom_d = pygame.transform.scale(self.thermal_sight_zoom_base,
                                                            (self.thermal_width / 4, self.thermal_height / 4))
-        self.gunner_site_base2 = pygame.image.load('resources/images/gunner_site2.png').convert_alpha()
+        self.gunner_site_base2 = pygame.image.load('resources/images/tank/gunner_site2.png').convert_alpha()
         self.gunner_site2 = pygame.transform.scale(self.gunner_site_base2,
                                                    (self.WIDTH, self.HEIGHT))
         self.reload_time = 6
-        self.test_sprite = pygame.image.load('resources/images/bush.png').convert_alpha()
+        self.test_sprite = pygame.image.load('resources/sprites/bush.png').convert_alpha()
         self.bush_sprite = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
         self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
         thermal_texture(self.bush_sprite_thermal, 20, self.max_t)
@@ -271,9 +275,9 @@ class Settings:
                                       for i in range(8)]
         for i in self.test_sprite_v_thermal:
             thermal_texture(i, 80, 80)
-        self.tree_sprite = pygame.image.load('resources/images/tree.png').convert_alpha()
+        self.tree_sprite = pygame.image.load('resources/sprites/tree.png').convert_alpha()
         self.tree_sprite_thermal = pygame.transform.scale(self.tree_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        self.destroyed_image = pygame.image.load('resources/images/destroyed.png').convert_alpha()
+        self.destroyed_image = pygame.image.load('resources/images/menu/destroyed.png').convert_alpha()
         self.destroyed_image = pygame.transform.scale(self.destroyed_image, (self.WIDTH, self.HEIGHT))
         thermal_texture(self.tree_sprite_thermal, 20, self.max_t)
         self.mine_coords = {(55, 20), (56, 21), (55, 21), (57, 25), (50, 60)}
@@ -295,7 +299,7 @@ class Settings:
             thermal_texture(i, 200, self.max_t)
         self.shot_anim_time = 0.3
         self.shot_frames = int(self.shot_anim_time * self.FPS)
-        self.shot_frames_delta = self.shot_frames // 3
+        self.shot_frames_delta = max(self.shot_frames // 3, 1)
         self.shot_frames = int(self.shot_frames_delta * 3)
 
         self.shot_he_anim = [pygame.image.load(f'resources/sprites/explode2_sprite/frame_{str(i + 1)}.png').convert_alpha()
@@ -308,7 +312,7 @@ class Settings:
             thermal_texture(i, 200, self.max_t)
         self.shot_he_anim_time = 0.4
         self.shot_he_frames = int(self.shot_he_anim_time * self.FPS)
-        self.shot_he_frames_delta = self.shot_he_frames // 5
+        self.shot_he_frames_delta = max(self.shot_he_frames // 5, 1)
         self.shot_he_frames = int(self.shot_he_frames_delta * 5)
 
         self.shot_smog_anim = [
@@ -322,7 +326,7 @@ class Settings:
             thermal_texture(i, 100, self.max_t)
         self.shot_smog_anim_time = 0.3
         self.shot_smog_frames = int(self.shot_smog_anim_time * self.FPS)
-        self.shot_smog_frames_delta = self.shot_smog_frames // 10
+        self.shot_smog_frames_delta = max(self.shot_smog_frames // 10, 1)
         self.shot_smog_frames = int(self.shot_smog_frames_delta * 10)
 
         self.bmp_death_anim = [
@@ -336,7 +340,7 @@ class Settings:
             thermal_texture(i, 100, self.max_t)
         self.bmp_death_anim_time = 0.8
         self.bmp_death_frames = int(self.bmp_death_anim_time * self.FPS)
-        self.bmp_death_frames_delta = self.bmp_death_frames // 14
+        self.bmp_death_frames_delta = max(self.bmp_death_frames // 14, 1)
         self.bmp_death_frames = int(self.bmp_death_frames_delta * 14)
 
         self.sprite_types = {'bush_thermal': self.bush_sprite_thermal,
@@ -345,20 +349,26 @@ class Settings:
                              'bmp_thermal': self.test_sprite_v_thermal,
                              'tree_thermal': self.tree_sprite_thermal,
                              'tree': self.tree_sprite}
-        self.list_of_objects_thermal = [
-            SpriteObject(self.sprite_types['bush_thermal'], True, (45.1, 7.1), 0.7, 1, self, 3, self, 'oth', 0),
-            SpriteObject(self.sprite_types['bush_thermal'], True, (47.1, 9.1), 0.7, 1, self, 3, self, 'oth', 1),
-            SpriteObject(self.sprite_types['bmp_thermal'], False, (54, 17), 0.7, 1, self, 6, self, 'bmp', 2, k=1.77,
-                         v=-0.03 * self.tile_w * self.FPS / 60, hp=100, death_anim=True),
-            SpriteObject(self.sprite_types['tree_thermal'], True, (50, 18), 0, 2, self, 3, self, 'oth', 3)]
 
-        self.list_of_objects = [
-            SpriteObject(self.sprite_types['bush'], True, (45.1, 7.1), 0.7, 1, self, 3, self, 'oth', 0),
-            SpriteObject(self.sprite_types['bush'], True, (47.1, 9.1), 0.7, 1, self, 3, self, 'oth', 1),
-            SpriteObject(self.sprite_types['bmp'], False, (54, 17), 0.7, 1, self, 6, self, 'bmp', 2, k=1.77,
-                         v=-0.03 * self.tile_w * self.FPS / 60, hp=100, death_anim=True),
-            SpriteObject(self.sprite_types['tree'], True, (50, 18), 0, 2, self, 3, self, 'oth', 3)]
-
+        # self.list_of_objects_thermal = [
+        #     SpriteObject(self.sprite_types['bush_thermal'], True, (45.1, 7.1), 0.7, 1, self, 3, self, 'oth', 0),
+        #     SpriteObject(self.sprite_types['bush_thermal'], True, (47.1, 9.1), 0.7, 1, self, 3, self, 'oth', 1),
+        #     SpriteObject(self.sprite_types['bmp_thermal'], False, (54, 17), 0.7, 1, self, 6, self, 'bmp', 2, k=1.77,
+        #                  v=-0.03 * self.tile_w * self.FPS / 60, hp=100, death_anim=True),
+        #     SpriteObject(self.sprite_types['tree_thermal'], True, (50, 18), 0, 2, self, 3, self, 'oth', 3)]
+        #
+        # self.list_of_objects = [
+        #     SpriteObject(self.sprite_types['bush'], True, (45.1, 7.1), 0.7, 1, self, 3, self, 'oth', 0),
+        #     SpriteObject(self.sprite_types['bush'], True, (47.1, 9.1), 0.7, 1, self, 3, self, 'oth', 1),
+        #     SpriteObject(self.sprite_types['bmp'], False, (54, 17), 0.7, 1, self, 6, self, 'bmp', 2, k=1.77,
+        #                  v=-0.03 * self.tile_w * self.FPS / 60, hp=100, death_anim=True),
+        #     SpriteObject(self.sprite_types['tree'], True, (50, 18), 0, 2, self, 3, self, 'oth', 3)]
+        self.minimap_tank_b_scope = pygame.transform.scale(self.minimap_tank_base_scope,
+                                                           (self.WIDTH * 0.0625 / 1.5,
+                                                            self.WIDTH * 0.0625 / 1.5))
+        self.minimap_tank_tower_scope = pygame.transform.scale(self.minimap_tank_tower_scope,
+                                                               (self.WIDTH * 0.062 / 1.5,
+                                                                self.WIDTH * 0.062 / 1.5))
         self.ammo_v = {0: 1500, 1: 670, 2: 800}
         self.sprites = Sprite(self)
 
@@ -380,19 +390,15 @@ class Settings:
         self.DIST_thermal = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_thermal * 3.14 / 180))
         if self.thermal_width % self.NUM_RAYS == 0:
             self.SCALE_thermal = self.thermal_width // self.NUM_RAYS
-            print('scale int')
         else:
             self.SCALE_thermal = int(self.thermal_width // self.NUM_RAYS) + 1
-            print('not')
         self.DELTA_ANGLE_thermal_zoom = self.FOV_thermal_zoom / self.NUM_RAYS
         self.DIST_thermal_zoom = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_thermal_zoom * 3.14 / 180))
         self.DELTA_ANGLE_thermal_zoom_extra = self.FOV_thermal_zoom_extra / self.NUM_RAYS
         self.DIST_thermal_zoom_extra = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_thermal_zoom_extra * 3.14 / 180))
         if self.thermal_width_d % self.NUM_RAYS == 0:
             self.SCALE_thermal_d = self.thermal_width_d // self.NUM_RAYS
-            print(11241232)
         else:
-            print(2432342)
             self.SCALE_thermal_d = int(self.thermal_width_d // self.NUM_RAYS) + 1
 
     def update_db(self):
@@ -431,6 +437,13 @@ class Settings:
         self.minimap_tank_tower = pygame.transform.scale(self.minimap_tank_tower_base,
                                                          (self.WIDTH * 0.0625 // self.minimap_k,
                                                           self.WIDTH * 0.0625 // self.minimap_k))
+
+        self.minimap_tank_b_scope = pygame.transform.scale(self.minimap_tank_base,
+                                                     (self.WIDTH * 0.0625 / 1.5,
+                                                      self.WIDTH * 0.0625 / 1.5))
+        self.minimap_tank_tower_scope = pygame.transform.scale(self.minimap_tank_tower_base,
+                                                         (self.WIDTH * 0.062 / 1.5,
+                                                          self.WIDTH * 0.062 / 1.5))
 
         self.map_width = self.tile_w * len(self.world_map[0])
         self.map_height = self.tile_h * len(self.world_map)
@@ -555,14 +568,14 @@ class Settings:
                           range(int((self.map_width // 12) // self.tile_w), int((self.map_width // 7) // self.tile_w))]
 
         self.shot_frames = int(self.shot_anim_time * self.FPS)
-        self.shot_frames_delta = self.shot_frames // 3
+        self.shot_frames_delta = max(self.shot_frames // 3, 1)
 
         self.shot_he_frames = int(self.shot_he_anim_time * self.FPS)
-        self.shot_he_frames_delta = self.shot_he_frames // 5
+        self.shot_he_frames_delta = max(self.shot_he_frames // 5, 1)
         self.shot_he_frames = int(self.shot_he_frames_delta * 5)
 
         self.shot_smog_frames = int(self.shot_smog_anim_time * self.FPS)
-        self.shot_smog_frames_delta = self.shot_smog_frames // 10
+        self.shot_smog_frames_delta = max(self.shot_smog_frames // 10, 1)
         self.shot_smog_frames = int(self.shot_smog_frames_delta * 10)
         self.sprites = Sprite(self)
 
