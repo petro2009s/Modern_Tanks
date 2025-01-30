@@ -10,7 +10,7 @@ from bin.damage import Damage
 
 class Tank:
     def __init__(self, settings, x, y, movement_angle, minimap_k, x_minimap, y_minimap, apfsds_c=1, he_c=1, heat_c=1,
-                 minimap_displaying=False):
+                 minimap_displaying=False, num_level=0):
         # настройки
         self.s = settings
         # звуки
@@ -47,6 +47,12 @@ class Tank:
         self.smog_anim = False
         self.is_explosion = False
         self.explosion_time = None
+
+        self.num_level = num_level
+        # параметры обучения
+        self.guide_mission_num = 0
+        self.is_guide_hint = True
+        self.is_guide_button_mission3_pressed = [False, False, False]
         # параметры миникарты
         self.x_minimap = x_minimap
         self.y_minimap = y_minimap
@@ -209,8 +215,9 @@ class Tank:
                     sys.exit()
 
                 if event.type == pygame.USEREVENT:
-                    if event.button == optic_sight_button:
-
+                    if event.button == optic_sight_button and (self.guide_mission_num >= 2 or self.num_level):
+                        if self.guide_mission_num == 2:
+                            self.is_guide_hint = True
                         self.extra_zoom = False
                         self.thermal_d = False
                         self.st = False
@@ -231,13 +238,13 @@ class Tank:
                         ammo_text2.set_another_text(self.ammo_list_text[self.current_ammo][1])
                         self.set_sky()
 
-                    elif event.button == thermal_sight_button:
-
+                    elif event.button == thermal_sight_button and (self.guide_mission_num >= 4 or self.num_level):
+                        if self.guide_mission_num == 4:
+                            self.is_guide_hint = True
                         self.thermal_d = False
                         self.st = False
 
                         self.thermal_sight()
-
                         self.thermal_d = True
                         self.st = True
                         if self.menu:
@@ -253,6 +260,8 @@ class Tank:
                         self.set_sky()
 
                     elif event.button == suo_button:
+                        if self.guide_mission_num == 1:
+                            self.is_guide_hint = True
                         self.suo()
 
                 if event.type == pygame.KEYDOWN:
@@ -361,6 +370,28 @@ class Tank:
 
             self.draw_minimap(self.x_minimap, self.y_minimap)
 
+            if not self.num_level:
+                if self.is_guide_hint:
+                    self.hint(self.s.help_level_descr)
+
+                if self.guide_mission_num == 1:
+                    suo_hint = pygame.Surface((self.s.suo_w_r, self.s.suo_h_r))
+                    suo_hint.set_alpha(196)
+                    suo_hint.fill((100, 10, 10))
+                    self.s.display.blit(suo_hint, (self.s.suo_x, self.s.suo_y))
+
+                if self.guide_mission_num == 2:
+                    optic_hint = pygame.Surface((self.s.optic_sight_w_r, self.s.optic_sight_h_r))
+                    optic_hint.set_alpha(196)
+                    optic_hint.fill((100, 10, 10))
+                    self.s.display.blit(optic_hint, (self.s.optic_sight_x, self.s.optic_sight_y))
+
+                if self.guide_mission_num == 4:
+                    thermal_hint = pygame.Surface((self.s.thermal_sight_w_r, self.s.thermal_sight_h_r))
+                    thermal_hint.set_alpha(196)
+                    thermal_hint.fill((100, 10, 10))
+                    self.s.display.blit(thermal_hint, (self.s.thermal_sight_x, self.s.thermal_sight_y))
+
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text_bl.draw(self.s.display)
@@ -371,6 +402,53 @@ class Tank:
 
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
+
+    def hint(self, text_all):
+        pygame.display.set_icon(self.s.icon)
+
+        continue_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.72, self.s.WIDTH * 0.33, self.s.HEIGHT * 0.1,
+                                 'Продолжить', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                                 'resources/images/buttons/button_active.png',
+                                 'resources/sounds/button_menu_sound.mp3')
+
+        show = True
+        pygame.mouse.set_visible(True)
+        background = pygame.Surface((self.s.WIDTH, self.s.HEIGHT))
+        background.set_alpha(128)
+        background.fill((1, 1, 1))
+        self.s.display.blit(background, (0, 0))
+        while show:
+
+            continue_button.check(pygame.mouse.get_pos())
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                if event.type == pygame.USEREVENT:
+                    if event.button == continue_button:
+                        show = False
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        show = False
+
+                continue_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
+
+            continue_button.draw(self.s.display)
+
+            for i in range(len(text_all[self.guide_mission_num])):
+                text = Text(round(self.s.WIDTH * 0.01), self.s.HEIGHT * (0.2 + 0.1 * i), (200, 200, 200), text_all[self.guide_mission_num][i],
+                             int(self.s.WIDTH * 0.025),
+                             is_topleft=True)
+                text.draw(self.s.display)
+
+            pygame.display.flip()
+            self.s.clock.tick(self.s.FPS)
+        pygame.mouse.set_visible(False)
+        self.guide_mission_num += 1
+        self.is_guide_hint = False
 
     def draw_minimap(self, x, y):
         if self.minimap_displaying:
@@ -556,10 +634,14 @@ class Tank:
         v = 0
 
         if keys[pygame.K_w]:
+            if self.guide_mission_num == 3 and not self.is_guide_button_mission3_pressed[0]:
+                self.is_guide_button_mission3_pressed[0] = True
             v = max(min(self.v + self.s.a_w * t, self.s.max_speed_w), self.s.max_speed_s)
             a_cur = self.s.a_w
 
         elif keys[pygame.K_s]:
+            if self.guide_mission_num == 3 and not self.is_guide_button_mission3_pressed[0]:
+                self.is_guide_button_mission3_pressed[0] = True
             v = max(min(self.v + self.s.a_s * t, self.s.max_speed_w), self.s.max_speed_s)
             a_cur = self.s.a_s
 
@@ -716,6 +798,11 @@ class Tank:
 
                 self.set_sky()
             self.angle_of_view %= 360
+            if self.angle_of_view != 0 and self.guide_mission_num == 3 and not self.is_guide_button_mission3_pressed[1]:
+                self.is_guide_button_mission3_pressed[1] = True
+
+            if self.horizontal != -self.s.HEIGHT * 0.085 and self.guide_mission_num == 3 and not self.is_guide_button_mission3_pressed[2]:
+                self.is_guide_button_mission3_pressed[2] = True
 
     def ammo(self, event, text):
         if event.key == pygame.K_1:
@@ -1643,6 +1730,12 @@ class Tank:
             if self.lock:
                 pygame.draw.circle(self.s.display, (255, 0, 0), (self.s.WIDTH * 0.55, self.s.HEIGHT * 0.933),
                                    self.s.WIDTH * 0.006)
+            if self.guide_mission_num == 3 and False not in self.is_guide_button_mission3_pressed:
+                self.is_guide_hint = True
+
+            if not self.num_level:
+                if self.is_guide_hint:
+                    self.hint(self.s.help_level_descr)
 
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
@@ -1656,6 +1749,9 @@ class Tank:
         if self.done == 'выполнена':
             if ((self.x // self.s.tile_w), (self.y // self.s.tile_h)) in self.s.end_point:
                 pygame.display.set_icon(self.s.icon)
+                self.s.background_sound.stop()
+                self.s.win_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
+                self.s.win_sound.play()
 
                 end_text_bl = Text(self.s.WIDTH * 0.5028, self.s.HEIGHT * 0.1052, (0, 0, 0), 'Миссия выполнена!',
                                    int(self.s.WIDTH * 0.052))
@@ -1736,7 +1832,7 @@ class Tank:
 
                         if event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_ESCAPE:
-                                self.s.music_menu.play(-1)
+                                self.s.music_menu.play()
                                 self.s.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
                                 self.s.background_sound.stop()
                                 self.s.reload_sound.stop()
@@ -2112,6 +2208,10 @@ class Tank:
 
             self.draw_tank(self.s.WIDTH * 0.9, self.s.HEIGHT // 2)
 
+            if not self.num_level:
+                if self.is_guide_hint:
+                    self.hint(self.s.help_level_descr)
+
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
         self.thermal = False
@@ -2200,6 +2300,9 @@ class Tank:
 
     def check_death(self):
         if self.death:
+            self.s.background_sound.stop()
+            self.s.lose_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
+            self.s.lose_sound.play()
             pygame.display.set_icon(self.s.icon)
 
             self.s.explode_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)

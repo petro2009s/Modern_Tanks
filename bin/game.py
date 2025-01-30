@@ -612,6 +612,12 @@ class Game:
                                     text='Обучение', im='resources/images/buttons/guide.png',
                                     sound='resources/sounds/button_menu_sound.mp3',
                                     font_size=self.s.size_text_b)
+        mission_1_button = SelectButton(round(self.s.WIDTH // 2 * 0.278), round(self.s.HEIGHT * 0.43),
+                                    w=self.s.WIDTH * 0.033, h=self.s.HEIGHT * 0.0925, w_r=self.s.WIDTH * 0.104,
+                                    h_r=self.s.HEIGHT * 0.139,
+                                    text='Миссия 1', im='resources/images/buttons/guide.png',
+                                    sound='resources/sounds/button_menu_sound.mp3',
+                                    font_size=self.s.size_text_b)
 
         ammo_descr_list = []
         k = 0.63
@@ -650,12 +656,12 @@ class Game:
             guide_list.append(temp)
 
         tank_list = [tank1_button]
-        lvl_list = [guide_button]
+        lvl_list = [guide_button, mission_1_button]
 
         rect = pygame.Rect(round(self.s.WIDTH // 2 * 0.89), round(self.s.HEIGHT * 0.14), self.s.WIDTH * 0.52,
                            self.s.HEIGHT * 0.676)
         button_list = [back_button, tank1_button, guide_button, play_button, plus1, plus2, plus3, minus1, minus2,
-                       minus3]
+                       minus3, mission_1_button]
 
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
@@ -704,6 +710,14 @@ class Game:
                 if event.type == pygame.USEREVENT:
                     if event.button == back_button:
                         gm = False
+
+                    if event.button == guide_button:
+                        self.s.lvl_dict[0] = True
+                        self.s.lvl_dict[1] = False
+
+                    if event.button == mission_1_button:
+                        self.s.lvl_dict[0] = False
+                        self.s.lvl_dict[1] = True
 
                     if event.button == plus1:
                         if MAX_AMMO > 0:
@@ -802,6 +816,6 @@ class Game:
     def play(self, APFSDS_COUNT, HE_COUNT, HEAT_COUNT):
         pygame.display.set_icon(self.s.icon)
         tank = Tank(self.s, self.s.start_point[0], self.s.start_point[1], 0, self.s.minimap_k, 0, 0, APFSDS_COUNT,
-                    HE_COUNT, HEAT_COUNT, self.s.minimap_dict[0])
+                    HE_COUNT, HEAT_COUNT, self.s.minimap_dict[0], num_level=[i for i in self.s.lvl_dict if self.s.lvl_dict[i]][0])
         tank.start()
         self.s.update_sprites()

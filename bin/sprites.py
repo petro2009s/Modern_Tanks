@@ -181,6 +181,8 @@ class SpriteObject:
         for i in range(len(self.sprites.all_list)):
             if self.sprites.all_list[i].num == self.num:
                 if self.sprites.all_list[i].is_death_anim:
+                    self.s.explode_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                    self.s.explode_sound.play()
                     if self.sprites.all_list[i].death_anim_counter % self.s.bmp_death_frames_delta == 0:
                         if tank.thermal or tank.thermal_d:
                             return self.s.bmp_death_anim_thermal[

@@ -60,6 +60,8 @@ class Settings:
         self.background_sound = pygame.mixer.Sound("resources/sounds/background.mp3")
         self.explode_sound = pygame.mixer.Sound("resources/sounds/explode.mp3")
         self.fpv_sound = pygame.mixer.Sound("resources/sounds/drone.mp3")
+        self.win_sound = pygame.mixer.Sound("resources/sounds/win.mp3")
+        self.lose_sound = pygame.mixer.Sound("resources/sounds/lose2.mp3")
 
         self.graph_dict = [self.bd.select('graph_table', 'low')[0][0], self.bd.select('graph_table', 'mid')[0][0],
                            self.bd.select('graph_table', 'high')[0][0]]
@@ -74,7 +76,7 @@ class Settings:
         self.volume_sound = self.bd.select('volume_table', 'volume_sound')[0][0]
 
         self.tank_dict = {0: True}
-        self.lvl_dict = {0: True}
+        self.lvl_dict = {0: True, 1: False}
         self.clock = pygame.time.Clock()
         fps = self.bd.select('FPS_table', '*')[0]
         fps_dict = {0: 30, 1: 60, 2: 90}
@@ -89,6 +91,14 @@ class Settings:
             self.T_90M_TTH = list(map(lambda x: x[:-1], f.readlines()))
         with open('resources/descriptions/guide.txt', encoding='utf-8') as f:
             self.guide_descr = list(map(lambda x: x[:-1], f.readlines()))
+        with open('resources/descriptions/help.txt', encoding='utf-8') as f:
+            self.help_level_list = list(map(str.rstrip, f.readlines()))
+            self.help_level_descr = [[]]
+            for i in self.help_level_list:
+                if i:
+                    self.help_level_descr[-1].append(i)
+                else:
+                    self.help_level_descr.append([])
 
         self.minimap_k = 5
 
