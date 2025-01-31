@@ -29,7 +29,9 @@ class Damage:
                 self.fpv_timer += 1 / self.tank.s.FPS
             elif self.tank.v != 0:
                 self.fpv_timer = 0
-
+            if self.fpv_timer >= 7:
+                self.tank.s.fpv_sound.set_volume(self.tank.s.volume_general / 100 * self.tank.s.volume_music / 100)
+                self.tank.s.fpv_sound.play()
         if self.fpv_timer > self.fpv_time:
             self.tank.death = True
             self.tank.cause = 'FPV-дрон'

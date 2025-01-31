@@ -50,7 +50,10 @@ class Tank:
 
         self.num_level = num_level
         # параметры обучения
-        self.guide_mission_num = 0
+        if num_level != 0:
+            self.guide_mission_num = 1000
+        else:
+            self.guide_mission_num = 0
         self.is_guide_hint = True
         self.is_guide_button_mission3_pressed = [False, False, False]
         # параметры миникарты
@@ -260,46 +263,51 @@ class Tank:
                         self.set_sky()
 
                     elif event.button == suo_button:
-                        if self.guide_mission_num == 1:
-                            self.is_guide_hint = True
-                        self.suo()
+                        if self.num_level == 0:
+                            if self.guide_mission_num == 1:
+                                self.is_guide_hint = True
+                                self.suo()
+                        else:
+                            self.suo()
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.s.display.blit(self.s.gunner_site2, (0, 0))
                         self.exit()
+                    if self.guide_mission_num >= 7:
+                        if event.key == pygame.K_e and self.rangefinder_suo:
+                            d = self.rangefinder()
+                            depth_text1.set_another_text(d[0])
+                            depth_text2.set_another_text(d[1])
+                            depth_text3.set_another_text(d[2])
+                            depth_text4.set_another_text(d[3])
+                        self.ammo(event, [ammo_text1, ammo_text2])
 
-                    if event.key == pygame.K_e and self.rangefinder_suo:
-                        d = self.rangefinder()
-                        depth_text1.set_another_text(d[0])
-                        depth_text2.set_another_text(d[1])
-                        depth_text3.set_another_text(d[2])
-                        depth_text4.set_another_text(d[3])
+                    if self.guide_mission_num >= 3:
+                        if event.key == pygame.K_z:
+                            self.zoom = True if self.zoom is False else False
+                            self.extra_zoom = False
+                            self.set_sky()
 
-                    if event.key == pygame.K_z:
-                        self.zoom = True if self.zoom is False else False
-                        self.extra_zoom = False
-                        self.set_sky()
+                        if event.key == pygame.K_LSHIFT:
+                            self.extra_zoom = True if self.extra_zoom is False else False
+                            self.zoom = False
+                            self.set_sky()
 
-                    if event.key == pygame.K_LSHIFT:
-                        self.extra_zoom = True if self.extra_zoom is False else False
-                        self.zoom = False
-                        self.set_sky()
-
-                    self.ammo(event, [ammo_text1, ammo_text2])
-
-                    if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
-                            self.ammo_list[self.current_ammo] > 0:
-                        self.reload = True
-                        self.block = True
-                        self.current_ammo_in_gun = int(str(self.current_ammo)[:])
+                    if self.guide_mission_num >= 9:
+                        if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
+                                self.ammo_list[self.current_ammo] > 0:
+                            self.reload = True
+                            self.block = True
+                            self.current_ammo_in_gun = int(str(self.current_ammo)[:])
 
                 optic_sight_button.handle_event(event)
                 thermal_sight_button.handle_event(event)
                 suo_button.handle_event(event)
 
-            self.movement()
-            self.guidance()
+            if self.guide_mission_num >= 3:
+                self.movement()
+                self.guidance()
 
             self.s.display.blit(self.s.gunner_site, (0, 0))
 
@@ -386,12 +394,22 @@ class Tank:
                     optic_hint.fill((100, 10, 10))
                     self.s.display.blit(optic_hint, (self.s.optic_sight_x, self.s.optic_sight_y))
 
-                if self.guide_mission_num == 4:
+                if self.guide_mission_num == 5:
                     thermal_hint = pygame.Surface((self.s.thermal_sight_w_r, self.s.thermal_sight_h_r))
                     thermal_hint.set_alpha(196)
                     thermal_hint.fill((100, 10, 10))
                     self.s.display.blit(thermal_hint, (self.s.thermal_sight_x, self.s.thermal_sight_y))
 
+                if self.guide_mission_num == 10:
+                    self.is_guide_hint = True
+                if self.guide_mission_num == 11:
+                    self.is_guide_hint = True
+                if self.guide_mission_num == 12:
+                    self.is_guide_hint = True
+                if self.guide_mission_num == 13:
+                    self.is_guide_hint = True
+                if self.guide_mission_num == 14:
+                    self.is_guide_hint = True
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text_bl.draw(self.s.display)
@@ -431,7 +449,7 @@ class Tank:
                         show = False
 
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
+                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_KP_ENTER:
                         show = False
 
                 continue_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
@@ -457,11 +475,6 @@ class Tank:
                                (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
                                int(self.s.WIDTH * 0.006) // self.s.minimap_k)
 
-            pygame.draw.line(self.s.display, (255, 0, 0),
-                             (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
-                             (x + (self.x + self.sq * math.sin(self.movement_angle * 3.14 / 180)) // self.s.minimap_k,
-                              y + (self.y - self.v * 0.5 * math.cos(
-                                  self.movement_angle * 3.14 / 180)) // self.s.minimap_k))
             pygame.draw.line(self.s.display, (255, 255, 255),
                              (x + self.pos(k=self.s.minimap_k)[0], y + self.pos(k=self.s.minimap_k)[1]),
                              (x + (self.x + self.v * 0.5 * math.sin(
@@ -537,12 +550,17 @@ class Tank:
         lkm_text = Text(self.s.WIDTH * 0.7, self.s.HEIGHT * 0.42, (200, 200, 200), 'ЛКМ - выстрел',
                         int(self.s.WIDTH * 0.01),
                         is_topleft=True)
-
+        if self.num_level == 0 and self.guide_mission_num <= 14:
+            task1 = self.s.task2_1
+            task2  = ''
+        else:
+            task1 = self.s.task1_1
+            task2 = self.s.task1_2
         task_text_1 = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.3, (200, 200, 200),
-                           f'Боевая задача: {self.s.task_1}',
+                           f'Боевая задача: {task1}',
                            int(self.s.WIDTH * 0.01), is_topleft=True)
         task_text_2 = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.33, (200, 200, 200),
-                           f'{self.s.task_2}',
+                           f'{task2}',
                            int(self.s.WIDTH * 0.01), is_topleft=True)
         destroyed_targets_text = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.36, (200, 200, 200),
                                       f'Уничтожено целей: {self.count_of_destroyed_targets} из {self.count_of_targets}.',
@@ -611,8 +629,11 @@ class Tank:
 
             task_text_1.draw(self.s.display)
             task_text_2.draw(self.s.display)
-
-            destroyed_targets_text.draw(self.s.display)
+            if self.num_level == 0:
+                if self.guide_mission_num > 14:
+                    destroyed_targets_text.draw(self.s.display)
+            else:
+                destroyed_targets_text.draw(self.s.display)
             q_text.draw(self.s.display)
             e_text.draw(self.s.display)
             r_text.draw(self.s.display)
@@ -688,6 +709,7 @@ class Tank:
                     self.angle_of_view -= temp
 
     def guidance(self):
+        # print(self.guide_mission_num)
         keys = pygame.key.get_pressed()
 
         t = 1 / self.s.FPS
@@ -1630,67 +1652,70 @@ class Tank:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         show = False
+                    if self.guide_mission_num >= 7:
+                        if event.key == pygame.K_e and self.rangefinder_suo:
+                            depth_text.set_another_text(self.rangefinder())
 
-                    if event.key == pygame.K_e and self.rangefinder_suo:
-                        depth_text.set_another_text(self.rangefinder())
-
-                    if event.key == pygame.K_z:
-                        self.zoom = True if self.zoom is False else False
-                        self.set_sky()
-
-                    if event.key == pygame.K_q and self.lock_on:
-                        if self.is_sprite_depth:
-                            self.true_depth = min(float(self.depth), float(self.depth_sprite))
-                        else:
-                            self.true_depth = float(self.depth)
-
-                        self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
-                        self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
-                        self.lock = True if self.lock is False else False
-
-                    self.ammo(event, [ammo_text])
-
-                    if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
-                            self.ammo_list[self.current_ammo] > 0:
-                        self.s.reload_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
-                        self.s.reload_sound.play()
-                        self.reload = True
-                        self.block = True
-                        self.current_ammo_in_gun = int(str(self.current_ammo)[:])
-
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == pygame.BUTTON_LEFT:
-                        if self.ready:
-                            self.ammo_list[self.current_ammo_in_gun] -= 1
-
-                            self.current_shooted_ammo_for_tank = int(str(self.current_ammo_in_gun)[:])
-                            self.current_ammo_in_gun = None
-                            self.ready = False
-                            self.is_shot = True
-                            self.block = True
-                            self.smog_anim = True
-                            self.is_explosion = True
-
+                        if event.key == pygame.K_q and self.lock_on:
                             if self.is_sprite_depth:
                                 self.true_depth = min(float(self.depth), float(self.depth_sprite))
                             else:
                                 self.true_depth = float(self.depth)
-                            depth = int(float(self.true_depth) * (7 / self.side))
-                            self.explosion_time = depth / self.s.ammo_v[self.current_shooted_ammo_for_tank]
 
-                            self.s.shoot_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
-                            self.s.shoot_sound.play()
+                            self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
+                            self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
+                            self.lock = True if self.lock is False else False
 
-                    if event.button == pygame.BUTTON_RIGHT and self.lock_on:
-                        if self.is_sprite_depth:
-                            self.true_depth = min(float(self.depth), float(self.depth_sprite))
+                        self.ammo(event, [ammo_text])
+                    if self.guide_mission_num >= 3:
+                        if event.key == pygame.K_z:
+                            self.zoom = True if self.zoom is False else False
+                            self.set_sky()
 
-                        else:
-                            self.true_depth = float(self.depth)
+                    if self.guide_mission_num >= 9:
+                        if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
+                                self.ammo_list[self.current_ammo] > 0:
+                            self.s.reload_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.reload_sound.play()
+                            self.reload = True
+                            self.block = True
+                            self.current_ammo_in_gun = int(str(self.current_ammo)[:])
 
-                        self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
-                        self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
-                        self.lock = True if self.lock is False else False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.guide_mission_num >= 8:
+                        if event.button == pygame.BUTTON_LEFT:
+                            if self.ready:
+                                self.ammo_list[self.current_ammo_in_gun] -= 1
+
+                                self.current_shooted_ammo_for_tank = int(str(self.current_ammo_in_gun)[:])
+                                self.current_ammo_in_gun = None
+                                self.ready = False
+                                self.is_shot = True
+                                self.block = True
+                                self.smog_anim = True
+                                self.is_explosion = True
+
+                                if self.is_sprite_depth:
+                                    self.true_depth = min(float(self.depth), float(self.depth_sprite))
+                                else:
+                                    self.true_depth = float(self.depth)
+                                depth = int(float(self.true_depth) * (7 / self.side))
+                                self.explosion_time = depth / self.s.ammo_v[self.current_shooted_ammo_for_tank]
+
+                                self.s.shoot_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                                self.s.shoot_sound.play()
+
+                    if self.guide_mission_num >= 7:
+                        if event.button == pygame.BUTTON_RIGHT and self.lock_on:
+                            if self.is_sprite_depth:
+                                self.true_depth = min(float(self.depth), float(self.depth_sprite))
+
+                            else:
+                                self.true_depth = float(self.depth)
+
+                            self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
+                            self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
+                            self.lock = True if self.lock is False else False
 
             self.movement()
             self.guidance()
@@ -1731,6 +1756,9 @@ class Tank:
                 pygame.draw.circle(self.s.display, (255, 0, 0), (self.s.WIDTH * 0.55, self.s.HEIGHT * 0.933),
                                    self.s.WIDTH * 0.006)
             if self.guide_mission_num == 3 and False not in self.is_guide_button_mission3_pressed:
+                self.is_guide_hint = True
+
+            if self.guide_mission_num == 4 and False not in self.is_guide_button_mission3_pressed:
                 self.is_guide_hint = True
 
             if not self.num_level:
@@ -2063,46 +2091,47 @@ class Tank:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         show = False
+                    if self.guide_mission_num >= 7:
+                        self.ammo(event, [ammo_text1, ammo_text2])
 
-                    self.ammo(event, [ammo_text1, ammo_text2])
+                        if event.key == pygame.K_e and self.rangefinder_suo:
+                            d = self.rangefinder()
+                            depth_text1.set_another_text(d[0])
+                            depth_text2.set_another_text(d[1])
+                            depth_text3.set_another_text(d[2])
+                            depth_text4.set_another_text(d[3])
 
-                    if event.key == pygame.K_e and self.rangefinder_suo:
-                        d = self.rangefinder()
-                        depth_text1.set_another_text(d[0])
-                        depth_text2.set_another_text(d[1])
-                        depth_text3.set_another_text(d[2])
-                        depth_text4.set_another_text(d[3])
+                        if event.key == pygame.K_q and self.lock_on:
+                            if self.is_sprite_depth:
+                                self.true_depth = min(float(self.depth), float(self.depth_sprite))
+                            else:
+                                self.true_depth = float(self.depth)
 
-                    if event.key == pygame.K_z:
-                        self.zoom = True if self.zoom is False else False
-                        self.extra_zoom = False
+                            self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
+                            self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
+                            self.lock = True if self.lock is False else False
+                    if self.guide_mission_num >= 3:
+                        if event.key == pygame.K_z:
+                            self.zoom = True if self.zoom is False else False
+                            self.extra_zoom = False
 
-                        self.set_sky()
+                            self.set_sky()
 
-                    if event.key == pygame.K_LSHIFT:
-                        self.extra_zoom = True if self.extra_zoom is False else False
-                        self.zoom = False
+                        if event.key == pygame.K_LSHIFT:
+                            self.extra_zoom = True if self.extra_zoom is False else False
+                            self.zoom = False
 
-                        self.set_sky()
+                            self.set_sky()
 
-                    if event.key == pygame.K_q and self.lock_on:
-                        if self.is_sprite_depth:
-                            self.true_depth = min(float(self.depth), float(self.depth_sprite))
-                        else:
-                            self.true_depth = float(self.depth)
+                    if self.guide_mission_num >= 9:
+                        if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
+                                self.ammo_list[self.current_ammo] > 0:
+                            self.reload = True
+                            self.block = True
+                            self.current_ammo_in_gun = int(str(self.current_ammo)[:])
 
-                        self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
-                        self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
-                        self.lock = True if self.lock is False else False
-
-                    if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
-                            self.ammo_list[self.current_ammo] > 0:
-                        self.reload = True
-                        self.block = True
-                        self.current_ammo_in_gun = int(str(self.current_ammo)[:])
-
-                        self.s.reload_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
-                        self.s.reload_sound.play()
+                            self.s.reload_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.reload_sound.play()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == pygame.BUTTON_LEFT:
@@ -2207,6 +2236,20 @@ class Tank:
             fps_count_text.draw(self.s.display)
 
             self.draw_tank(self.s.WIDTH * 0.9, self.s.HEIGHT // 2)
+            if self.guide_mission_num == 5:
+                self.is_guide_hint = True
+
+            if self.guide_mission_num == 6:
+                self.is_guide_hint = True
+
+            if self.guide_mission_num == 7:
+                self.is_guide_hint = True
+
+            if self.guide_mission_num == 8:
+                self.is_guide_hint = True
+
+            if self.guide_mission_num == 9:
+                self.is_guide_hint = True
 
             if not self.num_level:
                 if self.is_guide_hint:
@@ -2291,12 +2334,29 @@ class Tank:
         self.s.display.blit(mark, mark_pos)
 
     def movement_check(self):
-        for i in self.s.sprites.list_of_objects:
-            if i.type == 'bmp':
-                i.bmp_movement(self)
-        for i in self.s.sprites.list_of_objects_thermal:
-            if i.type == 'bmp':
-                i.bmp_movement(self)
+        if self.num_level == 0:
+            for i in self.s.sprites.list_of_objects:
+                if i.type == 'bmp':
+                    i.x_movement(self)
+                if i.type == 'tank':
+                    i.y_movement(self)
+            for i in self.s.sprites.list_of_objects_thermal:
+                if i.type == 'bmp':
+                    i.x_movement(self)
+                if i.type == 'tank':
+                    i.y_movement(self)
+        else:
+            for i in self.s.sprites.list_of_objects:
+                if i.type == 'bmp':
+                    i.x_movement(self)
+                if i.type == 'tank':
+                    i.x_movement(self)
+            for i in self.s.sprites.list_of_objects_thermal:
+                if i.type == 'bmp':
+                    i.x_movement(self)
+                if i.type == 'tank':
+                    i.x_movement(self)
+
 
     def check_death(self):
         if self.death:

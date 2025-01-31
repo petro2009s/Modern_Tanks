@@ -4,7 +4,7 @@ import os
 import screeninfo
 from bin.bd import DBController
 from bin.map import Map
-from bin.sprites import Sprite, SpriteObject
+from bin.sprites import Sprite
 import math
 
 
@@ -105,15 +105,22 @@ class Settings:
         with open('resources/maps/test_map.txt', encoding='utf-8') as f:
             self.world_map = list(map(lambda x: x[:-1], f.readlines()))
 
+        with open('resources/maps/guide_map.txt', encoding='utf-8') as f:
+            self.guide_map = list(map(lambda x: x[:-1], f.readlines()))
+        with open('resources/maps/mission1_map.txt', encoding='utf-8') as f:
+            self.mission1_map = list(map(lambda x: x[:-1], f.readlines()))
+
         self.tile_w = (self.WIDTH // len(self.world_map[0]))
         self.tile_h = (self.WIDTH // len(self.world_map[0]))
         self.map_width = self.tile_w * len(self.world_map[0])
         self.map_height = self.tile_h * len(self.world_map)
         self.map = Map(self.world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
+
         self.minimap_tank_base = pygame.image.load('resources/images/tank/tank_minimap_base.png').convert_alpha()
         self.minimap_tank_tower_base = pygame.image.load('resources/images/tank/tank_minimap_tower.png').convert_alpha()
         self.minimap_tank_base_scope = pygame.image.load('resources/images/tank/tank_minimap_base.png').convert_alpha()
-        self.minimap_tank_tower_scope = pygame.image.load('resources/images/tank/tank_minimap_tower.png').convert_alpha()
+        self.minimap_tank_tower_scope = pygame.image.load(
+            'resources/images/tank/tank_minimap_tower.png').convert_alpha()
         thermal_texture(self.minimap_tank_base_scope, 50, 60)
         thermal_texture(self.minimap_tank_tower_scope, 50, 60)
         self.minimap_tank_b = pygame.transform.scale(self.minimap_tank_base,
@@ -176,19 +183,36 @@ class Settings:
 
         self.texture_1_base = pygame.image.load('resources/images/textures/forest.png').convert_alpha()
         self.texture_2_base = pygame.image.load('resources/images/textures/building.png').convert_alpha()
+        self.texture_5_base = pygame.image.load('resources/images/textures/building1.png').convert_alpha()
+        self.texture_7_base = pygame.image.load('resources/images/textures/building2.png').convert_alpha()
+        self.texture_9_base = pygame.image.load('resources/images/textures/building3.png').convert_alpha()
+
         self.textures = {'3': pygame.transform.scale(self.texture_1_base,
                                                      (self.texture_w, self.texture_h)),
                          '1': pygame.transform.scale(self.texture_2_base,
                                                      (self.texture_w, self.texture_h)),
                          '2': pygame.transform.scale(self.texture_2_base,
-                                                     (self.texture_w, self.texture_h))
+                                                     (self.texture_w, self.texture_h)),
+                         '5': pygame.transform.scale(self.texture_5_base,
+                                                     (self.texture_w, self.texture_h)),
+                         '7': pygame.transform.scale(self.texture_7_base,
+                                                     (self.texture_w, self.texture_h)),
+                         '9': pygame.transform.scale(self.texture_9_base,
+                                                     (self.texture_w, self.texture_h)),
                          }
         self.thermal_textures = {'3': (pygame.transform.scale(self.texture_1_base,
                                                               (self.texture_w, self.texture_h)), 30),
                                  '1': (pygame.transform.scale(self.texture_2_base,
                                                               (self.texture_w, self.texture_h)), 20),
                                  '2': (pygame.transform.scale(self.texture_2_base,
-                                                              (self.texture_w, self.texture_h)), 40)
+                                                              (self.texture_w, self.texture_h)), 40),
+                                 '5': (pygame.transform.scale(self.texture_5_base,
+                                                              (self.texture_w, self.texture_h)), 40),
+                                 '7': (pygame.transform.scale(self.texture_7_base,
+                                                              (self.texture_w, self.texture_h)), 40),
+                                 '9': (pygame.transform.scale(self.texture_9_base,
+                                                              (self.texture_w, self.texture_h)), 50),
+
                                  }
         for i, j in self.thermal_textures.items():
             thermal_texture(j[0], j[1], self.max_t)
@@ -234,7 +258,8 @@ class Settings:
         self.thermal_sight_base = pygame.image.load('resources/images/scopes/sosna_u_thermal.png').convert_alpha()
         self.thermal_sight = pygame.transform.scale(self.thermal_sight_base,
                                                     (self.thermal_width, self.thermal_height))
-        self.thermal_sight_zoom_base = pygame.image.load('resources/images/scopes/sosna-u_thermal_zoom.png').convert_alpha()
+        self.thermal_sight_zoom_base = pygame.image.load(
+            'resources/images/scopes/sosna-u_thermal_zoom.png').convert_alpha()
         self.thermal_sight_zoom = pygame.transform.scale(self.thermal_sight_zoom_base,
                                                          (self.thermal_width, self.thermal_height))
         self.FOV_thermal_zoom_extra = 1.5
@@ -272,6 +297,18 @@ class Settings:
                                                    (self.WIDTH, self.HEIGHT))
         self.reload_time = 6
         self.test_sprite = pygame.image.load('resources/sprites/bush.png').convert_alpha()
+        self.test_sprite2 = pygame.image.load('resources/sprites/bush1.png').convert_alpha()
+        self.test_sprite3 = pygame.image.load('resources/sprites/bush2.png').convert_alpha()
+        self.test_sprite4 = pygame.image.load('resources/sprites/bush3.png').convert_alpha()
+        self.bush_sprite2 = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal2 = pygame.transform.scale(self.test_sprite2, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        thermal_texture(self.bush_sprite_thermal2, 20, 50)
+        self.bush_sprite3 = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal3 = pygame.transform.scale(self.test_sprite3, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        thermal_texture(self.bush_sprite_thermal3, 20, 50)
+        self.bush_sprite4 = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal4 = pygame.transform.scale(self.test_sprite4, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        thermal_texture(self.bush_sprite_thermal4, 20, 50)
         self.bush_sprite = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
         self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
         thermal_texture(self.bush_sprite_thermal, 20, self.max_t)
@@ -285,6 +322,17 @@ class Settings:
                                       for i in range(8)]
         for i in self.test_sprite_v_thermal:
             thermal_texture(i, 80, 80)
+
+        self.tank_sprite = [
+            pygame.image.load(f'resources/sprites/tank_sprite/tank{str((i * 45 + 90) % 360)}_p.png').convert_alpha() for
+            i in
+            range(8)]
+        self.tank_sprite_thermal = [
+            pygame.image.load(f'resources/sprites/tank_sprite/tank{str((i * 45 + 90) % 360)}_p.png').convert_alpha()
+            for i in range(8)]
+        for i in self.tank_sprite_thermal:
+            thermal_texture(i, 80, 80)
+
         self.tree_sprite = pygame.image.load('resources/sprites/tree.png').convert_alpha()
         self.tree_sprite_thermal = pygame.transform.scale(self.tree_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
         self.destroyed_image = pygame.image.load('resources/images/menu/destroyed.png').convert_alpha()
@@ -292,7 +340,7 @@ class Settings:
         thermal_texture(self.tree_sprite_thermal, 20, self.max_t)
         self.mine_coords = {(55, 20), (56, 21), (55, 21), (57, 25), (50, 60)}
         self.fpv_coords = set([(i, j) for j in range(len(self.world_map) // 2) for i in range(len(self.world_map[0]))])
-        self.fpv_time = 7
+        self.fpv_time = 10
         self.task_1 = 'уничтожить БМП и уехать'
         self.task_2 = 'на начальную точку.'
         self.count_of_targets = '1'
@@ -301,10 +349,12 @@ class Settings:
                                                 int((self.map_height // 1) // self.tile_h)) for i in
                           range(int((self.map_width // 12) // self.tile_w), int((self.map_width // 7) // self.tile_w))]
 
-        self.shot_anim = [pygame.image.load(f'resources/sprites/explode1_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
-                              range(3)]
-        self.shot_anim_thermal = [pygame.image.load(f'resources/sprites/explode1_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
-                              range(3)]
+        self.shot_anim = [pygame.image.load(f'resources/sprites/explode1_sprite/frame_{str(i + 1)}.png').convert_alpha()
+                          for i in
+                          range(3)]
+        self.shot_anim_thermal = [
+            pygame.image.load(f'resources/sprites/explode1_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
+            range(3)]
         for i in self.shot_anim_thermal:
             thermal_texture(i, 200, self.max_t)
         self.shot_anim_time = 0.3
@@ -312,9 +362,10 @@ class Settings:
         self.shot_frames_delta = max(self.shot_frames // 3, 1)
         self.shot_frames = int(self.shot_frames_delta * 3)
 
-        self.shot_he_anim = [pygame.image.load(f'resources/sprites/explode2_sprite/frame_{str(i + 1)}.png').convert_alpha()
-                          for i in
-                          range(5)]
+        self.shot_he_anim = [
+            pygame.image.load(f'resources/sprites/explode2_sprite/frame_{str(i + 1)}.png').convert_alpha()
+            for i in
+            range(5)]
         self.shot_he_anim_thermal = [
             pygame.image.load(f'resources/sprites/explode2_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
             range(5)]
@@ -358,7 +409,16 @@ class Settings:
                              'bmp': self.test_sprite_v,
                              'bmp_thermal': self.test_sprite_v_thermal,
                              'tree_thermal': self.tree_sprite_thermal,
-                             'tree': self.tree_sprite}
+                             'tree': self.tree_sprite,
+                             'tank': self.tank_sprite,
+                             'tank_thermal': self.tank_sprite_thermal,
+                             'bush1': self.bush_sprite2,
+                             'bush2': self.bush_sprite3,
+                             'bush3': self.bush_sprite4,
+                             'bush1_thermal': self.bush_sprite_thermal2,
+                             'bush2_thermal': self.bush_sprite_thermal3,
+                             'bush3_thermal': self.bush_sprite_thermal4
+                             }
 
         # self.list_of_objects_thermal = [
         #     SpriteObject(self.sprite_types['bush_thermal'], True, (45.1, 7.1), 0.7, 1, self, 3, self, 'oth', 0),
@@ -380,7 +440,106 @@ class Settings:
                                                                (self.WIDTH * 0.062 / 1.5,
                                                                 self.WIDTH * 0.062 / 1.5))
         self.ammo_v = {0: 1500, 1: 670, 2: 800}
-        self.sprites = Sprite(self)
+        # self.sprites = Sprite(self)
+
+    def set_lvl(self):
+        if self.lvl_dict[0]:
+            self.tile_w = (self.WIDTH // len(self.guide_map[0]))
+            self.tile_h = (self.WIDTH // len(self.guide_map[0]))
+            self.map_width = self.tile_w * len(self.guide_map[0])
+            self.map_height = self.tile_h * len(self.guide_map)
+            self.map = Map(self.guide_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
+            self.start_point = (self.map_width // 9, self.map_height // 1.1)
+            self.end_point = [(i, j) for j in range(56, 70) for i in
+                              range(0, 20)]
+            self.mine_coords1 = set([(i, j) for j in range(1, 15) for i in range(len(self.guide_map[0]) // 2)])
+            self.mine_coords2 = set([(i, j) for j in range(32, 50) for i in range(len(self.guide_map[0]) // 4)])
+            self.mine_coords3 = set([(i, j) for j in range(47, 100) for i in
+                                     range(int(len(self.guide_map[0]) * 0.7), len(self.guide_map[0]))])
+            self.fpv_coords = set([(i, j) for j in range(1, 51) for i in range(len(self.guide_map[0]))])
+            self.fpv_coords2 = set(
+                [(i, j) for j in range(51, 100) for i in range(len(self.guide_map[0]) // 2, len(self.guide_map[0]))])
+
+            self.mine_coords = self.mine_coords1 | self.mine_coords2 | self.mine_coords3
+            self.fpv_coords = self.fpv_coords | self.fpv_coords2
+            self.task2_1 = 'пройти обучение.'
+            self.task1_1 = 'уничтожить БМП и уехать'
+            self.task1_2 = 'на начальную точку.'
+            self.tank_sprite = [
+                pygame.image.load(f'resources/sprites/tank_sprite/tank{str((i * 45 + 90) % 360)}_p.png').convert_alpha()
+                for
+                i in
+                range(8)]
+            self.tank_sprite_thermal = [
+                pygame.image.load(f'resources/sprites/tank_sprite/tank{str((i * 45 + 90) % 360)}_p.png').convert_alpha()
+                for i in range(8)]
+            for i in self.tank_sprite_thermal:
+                thermal_texture(i, 80, 80)
+            self.sprite_types = {'bush_thermal': self.bush_sprite_thermal,
+                                 'bush': self.bush_sprite,
+                                 'bmp': self.test_sprite_v,
+                                 'bmp_thermal': self.test_sprite_v_thermal,
+                                 'tree_thermal': self.tree_sprite_thermal,
+                                 'tree': self.tree_sprite,
+                                 'tank': self.tank_sprite,
+                                 'tank_thermal': self.tank_sprite_thermal,
+                                 'bush1': self.bush_sprite2,
+                                 'bush2': self.bush_sprite3,
+                                 'bush3': self.bush_sprite4,
+                                 'bush1_thermal': self.bush_sprite_thermal2,
+                                 'bush2_thermal': self.bush_sprite_thermal3,
+                                 'bush3_thermal': self.bush_sprite_thermal4
+                                 }
+            self.count_of_targets = '2'
+
+            self.sprites = Sprite(self)
+
+        elif self.lvl_dict[1]:
+            self.tile_w = (self.WIDTH // len(self.mission1_map[0]))
+            self.tile_h = (self.WIDTH // len(self.mission1_map[0]))
+            self.map_width = self.tile_w * len(self.mission1_map[0])
+            self.map_height = self.tile_h * len(self.mission1_map)
+            self.map = Map(self.mission1_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
+            self.start_point = (self.map_width // 9, self.map_height // 1.05)
+            self.end_point = [(i, j) for j in range(122, 157) for i in
+                              range(129, 154)]
+            self.mine_coords1 = set([(i, j) for j in range(1, 15) for i in range(len(self.mission1_map[0]) // 2)])
+            self.mine_coords2 = set([(i, j) for j in range(32, 50) for i in range(len(self.mission1_map[0]) // 4)])
+            self.mine_coords3 = set([(i, j) for j in range(47, 100) for i in
+                                     range(int(len(self.mission1_map[0]) * 0.7), len(self.mission1_map[0]))])
+            self.fpv_coords = set([(i, j) for j in range(1, 105) for i in range(len(self.mission1_map[0]))])
+
+            self.mine_coords = self.mine_coords1 | self.mine_coords2 | self.mine_coords3
+            self.mine_coords = set()
+            self.task1_1 = 'уничтожить колонну техники, пока она не покинула карту, и уехать'
+            self.task1_2 = 'к низким зданиям на юго-востоке.'
+            self.count_of_targets = '3'
+            self.tank_sprite = [
+                pygame.image.load(f'resources/sprites/tank_sprite/tank{str(i * 45)}_p.png').convert_alpha()
+                for
+                i in
+                range(8)]
+            self.tank_sprite_thermal = [
+                pygame.image.load(f'resources/sprites/tank_sprite/tank{str(i * 45)}_p.png').convert_alpha()
+                for i in range(8)]
+            for i in self.tank_sprite_thermal:
+                thermal_texture(i, 80, 80)
+            self.sprite_types = {'bush_thermal': self.bush_sprite_thermal,
+                                 'bush': self.bush_sprite,
+                                 'bmp': self.test_sprite_v,
+                                 'bmp_thermal': self.test_sprite_v_thermal,
+                                 'tree_thermal': self.tree_sprite_thermal,
+                                 'tree': self.tree_sprite,
+                                 'tank': self.tank_sprite,
+                                 'tank_thermal': self.tank_sprite_thermal,
+                                 'bush1': self.bush_sprite2,
+                                 'bush2': self.bush_sprite3,
+                                 'bush3': self.bush_sprite4,
+                                 'bush1_thermal': self.bush_sprite_thermal2,
+                                 'bush2_thermal': self.bush_sprite_thermal3,
+                                 'bush3_thermal': self.bush_sprite_thermal4
+                                 }
+            self.sprites = Sprite(self)
 
     def graph_set(self, n):
         self.NUM_RAYS = n
@@ -430,8 +589,8 @@ class Settings:
         self.cursor = pygame.transform.scale(self.cursor_base, (self.WIDTH * 0.03125, self.WIDTH * 0.03125))
         self.size_text_b = int(self.WIDTH * 0.01875)
 
-        self.tile_w = (self.WIDTH // len(self.world_map[0]))
-        self.tile_h = (self.WIDTH // len(self.world_map[0]))
+        # self.tile_w = (self.WIDTH // len(self.world_map[0]))
+        # self.tile_h = (self.WIDTH // len(self.world_map[0]))
         self.side = min(int(self.WIDTH * 0.02), int(self.tile_w * 0.8))
         self.a_w = self.WIDTH * 0.05 * (self.FPS / 60) * (7 / self.side)
         self.a_s = -self.WIDTH * 0.1 * (self.FPS / 60) * (7 / self.side)
@@ -440,7 +599,8 @@ class Settings:
         self.max_speed_s = -self.WIDTH * 0.01 * (self.FPS / 60) * (7 / self.side)
         self.min_speed_ad = self.WIDTH * 0.01 * (self.FPS / 60) * 10 / 60 * (7 / self.side)
 
-        self.map = Map(self.world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
+        # self.map = Map(self.world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
+        self.set_lvl()
         self.minimap_tank_b = pygame.transform.scale(self.minimap_tank_base,
                                                      (self.WIDTH * 0.0625 // self.minimap_k,
                                                       self.WIDTH * 0.0625 // self.minimap_k))
@@ -449,14 +609,14 @@ class Settings:
                                                           self.WIDTH * 0.0625 // self.minimap_k))
 
         self.minimap_tank_b_scope = pygame.transform.scale(self.minimap_tank_base,
-                                                     (self.WIDTH * 0.0625 / 1.5,
-                                                      self.WIDTH * 0.0625 / 1.5))
+                                                           (self.WIDTH * 0.0625 / 1.5,
+                                                            self.WIDTH * 0.0625 / 1.5))
         self.minimap_tank_tower_scope = pygame.transform.scale(self.minimap_tank_tower_base,
-                                                         (self.WIDTH * 0.062 / 1.5,
-                                                          self.WIDTH * 0.062 / 1.5))
+                                                               (self.WIDTH * 0.062 / 1.5,
+                                                                self.WIDTH * 0.062 / 1.5))
 
-        self.map_width = self.tile_w * len(self.world_map[0])
-        self.map_height = self.tile_h * len(self.world_map)
+        # self.map_width = self.tile_w * len(self.world_map[0])
+        # self.map_height = self.tile_h * len(self.world_map)
         self.gunner_site = pygame.transform.scale(self.gunner_site_base,
                                                   (self.WIDTH, self.HEIGHT))
         self.texture_w = self.WIDTH * 0.6 * 1.44
@@ -562,6 +722,15 @@ class Settings:
         self.bush_sprite = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
         self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
         thermal_texture(self.bush_sprite_thermal, 20, 50)
+        self.bush_sprite2 = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal2 = pygame.transform.scale(self.test_sprite2, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        thermal_texture(self.bush_sprite_thermal2, 20, 50)
+        self.bush_sprite3 = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal3 = pygame.transform.scale(self.test_sprite3, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        thermal_texture(self.bush_sprite_thermal3, 20, 50)
+        self.bush_sprite4 = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal4 = pygame.transform.scale(self.test_sprite4, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        thermal_texture(self.bush_sprite_thermal4, 20, 50)
         self.center_ray = self.NUM_RAYS // 2 - 1
         self.FAKE_RAYS = int(self.NUM_RAYS * 2)
 
@@ -572,10 +741,10 @@ class Settings:
         for i in self.test_sprite_v_thermal:
             thermal_texture(i, 60, 60)
         self.destroyed_image = pygame.transform.scale(self.destroyed_image, (self.WIDTH, self.HEIGHT))
-        self.start_point = (self.map_width // 9, self.map_height // 1.1)
-        self.end_point = [(i, j) for j in range(int((self.map_height // 1.1) // self.tile_h),
-                                                int((self.map_height // 1) // self.tile_h)) for i in
-                          range(int((self.map_width // 12) // self.tile_w), int((self.map_width // 7) // self.tile_w))]
+        # self.start_point = (self.map_width // 9, self.map_height // 1.1)
+        # self.end_point = [(i, j) for j in range(int((self.map_height // 1.1) // self.tile_h),
+        #                                         int((self.map_height // 1) // self.tile_h)) for i in
+        #                   range(int((self.map_width // 12) // self.tile_w), int((self.map_width // 7) // self.tile_w))]
 
         self.shot_frames = int(self.shot_anim_time * self.FPS)
         self.shot_frames_delta = max(self.shot_frames // 3, 1)

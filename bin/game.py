@@ -814,6 +814,7 @@ class Game:
             self.s.clock.tick(self.s.FPS)
 
     def play(self, APFSDS_COUNT, HE_COUNT, HEAT_COUNT):
+        self.s.set_lvl()
         pygame.display.set_icon(self.s.icon)
         tank = Tank(self.s, self.s.start_point[0], self.s.start_point[1], 0, self.s.minimap_k, 0, 0, APFSDS_COUNT,
                     HE_COUNT, HEAT_COUNT, self.s.minimap_dict[0], num_level=[i for i in self.s.lvl_dict if self.s.lvl_dict[i]][0])
