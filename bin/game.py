@@ -613,11 +613,11 @@ class Game:
                                     sound='resources/sounds/button_menu_sound.mp3',
                                     font_size=self.s.size_text_b)
         mission_1_button = SelectButton(round(self.s.WIDTH // 2 * 0.278), round(self.s.HEIGHT * 0.43),
-                                    w=self.s.WIDTH * 0.033, h=self.s.HEIGHT * 0.0925, w_r=self.s.WIDTH * 0.104,
-                                    h_r=self.s.HEIGHT * 0.139,
-                                    text='Миссия 1', im='resources/images/buttons/guide.png',
-                                    sound='resources/sounds/button_menu_sound.mp3',
-                                    font_size=self.s.size_text_b)
+                                        w=self.s.WIDTH * 0.033, h=self.s.HEIGHT * 0.0925, w_r=self.s.WIDTH * 0.104,
+                                        h_r=self.s.HEIGHT * 0.139,
+                                        text='Миссия 1', im='resources/images/buttons/guide.png',
+                                        sound='resources/sounds/button_menu_sound.mp3',
+                                        font_size=self.s.size_text_b)
 
         ammo_descr_list = []
         k = 0.63
@@ -655,6 +655,13 @@ class Game:
             k4 += 0.0167
             guide_list.append(temp)
 
+        mission1_list = []
+        for i in self.s.mission1_descr:
+            temp = Text(round(self.s.WIDTH // 2 * 0.9), round(self.s.HEIGHT * k4), (200, 200, 200), i,
+                        int(self.s.WIDTH * 0.0078), (50, 60, 50),
+                        is_topleft=True)
+            k4 += 0.0167
+            mission1_list.append(temp)
         tank_list = [tank1_button]
         lvl_list = [guide_button, mission_1_button]
 
@@ -801,8 +808,12 @@ class Game:
                 i.draw(self.s.display)
             for i in T_90M_TTH_list:
                 i.draw(self.s.display)
-            for i in guide_list:
-                i.draw(self.s.display)
+            if self.s.lvl_dict[0]:
+                for i in guide_list:
+                    i.draw(self.s.display)
+            elif self.s.lvl_dict[1]:
+                for i in mission1_list:
+                    i.draw(self.s.display)
             am_d.draw(self.s.display)
             tank_descr.draw(self.s.display)
             tank_tth.draw(self.s.display)
@@ -817,6 +828,7 @@ class Game:
         self.s.set_lvl()
         pygame.display.set_icon(self.s.icon)
         tank = Tank(self.s, self.s.start_point[0], self.s.start_point[1], 0, self.s.minimap_k, 0, 0, APFSDS_COUNT,
-                    HE_COUNT, HEAT_COUNT, self.s.minimap_dict[0], num_level=[i for i in self.s.lvl_dict if self.s.lvl_dict[i]][0])
+                    HE_COUNT, HEAT_COUNT, self.s.minimap_dict[0],
+                    num_level=[i for i in self.s.lvl_dict if self.s.lvl_dict[i]][0])
         tank.start()
         self.s.update_sprites()

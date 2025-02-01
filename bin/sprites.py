@@ -15,7 +15,7 @@ class Sprite:
                 SpriteObject(self.sprite_types['bmp_thermal'], False, (85, 5), 0.7, 1, self.s, 6, self, 'bmp', 0,
                              k=1.77,
                              v=0, hp=100, death_anim=True),
-                SpriteObject(self.sprite_types['tank_thermal'], False, (64, 70), 0, 3,
+                SpriteObject(self.sprite_types['tank_thermal'], False, (64, 70), 0, 1.5,
                              self.s, 5, self, 'tank', 1, k=1.77,
                              v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, a2=1.5,
                              death_anim=True, k_exp=1.5),
@@ -27,16 +27,19 @@ class Sprite:
                 SpriteObject(self.sprite_types['tree_thermal'], True, (51, 27), 0, 2, self.s, 3, self, 'oth', 7),
                 SpriteObject(self.sprite_types['tree_thermal'], True, (27, 44), 0, 2, self.s, 3, self, 'oth', 8),
                 SpriteObject(self.sprite_types['bush_thermal'], True, (17, 40.1), 0.7, 1, self.s, 3, self, 'oth', 9),
-                SpriteObject(self.sprite_types['bush1_thermal'], True, (20.1, 50.1), 0.7, 1, self.s, 3, self, 'oth', 10),
-                SpriteObject(self.sprite_types['bush2_thermal'], True, (92.1, 60.1), 0.7, 1, self.s, 3, self, 'oth', 11),
-                SpriteObject(self.sprite_types['bush3_thermal'], True, (78.1, 49.1), 0.7, 1, self.s, 3, self, 'oth', 12),
+                SpriteObject(self.sprite_types['bush1_thermal'], True, (20.1, 50.1), 0.7, 1, self.s, 3, self, 'oth',
+                             10),
+                SpriteObject(self.sprite_types['bush2_thermal'], True, (92.1, 60.1), 0.7, 1, self.s, 3, self, 'oth',
+                             11),
+                SpriteObject(self.sprite_types['bush3_thermal'], True, (78.1, 49.1), 0.7, 1, self.s, 3, self, 'oth',
+                             12),
                 SpriteObject(self.sprite_types['tree_thermal'], True, (85, 42), 0, 2, self.s, 3, self, 'oth', 13)
-                ]
+            ]
 
             self.list_of_objects = [
                 SpriteObject(self.sprite_types['bmp'], False, (85, 5), 0.7, 1, self.s, 6, self, 'bmp', 0, k=1.77,
                              v=0, hp=100, death_anim=True),
-                SpriteObject(self.sprite_types['tank'], False, (64, 70), 0, 3, self.s, 5, self, 'tank', 1, k=1.77,
+                SpriteObject(self.sprite_types['tank'], False, (64, 70), 0, 1.5, self.s, 5, self, 'tank', 1, k=1.77,
                              v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5),
                 SpriteObject(self.sprite_types['bush'], True, (45.1, 4.1), 0.7, 1, self.s, 3, self, 'oth', 2),
                 SpriteObject(self.sprite_types['bush1'], True, (66.1, 12.1), 0.7, 1, self.s, 3, self, 'oth', 3),
@@ -50,16 +53,34 @@ class Sprite:
                 SpriteObject(self.sprite_types['bush2'], True, (92.1, 60.1), 0.7, 1, self.s, 3, self, 'oth', 11),
                 SpriteObject(self.sprite_types['bush3'], True, (78.1, 49.1), 0.7, 1, self.s, 3, self, 'oth', 12),
                 SpriteObject(self.sprite_types['tree'], True, (85, 42), 0, 2, self.s, 3, self, 'oth', 13)
-                ]
+            ]
         elif self.s.lvl_dict[1]:
             self.list_of_objects_thermal = [
-                SpriteObject(self.sprite_types['bmp_thermal'], False, (147, 7), 0.7, 1, self.s, 6, self, 'bmp', 0, k=1.77,
+                SpriteObject(self.sprite_types['bmp_thermal'], False, (147, 7), 0.7, 1, self.s, 6, self, 'bmp', 0,
+                             k=1.77,
                              v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True),
-                SpriteObject(self.sprite_types['tank_thermal'], False, (151, 7), -0.05, 1.5, self.s, 5, self, 'tank', 1, k=1.77,
+                SpriteObject(self.sprite_types['tank_thermal'], False, (151, 7), -0.05, 1.5, self.s, 5, self, 'tank', 1,
+                             k=1.77,
                              v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5),
                 SpriteObject(self.sprite_types['tank_thermal'], False, (143, 7), -0.05, 1.5, self.s, 5, self, 'tank', 2,
                              k=1.77,
-                             v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5)
+                             v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5),
+                SpriteObject(self.sprite_types['bush2_thermal'], True, (23.1, 77.1), 0.7, 1, self.s, 3, self, 'oth', 3),
+                SpriteObject(self.sprite_types['bush3_thermal'], True, (32.1, 80.1), 0.7, 1, self.s, 3, self, 'oth', 4),
+                SpriteObject(self.sprite_types['tree_thermal'], True, (80, 20), 0, 2, self.s, 3, self, 'oth', 5),
+                SpriteObject(self.sprite_types['tree_thermal'], True, (100, 20), 0, 2, self.s, 3, self, 'oth', 6),
+                SpriteObject(self.sprite_types['tree_thermal'], True, (27, 44), 0, 2, self.s, 3, self, 'oth', 7),
+                SpriteObject(self.sprite_types['bush_thermal'], True, (100, 100.1), 0.7, 1, self.s, 3, self, 'oth', 8),
+                SpriteObject(self.sprite_types['bush1_thermal'], True, (30.1, 110.1), 0.7, 1, self.s, 3, self, 'oth',
+                             9),
+                SpriteObject(self.sprite_types['bush2_thermal'], True, (50.1, 60.1), 0.7, 1, self.s, 3, self, 'oth',
+                             10),
+                SpriteObject(self.sprite_types['bush3_thermal'], True, (78.1, 49.1), 0.7, 1, self.s, 3, self, 'oth',
+                             11),
+                SpriteObject(self.sprite_types['tree_thermal'], True, (122, 20), 0, 2, self.s, 3, self, 'oth', 12),
+                SpriteObject(self.sprite_types['tree_thermal'], True, (60, 20), 0, 2, self.s, 3, self, 'oth', 13),
+                SpriteObject(self.sprite_types['tree_thermal'], True, (40, 20), 0, 2, self.s, 3, self, 'oth', 14),
+                SpriteObject(self.sprite_types['tree_thermal'], True, (20, 20), 0, 2, self.s, 3, self, 'oth', 15),
             ]
 
             self.list_of_objects = [
@@ -68,7 +89,23 @@ class Sprite:
                 SpriteObject(self.sprite_types['tank'], False, (151, 7), -0.05, 1.5, self.s, 5, self, 'tank', 1, k=1.77,
                              v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5),
                 SpriteObject(self.sprite_types['tank'], False, (143, 7), -0.05, 1.5, self.s, 5, self, 'tank', 2, k=1.77,
-                             v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5)
+                             v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5),
+                SpriteObject(self.sprite_types['bush2'], True, (23.1, 77.1), 0.7, 1, self.s, 3, self, 'oth', 3),
+                SpriteObject(self.sprite_types['bush3'], True, (32.1, 80.1), 0.7, 1, self.s, 3, self, 'oth', 4),
+                SpriteObject(self.sprite_types['tree'], True, (80, 20), 0, 2, self.s, 3, self, 'oth', 5),
+                SpriteObject(self.sprite_types['tree'], True, (100, 20), 0, 2, self.s, 3, self, 'oth', 6),
+                SpriteObject(self.sprite_types['tree'], True, (27, 44), 0, 2, self.s, 3, self, 'oth', 7),
+                SpriteObject(self.sprite_types['bush'], True, (100, 100.1), 0.7, 1, self.s, 3, self, 'oth', 8),
+                SpriteObject(self.sprite_types['bush1'], True, (30.1, 110.1), 0.7, 1, self.s, 3, self, 'oth',
+                             9),
+                SpriteObject(self.sprite_types['bush2'], True, (50.1, 60.1), 0.7, 1, self.s, 3, self, 'oth',
+                             10),
+                SpriteObject(self.sprite_types['bush3'], True, (78.1, 49.1), 0.7, 1, self.s, 3, self, 'oth',
+                             11),
+                SpriteObject(self.sprite_types['tree'], True, (122, 20), 0, 2, self.s, 3, self, 'oth', 12),
+                SpriteObject(self.sprite_types['tree'], True, (60, 20), 0, 2, self.s, 3, self, 'oth', 13),
+                SpriteObject(self.sprite_types['tree'], True, (40, 20), 0, 2, self.s, 3, self, 'oth', 14),
+                SpriteObject(self.sprite_types['tree'], True, (20, 20), 0, 2, self.s, 3, self, 'oth', 15),
             ]
         self.all_list = self.list_of_objects + self.list_of_objects_thermal
         # коллизии
@@ -94,6 +131,7 @@ class SpriteObject:
         # направление движения и скорость
         self.movement_angle = 1
         self.v = v
+
         # параметры отображения спрайта
         self.object = object
         self.stat = stat
@@ -165,11 +203,9 @@ class SpriteObject:
                     # проверка того, что перекрестие на спрайте
                     if (self.s.center_ray - self.a1 * (10 - HALF_FOV) * proj_height * self.k / 300) <= current_ray <= (
                             self.s.center_ray + self.a1 * (10 - HALF_FOV) * proj_height * self.k / 300):
-                        print(1)
                         if self.s.HEIGHT // 2 * k - horizontal >= \
                                 sprite_pos[1] * self.a2 and (
                                 sprite_pos[1] + proj_height) * self.a2 >= (self.s.HEIGHT // 2 * k - horizontal):
-                            print(2)
 
                             tank.depth_sprite = str(dist)
                             tank.is_sprite_depth = True
@@ -211,23 +247,36 @@ class SpriteObject:
             dx = self.v * self.movement_angle
             if dx != 0:
                 if ((self.x + dx) // self.s.tile_w, self.y // self.s.tile_h) == (
-                        tank.x // self.s.tile_w, tank.y // self.s.tile_h) or ((self.x + dx) // self.s.tile_w, self.y // self.s.tile_h) in self.sprites.collision_set.values():
+                        tank.x // self.s.tile_w, tank.y // self.s.tile_h):
                     dx = 0
+                oth = list(self.sprites.collision_set.values()).copy()
+                if (self.x // self.s.tile_w, self.y // self.s.tile_h) in oth:
+                    oth.remove((self.x // self.s.tile_w, self.y // self.s.tile_h))
+                other_sprites = oth
+
                 if tank.num_level == 1:
                     if ((self.x + dx) // self.s.tile_w, self.y // self.s.tile_h) in self.s.map.world_map:
                         self.death = True
-                        print(2)
+                        del self.sprites.list_of_objects[self.num]
+                        del self.sprites.list_of_objects_thermal[self.num]
+                        self.sprites.all_list = self.sprites.list_of_objects + self.sprites.list_of_objects_thermal
+                        del self.sprites.collision_set[self.num]
+                        self.set_new_num()
                         self.sprites.collision_set[self.num] = (0, 0)
                         self.v = 0
+                    elif ((self.x + dx) // self.s.tile_w, self.y // self.s.tile_h) in other_sprites:
+                        dx = 0
                 else:
                     if ((self.x + dx) // self.s.tile_w, self.y // self.s.tile_h) in self.s.map.world_map:
                         self.movement_angle *= -1
+                    if ((self.x + dx) // self.s.tile_w, self.y // self.s.tile_h) in other_sprites:
+                        dx = 0
                 self.x += dx
                 self.sprites.collision_set[self.num] = (self.x // self.s.tile_w, self.y // self.s.tile_h)
 
-
     def y_movement(self, tank):
         if self.v != 0:
+
             dy = self.v * self.movement_angle
             if dy != 0:
                 if ((self.x) // self.s.tile_w, (self.y + dy) // self.s.tile_h) == (
@@ -242,11 +291,31 @@ class SpriteObject:
     def check_death_anim(self):
         for i in range(len(self.sprites.all_list)):
             if self.sprites.all_list[i].num == self.num:
-                if self.sprites.all_list[i].death_anim_counter > self.s.bmp_death_frames:
+                if self.sprites.all_list[i].death_anim_counter >= self.s.bmp_death_frames:
                     self.sprites.all_list[i].is_death_anim = False
                     self.sprites.all_list[i].death = True
                     self.sprites.all_list[i].death_anim_counter = 0
+                    del self.sprites.list_of_objects[self.sprites.all_list[i].num]
+                    del self.sprites.list_of_objects_thermal[self.sprites.all_list[i].num]
+                    self.sprites.all_list = self.sprites.list_of_objects + self.sprites.list_of_objects_thermal
+                    del self.sprites.collision_set[self.num]
 
+                    self.set_new_num()
+
+                    break
+
+    def set_new_num(self):
+        temp = {}
+        for i, j in self.sprites.collision_set.items():
+            if i > self.num:
+                temp[i - 1] = j
+            else:
+                temp[i] = j
+        for i in range(len(self.sprites.all_list)):
+            if self.sprites.all_list[i].num > self.num:
+                self.sprites.all_list[i].num -= 1
+
+        self.sprites.collision_set = temp
 
     # анимация смерти
     def death_anim(self, tank):
@@ -291,17 +360,18 @@ class SpriteObject:
     # проверка смерти спрайта
     def check_death(self, tank):
         for i in range(len(self.sprites.all_list)):
-            if self.sprites.all_list[i].hp <= 0:
-                if self.sprites.all_list[i].type == 'oth':
-                    self.sprites.all_list[i].death = True
-                else:
-                    self.sprites.all_list[i].is_death_anim = True
-                if self.sprites.all_list[i].type == 'bmp' and not self.sprites.all_list[i].death:
-                    tank.count_of_destroyed_targets = str(float(tank.count_of_destroyed_targets) + 0.5)
-                    print(tank.count_of_destroyed_targets, 1)
-                elif self.sprites.all_list[i].type == 'tank' and not self.sprites.all_list[i].death:
-                    tank.count_of_destroyed_targets = str(float(tank.count_of_destroyed_targets) + 0.5)
-                    print(tank.count_of_destroyed_targets, 2)
+            if self.num == self.sprites.all_list[i].num:
+                if self.sprites.all_list[i].hp <= 0:
+                    if self.sprites.all_list[i].type == 'oth':
+                        self.sprites.all_list[i].death = True
+                    else:
+                        self.sprites.all_list[i].is_death_anim = True
+                    if self.sprites.all_list[i].type == 'bmp' and not self.sprites.all_list[i].death:
+                        tank.count_of_destroyed_targets = str(float(tank.count_of_destroyed_targets) + 0.5)
+
+                    elif self.sprites.all_list[i].type == 'tank' and not self.sprites.all_list[i].death:
+                        tank.count_of_destroyed_targets = str(float(tank.count_of_destroyed_targets) + 0.5)
+
 
         tank.count_of_destroyed_targets = str(int(float(tank.count_of_destroyed_targets)))
 
