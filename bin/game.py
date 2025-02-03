@@ -406,7 +406,7 @@ class Game:
                             self.s.monitor_on_text += 1
                             screen_text.set_another_text(f"Монитор {self.s.monitor_on_text + 1}")
                             screen_text_bl.set_another_text(f"Монитор {self.s.monitor_on_text + 1}")
-                            self.s.size_list = pygame.display.list_modes(display=self.s.monitor_on_text)
+                            self.s.size_list = list(filter(lambda x: x[0] / x[1] == 16 / 9, pygame.display.list_modes(display=self.s.monitor_on_text)))
                             self.s.size_on_text = self.s.size_list[0]
                             size_text.set_another_text("*".join(list(map(str, self.s.size_on_text))))
                             size_text_bl.set_another_text("*".join(list(map(str, self.s.size_on_text))))
@@ -416,7 +416,7 @@ class Game:
                             self.s.monitor_on_text -= 1
                             screen_text.set_another_text(f"Монитор {self.s.monitor_on_text + 1}")
                             screen_text_bl.set_another_text(f"Монитор {self.s.monitor_on_text + 1}")
-                            self.s.size_list = pygame.display.list_modes(display=self.s.monitor_on_text)
+                            self.s.size_list = list(filter(lambda x: x[0] / x[1] == 16 / 9, pygame.display.list_modes(display=self.s.monitor_on_text)))
                             self.s.size_on_text = self.s.size_list[0]
                             size_text.set_another_text("*".join(list(map(str, self.s.size_on_text))))
                             size_text_bl.set_another_text("*".join(list(map(str, self.s.size_on_text))))

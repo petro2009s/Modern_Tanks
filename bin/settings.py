@@ -2,9 +2,11 @@ import pygame
 import gif_pygame
 import os
 import screeninfo
+import threading
 from bin.bd import DBController
 from bin.map import Map
 from bin.sprites import Sprite
+from bin.text import Text
 import math
 
 
@@ -24,7 +26,7 @@ class Settings:
             self.HEIGHT = self.height_m
             self.bd.update_to_db("size_table", "(width, height)", f"({self.WIDTH}, {self.HEIGHT})")
         self.size_text_b = int(self.WIDTH * 0.01875)
-        self.size_list = pygame.display.list_modes(display=self.monitor)
+        self.size_list = list(filter(lambda x: x[0] / x[1] == 16 / 9, pygame.display.list_modes(display=self.monitor)))
         self.size_on_text = [self.WIDTH, self.HEIGHT]
 
         self.button_color = (50, 60, 50)
@@ -39,6 +41,18 @@ class Settings:
                 pygame.display.set_mode((self.WIDTH, self.HEIGHT - 40), display=self.monitor)
             else:
                 pygame.display.set_mode((self.WIDTH, self.HEIGHT), display=self.monitor)
+
+        self.clock = pygame.time.Clock()
+        fps = self.bd.select('FPS_table', '*')[0]
+        fps_dict = {0: 30, 1: 60, 2: 90}
+        self.FPS = fps_dict[[i for i in range(3) if fps[i] == 1][0]]
+        # self.FPS = 10000
+
+        self.count_point = 3
+        self.load_timer = 1
+        self.show = True
+        self.thread = threading.Thread(target=self.load, args=())
+        self.thread.start()
 
         self.menu1 = pygame.image.load('resources/images/menu/menu_p1.png').convert()
         self.menu2 = pygame.image.load('resources/images/menu/menu_p2.png').convert()
@@ -77,11 +91,6 @@ class Settings:
 
         self.tank_dict = {0: True}
         self.lvl_dict = {0: True, 1: False}
-        self.clock = pygame.time.Clock()
-        fps = self.bd.select('FPS_table', '*')[0]
-        fps_dict = {0: 30, 1: 60, 2: 90}
-        self.FPS = fps_dict[[i for i in range(3) if fps[i] == 1][0]]
-        # self.FPS = 10000
 
         with open('resources/descriptions/ammunition.txt', encoding='utf-8') as f:
             self.ammo = list(map(lambda x: x[:-1], f.readlines()))
@@ -440,9 +449,14 @@ class Settings:
                                                                (self.WIDTH * 0.062 / 1.5,
                                                                 self.WIDTH * 0.062 / 1.5))
         self.ammo_v = {0: 1500, 1: 670, 2: 800}
+        self.show = False
+        self.thread.join()
         # self.sprites = Sprite(self)
 
     def set_lvl(self):
+        self.show = True
+        self.thread = threading.Thread(target=self.load, args=())
+        self.thread.start()
         if self.lvl_dict[0]:
             self.tile_w = (self.WIDTH // len(self.guide_map[0]))
             self.tile_h = (self.WIDTH // len(self.guide_map[0]))
@@ -540,8 +554,13 @@ class Settings:
                                  'bush3_thermal': self.bush_sprite_thermal4
                                  }
             self.sprites = Sprite(self)
+        self.show = False
+        self.thread.join()
 
     def graph_set(self, n):
+        self.show = True
+        self.thread = threading.Thread(target=self.load, args=())
+        self.thread.start()
         self.NUM_RAYS = n
         self.DELTA_ANGLE_optic = self.FOV_optic / self.NUM_RAYS
         self.DIST_optic = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_optic * 3.14 / 180))
@@ -569,8 +588,13 @@ class Settings:
             self.SCALE_thermal_d = self.thermal_width_d // self.NUM_RAYS
         else:
             self.SCALE_thermal_d = int(self.thermal_width_d // self.NUM_RAYS) + 1
+        self.show = False
+        self.thread.join()
 
     def update_db(self):
+        self.show = True
+        self.thread = threading.Thread(target=self.load, args=())
+        self.thread.start()
         self.bd.update_to_db("graph_table", "(low, mid, high)",
                              f"({self.graph_dict[0]}, {self.graph_dict[1]}, {self.graph_dict[2]})")
         self.bd.update_to_db("minimap_table", "([on], off)", f"({self.minimap_dict[0]}, {self.minimap_dict[1]})")
@@ -581,8 +605,13 @@ class Settings:
         self.bd.update_to_db("full_table", "([on], off)", f"({self.full_dict[0]}, {self.full_dict[1]})")
         self.bd.update_to_db("size_table", "(width, height)", f"({self.WIDTH}, {self.HEIGHT})")
         self.bd.update_to_db("monitor_table", "id", f"{self.monitor}")
+        self.show = False
+        self.thread.join()
 
     def update_size(self):
+        self.show = True
+        self.thread = threading.Thread(target=self.load, args=())
+        self.thread.start()
         gif_pygame.transform.scale(self.gif, (self.WIDTH, self.HEIGHT))
         for i in range(len(self.menu_list)):
             self.menu_list[i] = pygame.transform.scale(self.menu_list[i], (self.WIDTH, self.HEIGHT))
@@ -600,7 +629,16 @@ class Settings:
         self.min_speed_ad = self.WIDTH * 0.01 * (self.FPS / 60) * 10 / 60 * (7 / self.side)
 
         # self.map = Map(self.world_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
+
+        self.show = False
+        self.thread.join()
+
         self.set_lvl()
+
+        self.show = True
+        self.thread = threading.Thread(target=self.load, args=())
+        self.thread.start()
+
         self.minimap_tank_b = pygame.transform.scale(self.minimap_tank_base,
                                                      (self.WIDTH * 0.0625 // self.minimap_k,
                                                       self.WIDTH * 0.0625 // self.minimap_k))
@@ -757,9 +795,37 @@ class Settings:
         self.shot_smog_frames_delta = max(self.shot_smog_frames // 10, 1)
         self.shot_smog_frames = int(self.shot_smog_frames_delta * 10)
         self.sprites = Sprite(self)
+        self.show = False
+        self.thread.join()
 
     def update_sprites(self):
+        self.show = True
+        self.thread = threading.Thread(target=self.load, args=())
+        self.thread.start()
+
         self.sprites = Sprite(self)
+
+        self.show = False
+        self.thread.join()
+
+    def load(self):
+        while self.show:
+            if self.load_timer >= 1:
+                background = pygame.Surface((self.WIDTH, self.HEIGHT))
+                background.fill((19, 69, 19))
+                self.display.blit(background, (0, 0))
+                load_bl = Text(self.WIDTH * 0.5028, self.HEIGHT * 0.5046, (0, 0, 0), 'Загрузка' + "." * self.count_point,
+                               int(self.WIDTH * 0.052))
+                load = Text(self.WIDTH * 0.5, self.HEIGHT * 0.5, (200, 200, 200), 'Загрузка' + "." * self.count_point,
+                            int(self.WIDTH * 0.052))
+                load_bl.draw(self.display)
+                load.draw(self.display)
+                self.count_point = 0 if self.count_point == 3 else self.count_point + 1
+                self.load_timer = 0
+            self.load_timer += 1 / (int(self.clock.get_fps()) + self.FPS * (int(self.clock.get_fps()) == 0))
+            pygame.display.flip()
+            self.clock.tick(self.FPS)
+        self.load_timer = 1
 
 
 def thermal_texture(surface, t, max_t):
