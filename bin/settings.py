@@ -100,6 +100,8 @@ class Settings:
             self.T_90M_TTH = list(map(lambda x: x[:-1], f.readlines()))
         with open('resources/descriptions/guide.txt', encoding='utf-8') as f:
             self.guide_descr = list(map(lambda x: x[:-1], f.readlines()))
+        with open('resources/descriptions/mission_1_descr.txt', encoding='utf-8') as f:
+            self.mission1_descr = list(map(lambda x: x[:-1], f.readlines()))
         with open('resources/descriptions/help.txt', encoding='utf-8') as f:
             self.help_level_list = list(map(str.rstrip, f.readlines()))
             self.help_level_descr = [[]]
@@ -168,7 +170,6 @@ class Settings:
         self.DELTA_ANGLE_optic_zoom = self.FOV_optic_zoom / self.NUM_RAYS
         self.DIST_optic_zoom = self.NUM_RAYS / (2 * math.tan(self.HALF_FOV_optic_zoom * 3.14 / 180))
         self.PROJ_COEFF_optic_zoom = 210 * self.HEIGHT
-        print(self.PROJ_COEFF_optic_zoom)
         if self.optic_scope_width % self.NUM_RAYS == 0:
             self.SCALE_optic_zoom = self.optic_scope_width // self.NUM_RAYS
         else:
@@ -250,10 +251,8 @@ class Settings:
         self.PROJ_COEFF_thermal = 95 * self.thermal_height
         if self.thermal_width % self.NUM_RAYS == 0:
             self.SCALE_thermal = self.thermal_width // self.NUM_RAYS
-            print('scale int')
         else:
             self.SCALE_thermal = int(self.thermal_width // self.NUM_RAYS) + 1
-            print('not')
 
         self.thermal_x = self.HEIGHT / 13.4 * 1.4
         self.thermal_y = self.HEIGHT / 14.2 * 1.57
@@ -290,9 +289,7 @@ class Settings:
         self.PROJ_COEFF_thermal_zoom_d = 90 * self.thermal_height
         if self.thermal_width_d % self.NUM_RAYS == 0:
             self.SCALE_thermal_d = self.thermal_width_d // self.NUM_RAYS
-            print(11241232)
         else:
-            print(2432342)
             self.SCALE_thermal_d = int(self.thermal_width_d // self.NUM_RAYS) + 1
         self.thermal_x_d = self.WIDTH * 9.1 / 37
         self.thermal_y_d = self.HEIGHT * 11 / 20.5
