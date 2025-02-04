@@ -58,13 +58,13 @@ class Sprite:
             self.list_of_objects_thermal = [
                 SpriteObject(self.sprite_types['bmp_thermal'], False, (147, 7), 0.7, 1, self.s, 6, self, 'bmp', 0,
                              k=1.77,
-                             v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True),
+                             v=-0.08 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True),
                 SpriteObject(self.sprite_types['tank_thermal'], False, (151, 7), -0.05, 1.5, self.s, 5, self, 'tank', 1,
                              k=1.77,
-                             v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5),
+                             v=-0.08 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5),
                 SpriteObject(self.sprite_types['tank_thermal'], False, (143, 7), -0.05, 1.5, self.s, 5, self, 'tank', 2,
                              k=1.77,
-                             v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5),
+                             v=-0.08 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5),
                 SpriteObject(self.sprite_types['bush2_thermal'], True, (23.1, 77.1), 0.7, 1, self.s, 3, self, 'oth', 3),
                 SpriteObject(self.sprite_types['bush3_thermal'], True, (32.1, 80.1), 0.7, 1, self.s, 3, self, 'oth', 4),
                 SpriteObject(self.sprite_types['tree_thermal'], True, (80, 20), 0, 2, self.s, 3, self, 'oth', 5),
@@ -85,11 +85,11 @@ class Sprite:
 
             self.list_of_objects = [
                 SpriteObject(self.sprite_types['bmp'], False, (147, 7), 0.7, 1, self.s, 6, self, 'bmp', 0, k=1.77,
-                             v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True),
+                             v=-0.08 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True),
                 SpriteObject(self.sprite_types['tank'], False, (151, 7), -0.05, 1.5, self.s, 5, self, 'tank', 1, k=1.77,
-                             v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5),
+                             v=-0.08 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5),
                 SpriteObject(self.sprite_types['tank'], False, (143, 7), -0.05, 1.5, self.s, 5, self, 'tank', 2, k=1.77,
-                             v=-0.03 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5),
+                             v=-0.08 * self.s.tile_w * self.s.FPS / 60, hp=100, death_anim=True, a2=1.5, k_exp=1.5),
                 SpriteObject(self.sprite_types['bush2'], True, (23.1, 77.1), 0.7, 1, self.s, 3, self, 'oth', 3),
                 SpriteObject(self.sprite_types['bush3'], True, (32.1, 80.1), 0.7, 1, self.s, 3, self, 'oth', 4),
                 SpriteObject(self.sprite_types['tree'], True, (80, 20), 0, 2, self.s, 3, self, 'oth', 5),
@@ -131,7 +131,6 @@ class SpriteObject:
         # направление движения и скорость
         self.movement_angle = 1
         self.v = v
-
         # параметры отображения спрайта
         self.object = object
         self.stat = stat
@@ -162,83 +161,85 @@ class SpriteObject:
             fake_walls0 = [tank.walls[0] for i in range(self.s.FAKE_RAYS)]
             fake_walls1 = [tank.walls[-1] for i in range(self.s.FAKE_RAYS)]
             fake_walls = fake_walls0 + tank.walls + fake_walls1
+
             DELTA_ANGLE, PROJ_COEFF, horizontal, SCALE, HALF_FOV, drx, dry, height, k = self.all_current_parametres(
                 tank)
 
-            dx, dy = self.x - tank.x, self.y - tank.y
-            dist = math.sqrt(dx ** 2 + dy ** 2)
-            theta = math.atan2(dy, dx)
-            gamma = theta - tank.angle_of_view * 3.14 / 180
+            if drx:
+                dx, dy = self.x - tank.x, self.y - tank.y
+                dist = math.sqrt(dx ** 2 + dy ** 2)
+                theta = math.atan2(dy, dx)
+                gamma = theta - tank.angle_of_view * 3.14 / 180
 
-            if dx > 0 and 180 <= tank.angle_of_view <= 360 or dx < 0 and dy < 0:
-                gamma += 2 * math.pi
+                if dx > 0 and 180 <= tank.angle_of_view <= 360 or dx < 0 and dy < 0:
+                    gamma += 2 * math.pi
 
-            delta_rays = int(gamma / (DELTA_ANGLE * 3.14 / 180))
-            current_ray = self.s.center_ray + delta_rays
+                delta_rays = int(gamma / (DELTA_ANGLE * 3.14 / 180))
+                current_ray = self.s.center_ray + delta_rays
 
-            dist *= math.cos(math.radians(HALF_FOV - current_ray * DELTA_ANGLE))
+                dist *= math.cos(math.radians(HALF_FOV - current_ray * DELTA_ANGLE))
 
-            fake_ray = current_ray + self.s.FAKE_RAYS
-            # проверка на наличие в кадре
-            if 0 <= fake_ray <= self.s.NUM_RAYS - 1 + 2 * self.s.FAKE_RAYS and dist < fake_walls[fake_ray][0]:
-                #
-                proj_height = min(int(PROJ_COEFF / dist * self.scale), 5 * self.s.HEIGHT)
-                half_proj_height = proj_height // 2
+                fake_ray = current_ray + self.s.FAKE_RAYS
+                # проверка на наличие в кадре
+                if 0 <= fake_ray <= self.s.NUM_RAYS - 1 + 2 * self.s.FAKE_RAYS and dist < fake_walls[fake_ray][0]:
+                    # проекционная высота
+                    proj_height = min(int(PROJ_COEFF / dist * self.scale), 5 * self.s.HEIGHT)
+                    half_proj_height = proj_height // 2
 
-                shift = half_proj_height * self.shift
-                # объемный спрайт
-                if not self.stat:
-                    if theta < 0:
-                        theta += 2 * math.pi
-                    theta = 360 - int(math.degrees(theta))
-                    for angles in self.sprite_angles:
-                        if theta in angles:
-                            self.object = self.sprite_pos[angles]
-                            break
+                    shift = half_proj_height * self.shift
+                    # объемный спрайт
+                    if not self.stat:
+                        if theta < 0:
+                            theta += 2 * math.pi
+                        theta = 360 - int(math.degrees(theta))
+                        for angles in self.sprite_angles:
+                            if theta in angles:
+                                self.object = self.sprite_pos[angles]
+                                break
 
-                if not self.is_death_anim:
-                    sprite_pos = (
-                        drx + current_ray * SCALE - half_proj_height * self.k,
-                        horizontal + dry + height // 2 - half_proj_height + shift)
-                    # проверка того, что перекрестие на спрайте
-                    if (self.s.center_ray - self.a1 * (10 - HALF_FOV) * proj_height * self.k / 300) <= current_ray <= (
-                            self.s.center_ray + self.a1 * (10 - HALF_FOV) * proj_height * self.k / 300):
-                        if self.s.HEIGHT // 2 * k - horizontal >= \
-                                sprite_pos[1] * self.a2 and (
-                                sprite_pos[1] + proj_height) * self.a2 >= (self.s.HEIGHT // 2 * k - horizontal):
+                    if not self.is_death_anim:
+                        sprite_pos = (
+                            drx + current_ray * SCALE - half_proj_height * self.k,
+                            horizontal + dry + height // 2 - half_proj_height + shift)
+                        # проверка того, что перекрестие на спрайте
+                        if (self.s.center_ray - self.a1 * (10 - HALF_FOV) * proj_height * self.k / 300) <= current_ray <= (
+                                self.s.center_ray + self.a1 * (10 - HALF_FOV) * proj_height * self.k / 300):
+                            if self.s.HEIGHT // 2 * k - horizontal >= \
+                                    sprite_pos[1] * self.a2 and (
+                                    sprite_pos[1] + proj_height) * self.a2 >= (self.s.HEIGHT // 2 * k - horizontal):
 
-                            tank.depth_sprite = str(dist)
-                            tank.is_sprite_depth = True
-                            # выстрел по спрайту
-                            if tank.current_shooted_ammo is not None and tank.shot_anim is True:
-                                self.minus_hp(tank)
-                                self.check_death(tank)
-                                tank.current_shooted_ammo = None
-                        # захват спрайта
-                        if tank.lock:
-                            tank.lock_x, tank.lock_y = self.x, self.y
-                    # проверка направления движения
-                    if self.movement_angle < 0:
-                        o = pygame.transform.flip(self.object, True, False)
-                        sprite = pygame.transform.scale(o, (proj_height * self.k, proj_height))
+                                tank.depth_sprite = str(dist)
+                                tank.is_sprite_depth = True
+                                # выстрел по спрайту
+                                if tank.current_shooted_ammo is not None and tank.shot_anim is True:
+                                    self.minus_hp(tank)
+                                    self.check_death(tank)
+                                    tank.current_shooted_ammo = None
+                            # захват спрайта
+                            if tank.lock:
+                                tank.lock_x, tank.lock_y = self.x, self.y
+                        # проверка направления движения
+                        if self.movement_angle < 0:
+                            o = pygame.transform.flip(self.object, True, False)
+                            sprite = pygame.transform.scale(o, (proj_height * self.k, proj_height))
+                        else:
+                            sprite = pygame.transform.scale(self.object, (proj_height * self.k, proj_height))
+                    # анимация смерти
                     else:
-                        sprite = pygame.transform.scale(self.object, (proj_height * self.k, proj_height))
-                # анимация смерти
-                else:
-                    self.check_death_anim()
+                        self.check_death_anim()
 
-                    sprite = self.death_anim(tank)
-                    self.death_anim_counter += 1
+                        sprite = self.death_anim(tank)
+                        self.death_anim_counter += 1
 
-                    if sprite == False:
-                        return (False,)
+                        if sprite == False:
+                            return (False,)
 
-                    sprite_pos = (
-                        drx + current_ray * SCALE - half_proj_height * 2.07 * self.k_exp,
-                        horizontal + dry + height // 2 - half_proj_height * self.k_exp)
-                    sprite = pygame.transform.scale(sprite, (proj_height * 2.07 * self.k_exp, proj_height * self.k_exp))
-                # возвращение кортежа с параметрами спрайта
-                return (dist, sprite, sprite_pos)
+                        sprite_pos = (
+                            drx + current_ray * SCALE - half_proj_height * 2.07 * self.k_exp,
+                            horizontal + dry + height // 2 - half_proj_height * self.k_exp)
+                        sprite = pygame.transform.scale(sprite, (proj_height * 2.07 * self.k_exp, proj_height * self.k_exp))
+                    # возвращение кортежа с параметрами спрайта
+                    return (dist, sprite, sprite_pos)
         return (False,)
 
     # движение бмп
@@ -415,7 +416,7 @@ class SpriteObject:
                 return (DELTA_ANGLE, PROJ_COEFF, horizontal, SCALE, HALF_FOV, drx, dry, height, k)
 
             else:
-                return (False,)
+                return (False, False, False, False, False, False, False, False, False)
 
         elif tank.extra_zoom:
             if tank.thermal:
@@ -443,7 +444,7 @@ class SpriteObject:
                 k = 0.6
                 return (DELTA_ANGLE, PROJ_COEFF, horizontal, SCALE, HALF_FOV, drx, dry, height, k)
             else:
-                return (False,)
+                return (False, False, False, False, False, False, False, False, False)
         else:
             if tank.thermal:
                 DELTA_ANGLE = self.s.DELTA_ANGLE_thermal
@@ -481,4 +482,4 @@ class SpriteObject:
                 k = 0.6
                 return (DELTA_ANGLE, PROJ_COEFF, horizontal, SCALE, HALF_FOV, drx, dry, height, k)
             else:
-                return (False,)
+                return (False, False, False, False, False, False, False, False, False)

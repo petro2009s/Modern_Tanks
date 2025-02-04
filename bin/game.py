@@ -51,6 +51,9 @@ class Game:
         fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200),
                               str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                               is_topleft=True)
+
+        pygame.event.set_grab(True)
+
         while show:
 
             quit_button.check(pygame.mouse.get_pos())
@@ -290,6 +293,8 @@ class Game:
                     plus_general, minus_general, screen_text_bl, screen_text, fullscreen_text_bl, fullscreen_text,
                     plus_screen, minus_screen, plus_screen_size, minus_screen_size, size_text_bl, size_text,
                     apply_button, full_on, full_off]
+
+        pygame.event.set_grab(True)
 
         while sett:
             back_button.check(pygame.mouse.get_pos())
@@ -686,6 +691,7 @@ class Game:
         background.set_alpha(128)
         background.fill((37, 46, 37))
 
+        pygame.event.set_grab(True)
         while gm:
 
             apfsds_txt.is_cl = True
@@ -826,6 +832,9 @@ class Game:
 
     def play(self, APFSDS_COUNT, HE_COUNT, HEAT_COUNT):
         self.s.set_lvl()
+
+        pygame.event.set_grab(True)
+
         pygame.display.set_icon(self.s.icon)
         tank = Tank(self.s, self.s.start_point[0], self.s.start_point[1], 0, self.s.minimap_k, 0, 0, APFSDS_COUNT,
                     HE_COUNT, HEAT_COUNT, self.s.minimap_dict[0],

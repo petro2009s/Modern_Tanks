@@ -126,6 +126,9 @@ class Tank:
 
     def start(self):
         pygame.display.set_icon(self.s.icon)
+
+        pygame.event.set_grab(True)
+
         show = True
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
@@ -457,9 +460,10 @@ class Tank:
             continue_button.draw(self.s.display)
 
             for i in range(len(text_all[self.guide_mission_num])):
-                text = Text(round(self.s.WIDTH * 0.01), self.s.HEIGHT * (0.2 + 0.1 * i), (200, 200, 200), text_all[self.guide_mission_num][i],
-                             int(self.s.WIDTH * 0.025),
-                             is_topleft=True)
+                text = Text(round(self.s.WIDTH * 0.01), self.s.HEIGHT * (0.2 + 0.1 * i), (200, 200, 200),
+                            text_all[self.guide_mission_num][i],
+                            int(self.s.WIDTH * 0.025),
+                            is_topleft=True)
                 text.draw(self.s.display)
 
             pygame.display.flip()
@@ -505,6 +509,7 @@ class Tank:
             rect2.center = (x + self.pos(k=self.s.minimap_k)[0],
                             y + self.pos(k=self.s.minimap_k)[1])
             self.s.display.blit(image, rect2)
+
     def draw_tank(self, x, y):
         image = pygame.transform.rotate(self.s.minimap_tank_b_scope, -self.movement_angle)
         rect = image.get_rect()
@@ -552,7 +557,7 @@ class Tank:
                         is_topleft=True)
         if self.num_level == 0 and self.guide_mission_num <= 14:
             task1 = self.s.task2_1
-            task2  = ''
+            task2 = ''
         else:
             task1 = self.s.task1_1
             task2 = self.s.task1_2
@@ -709,7 +714,6 @@ class Tank:
                     self.angle_of_view -= temp
 
     def guidance(self):
-        # print(self.guide_mission_num)
         keys = pygame.key.get_pressed()
 
         t = 1 / self.s.FPS
@@ -823,7 +827,8 @@ class Tank:
             if self.angle_of_view != 0 and self.guide_mission_num == 3 and not self.is_guide_button_mission3_pressed[1]:
                 self.is_guide_button_mission3_pressed[1] = True
 
-            if self.horizontal != -self.s.HEIGHT * 0.085 and self.guide_mission_num == 3 and not self.is_guide_button_mission3_pressed[2]:
+            if self.horizontal != -self.s.HEIGHT * 0.085 and self.guide_mission_num == 3 and not \
+                    self.is_guide_button_mission3_pressed[2]:
                 self.is_guide_button_mission3_pressed[2] = True
 
     def ammo(self, event, text):
@@ -849,6 +854,7 @@ class Tank:
         self.thermal_on = True if self.thermal_on is False else False
         self.lock_on = True if self.lock_on is False else False
         self.thermal_d = True if self.thermal_d is False else False
+        self.lock = False
 
     def timer(self):
         if self.shot_timer >= self.shot_time:
@@ -1595,6 +1601,8 @@ class Tank:
     def optic_sight(self):
         show = True
 
+        pygame.event.set_grab(True)
+
         pygame.display.set_icon(self.s.icon)
 
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
@@ -1772,8 +1780,14 @@ class Tank:
     def check_is_done(self):
         if self.count_of_destroyed_targets >= self.count_of_targets:
             self.done = 'выполнена'
+        if self.num_level == 1:
+            if self.done == 'не выполнена' and len(self.s.sprites.list_of_objects_thermal) == 13 + int(self.count_of_destroyed_targets):
+                self.done = 'не выполнена, колонна уехала'
 
     def check_mission(self):
+
+        pygame.event.set_grab(True)
+
         if self.done == 'выполнена':
             if ((self.x // self.s.tile_w), (self.y // self.s.tile_h)) in self.s.end_point:
                 pygame.display.set_icon(self.s.icon)
@@ -1817,7 +1831,8 @@ class Tank:
 
                 exit_to_menu_button = Button(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
                                              self.s.HEIGHT * 0.0925,
-                                             'Выйти в меню', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                                             'Выйти в меню', self.s.size_text_b,
+                                             'resources/images/buttons/button_inact.png',
                                              'resources/images/buttons/button_active.png',
                                              'resources/sounds/button_menu_sound.mp3')
                 quit_button = Button(self.s.WIDTH * 0.081, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
@@ -1900,6 +1915,130 @@ class Tank:
                     pygame.display.flip()
                     self.s.clock.tick(self.s.FPS)
 
+        elif self.done == 'не выполнена, колонна уехала':
+            pygame.display.set_icon(self.s.icon)
+            self.s.background_sound.stop()
+            self.s.lose_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
+            self.s.lose_sound.play()
+
+            end_text_bl = Text(self.s.WIDTH * 0.5028, self.s.HEIGHT * 0.1052, (0, 0, 0), 'Миссия провалена!',
+                               int(self.s.WIDTH * 0.052))
+            end_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.1, (200, 200, 200), 'Миссия провалена!',
+                            int(self.s.WIDTH * 0.052))
+
+            done_text_bl = Text(self.s.WIDTH * 0.032, self.s.HEIGHT * 0.253, (0, 0, 0),
+                                f'Боевая задача {self.done}:', int(self.s.WIDTH * 0.025),
+                                is_topleft=True)
+            done_text = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.25, (200, 200, 200),
+                             f'Боевая задача {self.done}:',
+                             int(self.s.WIDTH * 0.025), is_topleft=True)
+
+            destroyed_targets_text_bl = Text(self.s.WIDTH * 0.072, self.s.HEIGHT * 0.333, (0, 0, 0),
+                                             f'Уничтожено целей: {self.count_of_destroyed_targets} из {self.count_of_targets}.',
+                                             int(self.s.WIDTH * 0.025),
+                                             is_topleft=True)
+            destroyed_targets_text = Text(self.s.WIDTH * 0.07, self.s.HEIGHT * 0.33, (200, 200, 200),
+                                          f'Уничтожено целей: {self.count_of_destroyed_targets} из {self.count_of_targets}.',
+                                          int(self.s.WIDTH * 0.025), is_topleft=True)
+
+            fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
+                                     str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
+                                     is_topleft=True)
+            fps_count_text = Text(self.s.WIDTH * 0.96, self.s.HEIGHT * 0.97, (200, 200, 200),
+                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
+                                  is_topleft=True)
+
+            destroyed_text_bl = Text(self.s.WIDTH * 0.072, self.s.HEIGHT * 0.413, (0, 0, 0),
+                                     f'Техника не потеряна.', int(self.s.WIDTH * 0.025),
+                                     is_topleft=True)
+            destroyed_text = Text(self.s.WIDTH * 0.07, self.s.HEIGHT * 0.41, (200, 200, 200),
+                                  f'Техника не потеряна.', int(self.s.WIDTH * 0.025),
+                                  is_topleft=True)
+
+            exit_to_menu_button = Button(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
+                                         self.s.HEIGHT * 0.0925,
+                                         'Выйти в меню', self.s.size_text_b,
+                                         'resources/images/buttons/button_inact.png',
+                                         'resources/images/buttons/button_active.png',
+                                         'resources/sounds/button_menu_sound.mp3')
+            quit_button = Button(self.s.WIDTH * 0.081, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
+                                 self.s.HEIGHT * 0.0925,
+                                 'Выйти', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                                 'resources/images/buttons/button_active.png',
+                                 'resources/sounds/button_menu_sound.mp3')
+
+            background = pygame.Surface((self.s.WIDTH * 0.7, self.s.HEIGHT * 0.44))
+            background.set_alpha(128)
+            background.fill((50, 60, 50))
+
+            show = True
+
+            while show:
+
+                exit_to_menu_button.check(pygame.mouse.get_pos())
+                quit_button.check(pygame.mouse.get_pos())
+
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+
+                    if event.type == pygame.USEREVENT:
+                        if event.button == quit_button:
+                            pygame.quit()
+                            sys.exit()
+
+                        elif event.button == exit_to_menu_button:
+                            self.s.music_menu.play(-1)
+                            self.s.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
+                            self.s.background_sound.stop()
+                            self.s.reload_sound.stop()
+                            self.s.shoot_sound.stop()
+                            self.menu = True
+                            show = False
+
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            self.s.music_menu.play()
+                            self.s.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
+                            self.s.background_sound.stop()
+                            self.s.reload_sound.stop()
+                            self.s.shoot_sound.stop()
+                            self.menu = True
+                            show = False
+
+                    exit_to_menu_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
+                    quit_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
+
+                self.s.display.blit(self.s.destroyed_image, (0, 0))
+                self.s.display.blit(background, (self.s.WIDTH * 0.026, self.s.HEIGHT * 0.24))
+
+                exit_to_menu_button.draw(self.s.display)
+                quit_button.draw(self.s.display)
+
+                end_text_bl.draw(self.s.display)
+                end_text.draw(self.s.display)
+
+                done_text_bl.draw(self.s.display)
+                done_text.draw(self.s.display)
+
+                destroyed_targets_text_bl.draw(self.s.display)
+                destroyed_targets_text.draw(self.s.display)
+
+                destroyed_text_bl.draw(self.s.display)
+                destroyed_text.draw(self.s.display)
+
+                fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
+                fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
+                fps_count_text_bl.draw(self.s.display)
+                fps_count_text.draw(self.s.display)
+
+                if pygame.mouse.get_focused():
+                    self.s.display.blit(self.s.cursor, pygame.mouse.get_pos())
+
+                pygame.display.flip()
+                self.s.clock.tick(self.s.FPS)
+
     def shot(self, x, y):
         if self.shot_anim:
             shot_frames_delta = self.s.shot_he_frames_delta if self.current_shooted_ammo_for_tank == 1 else self.s.shot_frames_delta
@@ -1970,6 +2109,8 @@ class Tank:
 
     def thermal_sight(self):
         show = True
+
+        pygame.event.set_grab(True)
 
         pygame.display.set_icon(self.s.icon)
 
@@ -2357,8 +2498,10 @@ class Tank:
                 if i.type == 'tank':
                     i.x_movement(self)
 
-
     def check_death(self):
+
+        pygame.event.set_grab(True)
+
         if self.death:
             self.s.background_sound.stop()
             self.s.lose_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
@@ -2379,6 +2522,13 @@ class Tank:
             cause_text = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.17, (200, 200, 200),
                               f'Причина смерти: {self.cause}.',
                               int(self.s.WIDTH * 0.025), is_topleft=True)
+
+            destroyed_text_bl = Text(self.s.WIDTH * 0.072, self.s.HEIGHT * 0.413, (0, 0, 0),
+                                     f'Техника потеряна.', int(self.s.WIDTH * 0.025),
+                                     is_topleft=True)
+            destroyed_text = Text(self.s.WIDTH * 0.07, self.s.HEIGHT * 0.41, (200, 200, 200),
+                                  f'Техника потеряна.', int(self.s.WIDTH * 0.025),
+                                  is_topleft=True)
 
             done_text_bl = Text(self.s.WIDTH * 0.032, self.s.HEIGHT * 0.253, (0, 0, 0),
                                 f'Боевая задача {self.done}:', int(self.s.WIDTH * 0.025),
@@ -2402,16 +2552,10 @@ class Tank:
                                   str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                                   is_topleft=True)
 
-            destroyed_text_bl = Text(self.s.WIDTH * 0.072, self.s.HEIGHT * 0.413, (0, 0, 0),
-                                     f'Техника потеряна.', int(self.s.WIDTH * 0.025),
-                                     is_topleft=True)
-            destroyed_text = Text(self.s.WIDTH * 0.07, self.s.HEIGHT * 0.41, (200, 200, 200),
-                                  f'Техника потеряна.', int(self.s.WIDTH * 0.025),
-                                  is_topleft=True)
-
             exit_to_menu_button = Button(self.s.WIDTH * 0.58, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
                                          self.s.HEIGHT * 0.0925,
-                                         'Выйти в меню', self.s.size_text_b, 'resources/images/buttons/button_inact.png',
+                                         'Выйти в меню', self.s.size_text_b,
+                                         'resources/images/buttons/button_inact.png',
                                          'resources/images/buttons/button_active.png',
                                          'resources/sounds/button_menu_sound.mp3')
             quit_button = Button(self.s.WIDTH * 0.081, self.s.HEIGHT * 0.83, self.s.WIDTH * 0.336,
@@ -2475,14 +2619,14 @@ class Tank:
                 cause_text_bl.draw(self.s.display)
                 cause_text.draw(self.s.display)
 
+                destroyed_text_bl.draw(self.s.display)
+                destroyed_text.draw(self.s.display)
+
                 done_text_bl.draw(self.s.display)
                 done_text.draw(self.s.display)
 
                 destroyed_targets_text_bl.draw(self.s.display)
                 destroyed_targets_text.draw(self.s.display)
-
-                destroyed_text_bl.draw(self.s.display)
-                destroyed_text.draw(self.s.display)
 
                 fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
                 fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
