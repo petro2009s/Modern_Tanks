@@ -623,7 +623,12 @@ class Game:
                                         text='Миссия 1', im='resources/images/buttons/guide.png',
                                         sound='resources/sounds/button_menu_sound.mp3',
                                         font_size=self.s.size_text_b)
-
+        mission_2_button = SelectButton(round(self.s.WIDTH // 2 * 0.496), round(self.s.HEIGHT * 0.43),
+                                        w=self.s.WIDTH * 0.033, h=self.s.HEIGHT * 0.0925, w_r=self.s.WIDTH * 0.104,
+                                        h_r=self.s.HEIGHT * 0.139,
+                                        text='Миссия 2', im='resources/images/buttons/guide.png',
+                                        sound='resources/sounds/button_menu_sound.mp3',
+                                        font_size=self.s.size_text_b)
         ammo_descr_list = []
         k = 0.63
         for i in self.s.ammo:
@@ -667,13 +672,21 @@ class Game:
                         is_topleft=True)
             k4 += 0.0167
             mission1_list.append(temp)
+
+        mission2_list = []
+        for i in self.s.mission2_descr:
+            temp = Text(round(self.s.WIDTH // 2 * 0.9), round(self.s.HEIGHT * k4), (200, 200, 200), i,
+                        int(self.s.WIDTH * 0.0078), (50, 60, 50),
+                        is_topleft=True)
+            k4 += 0.0167
+            mission2_list.append(temp)
         tank_list = [tank1_button]
-        lvl_list = [guide_button, mission_1_button]
+        lvl_list = [guide_button, mission_1_button, mission_2_button]
 
         rect = pygame.Rect(round(self.s.WIDTH // 2 * 0.89), round(self.s.HEIGHT * 0.14), self.s.WIDTH * 0.52,
                            self.s.HEIGHT * 0.676)
         button_list = [back_button, tank1_button, guide_button, play_button, plus1, plus2, plus3, minus1, minus2,
-                       minus3, mission_1_button]
+                       minus3, mission_1_button, mission_2_button]
 
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
@@ -727,10 +740,17 @@ class Game:
                     if event.button == guide_button:
                         self.s.lvl_dict[0] = True
                         self.s.lvl_dict[1] = False
+                        self.s.lvl_dict[2] = False
 
                     if event.button == mission_1_button:
                         self.s.lvl_dict[0] = False
                         self.s.lvl_dict[1] = True
+                        self.s.lvl_dict[2] = False
+
+                    if event.button == mission_2_button:
+                        self.s.lvl_dict[0] = False
+                        self.s.lvl_dict[1] = False
+                        self.s.lvl_dict[2] = True
 
                     if event.button == plus1:
                         if MAX_AMMO > 0:
@@ -819,6 +839,9 @@ class Game:
                     i.draw(self.s.display)
             elif self.s.lvl_dict[1]:
                 for i in mission1_list:
+                    i.draw(self.s.display)
+            elif self.s.lvl_dict[2]:
+                for i in mission2_list:
                     i.draw(self.s.display)
             am_d.draw(self.s.display)
             tank_descr.draw(self.s.display)

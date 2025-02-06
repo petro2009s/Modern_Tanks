@@ -97,7 +97,7 @@ class Settings:
         self.volume_sound = self.bd.select('volume_table', 'volume_sound')[0][0]
 
         self.tank_dict = {0: True}
-        self.lvl_dict = {0: True, 1: False}
+        self.lvl_dict = {0: True, 1: False, 2: False}
         #
         with open('resources/descriptions/ammunition.txt', encoding='utf-8') as f:
             self.ammo = list(map(lambda x: x[:-1], f.readlines()))
@@ -109,6 +109,8 @@ class Settings:
             self.guide_descr = list(map(lambda x: x[:-1], f.readlines()))
         with open('resources/descriptions/mission_1_descr.txt', encoding='utf-8') as f:
             self.mission1_descr = list(map(lambda x: x[:-1], f.readlines()))
+        with open('resources/descriptions/mission_2_descr.txt', encoding='utf-8') as f:
+            self.mission2_descr = list(map(lambda x: x[:-1], f.readlines()))
         with open('resources/descriptions/help.txt', encoding='utf-8') as f:
             self.help_level_list = list(map(str.rstrip, f.readlines()))
             self.help_level_descr = [[]]
@@ -124,6 +126,8 @@ class Settings:
             self.guide_map = list(map(lambda x: x[:-1], f.readlines()))
         with open('resources/maps/mission1_map.txt', encoding='utf-8') as f:
             self.mission1_map = list(map(lambda x: x[:-1], f.readlines()))
+        with open('resources/maps/mission2_map.txt', encoding='utf-8') as f:
+            self.mission2_map = list(map(lambda x: x[:-1], f.readlines()))
         #
         self.tile_w = (self.WIDTH // len(self.world_map[0]))
         self.tile_h = (self.WIDTH // len(self.world_map[0]))
@@ -369,11 +373,25 @@ class Settings:
             for i in range(8)]
         for i in self.tank_sprite_thermal:
             thermal_texture(i, 80, 80)
+
+        self.mrap_sprite = [
+            pygame.image.load(f'resources/sprites/mrap_sprite/mrap_{str((i * 45 + 90) % 360)}_p.png').convert_alpha() for
+            i in
+            range(8)]
+        self.mrap_sprite_thermal = [
+            pygame.image.load(f'resources/sprites/mrap_sprite/mrap_{str((i * 45 + 90) % 360)}_p.png').convert_alpha()
+            for i in range(8)]
+        for i in self.mrap_sprite_thermal:
+            thermal_texture(i, 80, 80)
+
         #
         self.mine_coords = {(55, 20), (56, 21), (55, 21), (57, 25), (50, 60)}
         self.fpv_coords = set([(i, j) for j in range(len(self.world_map) // 2) for i in range(len(self.world_map[0]))])
+        self.rpg_coords = (0, 0)
         #
         self.fpv_time = 10
+
+        self.rpg_time = 10
         #
         self.reload_time = 6
         #
@@ -478,6 +496,8 @@ class Settings:
             self.map_width = self.tile_w * len(self.guide_map[0])
             self.map_height = self.tile_h * len(self.guide_map)
             self.map = Map(self.guide_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
+            self.texture_scale = self.texture_w // self.tile_w if self.texture_w % self.tile_w == 0 else self.texture_w // self.tile_w + 1
+
             self.start_point = (self.map_width // 9, self.map_height // 1.1)
             self.end_point = [(i, j) for j in range(56, 70) for i in
                               range(0, 20)]
@@ -529,6 +549,8 @@ class Settings:
             self.map_width = self.tile_w * len(self.mission1_map[0])
             self.map_height = self.tile_h * len(self.mission1_map)
             self.map = Map(self.mission1_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
+            self.texture_scale = self.texture_w // self.tile_w if self.texture_w % self.tile_w == 0 else self.texture_w // self.tile_w + 1
+
             self.start_point = (self.map_width // 9, self.map_height // 1.05)
             self.end_point = [(i, j) for j in range(122, 157) for i in
                               range(129, 154)]
@@ -540,8 +562,8 @@ class Settings:
 
             self.mine_coords = self.mine_coords1 | self.mine_coords2 | self.mine_coords3
             self.mine_coords = set()
-            self.task1_1 = 'уничтожить колонну техники, пока она не покинула карту, и уехать'
-            self.task1_2 = 'к низким зданиям на юго-востоке.'
+            self.task1_1 = 'уничтожить колонну техники, пока она не покинула'
+            self.task1_2 = 'карту, и уехать к низким зданиям на юго-востоке.'
             self.count_of_targets = '3'
             self.tank_sprite = [
                 pygame.image.load(f'resources/sprites/tank_sprite/tank{str(i * 45)}_p.png').convert_alpha()
@@ -569,9 +591,60 @@ class Settings:
                                  'bush3_thermal': self.bush_sprite_thermal4
                                  }
             self.sprites = Sprite(self)
+
+        elif self.lvl_dict[2]:
+            self.tile_w = (self.WIDTH // len(self.mission2_map[0]))
+            self.tile_h = (self.WIDTH // len(self.mission2_map[0]))
+            self.map_width = self.tile_w * len(self.mission2_map[0])
+            self.map_height = self.tile_h * len(self.mission2_map)
+            self.map = Map(self.mission2_map, self.tile_w, self.tile_h, self.WIDTH * 0.002)
+            self.texture_scale = self.texture_w // self.tile_w if self.texture_w % self.tile_w == 0 else self.texture_w // self.tile_w + 1
+
+            self.start_point = (self.tile_w * 5, self.tile_h * 50)
+            self.end_point = [(i, j) for j in range(0, 7) for i in
+                              range(0, 54)]
+            self.rpg_coords = [(i, j) for j in range(0, 52) for i in
+                              range(10, 18)]
+            self.mine_coords1 = set()
+            self.mine_coords2 = set()
+            self.mine_coords3 = set()
+            self.fpv_coords = set()
+
+            self.mine_coords = self.mine_coords1 | self.mine_coords2 | self.mine_coords3
+            self.mine_coords = set()
+            self.task1_1 = 'уничтожить всю технику и'
+            self.task1_2 = 'уехать из города.'
+            self.count_of_targets = '3'
+            self.tank_sprite = [
+                pygame.image.load(f'resources/sprites/tank_sprite/tank{str(i * 45)}_p.png').convert_alpha()
+                for
+                i in
+                range(8)]
+            self.tank_sprite_thermal = [
+                pygame.image.load(f'resources/sprites/tank_sprite/tank{str(i * 45)}_p.png').convert_alpha()
+                for i in range(8)]
+            for i in self.tank_sprite_thermal:
+                thermal_texture(i, 80, 80)
+            self.sprite_types = {'bush_thermal': self.bush_sprite_thermal,
+                                 'bush': self.bush_sprite,
+                                 'bmp': self.test_sprite_v,
+                                 'bmp_thermal': self.test_sprite_v_thermal,
+                                 'tree_thermal': self.tree_sprite_thermal,
+                                 'tree': self.tree_sprite,
+                                 'tank': self.tank_sprite,
+                                 'tank_thermal': self.tank_sprite_thermal,
+                                 'bush1': self.bush_sprite2,
+                                 'bush2': self.bush_sprite3,
+                                 'bush3': self.bush_sprite4,
+                                 'bush1_thermal': self.bush_sprite_thermal2,
+                                 'bush2_thermal': self.bush_sprite_thermal3,
+                                 'bush3_thermal': self.bush_sprite_thermal4,
+                                 'mrap_thermal': self.mrap_sprite_thermal,
+                                 'mrap': self.mrap_sprite
+                                 }
+            self.sprites = Sprite(self)
         self.show = False
         self.thread.join()
-
     #
     def graph_set(self, n):
         self.show = True
@@ -803,7 +876,7 @@ class Settings:
         thermal_texture(self.bush_sprite_thermal4, 20, 50)
 
         self.center_ray = self.NUM_RAYS // 2 - 1
-        self.FAKE_RAYS = int(self.NUM_RAYS * 2)
+        self.FAKE_RAYS = int(self.NUM_RAYS * 4)
 
         self.test_sprite_v = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in
                               range(8)]

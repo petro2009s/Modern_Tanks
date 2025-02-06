@@ -120,7 +120,12 @@ class Tank:
         self.set_sky()
         # цвет неба
         self.sky_thermal_color = (135 * (20 / self.s.max_t), 135 * (20 / self.s.max_t), 135 * (20 / self.s.max_t))
-        self.floor_thermal_color = (45 * (20 / self.s.max_t), 45 * (20 / self.s.max_t), 45 * (20 / self.s.max_t))
+        if self.num_level != 2:
+            self.floor_color = (53, 104, 45)
+            self.floor_thermal_color = (45 * (20 / self.s.max_t), 45 * (20 / self.s.max_t), 45 * (20 / self.s.max_t))
+        else:
+            self.floor_color = (100, 100, 100)
+            self.floor_thermal_color = (45 * (20 / self.s.max_t), 45 * (20 / self.s.max_t), 45 * (20 / self.s.max_t))
         # урон по танку
         self.damage = Damage(self)
 
@@ -207,6 +212,7 @@ class Tank:
             self.check_death()
             self.damage.check_mines()
             self.damage.check_drones()
+            self.damage.check_rpg()
             self.timer()
             if self.menu:
                 show = False
@@ -1644,13 +1650,14 @@ class Tank:
             self.check_death()
             self.damage.check_mines()
             self.damage.check_drones()
+            self.damage.check_rpg()
             self.timer()
             if self.menu:
                 show = False
 
             self.s.display.fill((0, 0, 0))
 
-            pygame.draw.rect(self.s.display, (53, 104, 45), floor)
+            pygame.draw.rect(self.s.display, self.floor_color, floor)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -1781,7 +1788,8 @@ class Tank:
         if self.count_of_destroyed_targets >= self.count_of_targets:
             self.done = 'выполнена'
         if self.num_level == 1:
-            if self.done == 'не выполнена' and len(self.s.sprites.list_of_objects_thermal) == 13 + int(self.count_of_destroyed_targets):
+            print(len(self.s.sprites.list_of_objects_thermal), int(float(self.count_of_destroyed_targets)))
+            if self.done == 'не выполнена' and len(self.s.sprites.list_of_objects_thermal) == 13 + int(float(self.count_of_destroyed_targets)):
                 self.done = 'не выполнена, колонна уехала'
 
     def check_mission(self):
@@ -2211,6 +2219,7 @@ class Tank:
             self.check_death()
             self.damage.check_mines()
             self.damage.check_drones()
+            self.damage.check_rpg()
             self.timer()
             if self.menu:
                 show = False
@@ -2492,11 +2501,15 @@ class Tank:
                     i.x_movement(self)
                 if i.type == 'tank':
                     i.x_movement(self)
+                if i.type == 'mrap':
+                    i.y_movement(self)
             for i in self.s.sprites.list_of_objects_thermal:
                 if i.type == 'bmp':
                     i.x_movement(self)
                 if i.type == 'tank':
                     i.x_movement(self)
+                if i.type == 'mrap':
+                    i.y_movement(self)
 
     def check_death(self):
 

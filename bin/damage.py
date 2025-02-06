@@ -9,9 +9,14 @@ class Damage:
         self.mine_coords = self.tank.s.mine_coords
         # координаты зон с FPV-дронами
         self.fpv_coords = self.tank.s.fpv_coords
+
+        self.rpg_coords = self.tank.s.rpg_coords
         # счет времени для дронов
         self.fpv_time = self.tank.s.fpv_time
         self.fpv_timer = 0
+
+        self.rpg_time = self.tank.s.rpg_time
+        self.rpg_timer = 0
 
     # проверка мин
     def check_mines(self):
@@ -35,3 +40,12 @@ class Damage:
         if self.fpv_timer > self.fpv_time:
             self.tank.death = True
             self.tank.cause = 'FPV-дрон'
+
+    def check_rpg(self):
+        if (self.tank.x // self.tank.s.tile_w, self.tank.y // self.tank.s.tile_h) in self.rpg_coords:
+            self.rpg_timer += 1 / self.tank.s.FPS
+        else:
+            self.rpg_timer = 0
+        if self.rpg_timer > self.rpg_time:
+            self.tank.death = True
+            self.tank.cause = 'выстрел из РПГ'
