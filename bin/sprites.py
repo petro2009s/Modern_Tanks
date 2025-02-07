@@ -303,7 +303,6 @@ class SpriteObject:
                 else:
                     if ((self.x + dx) // self.s.tile_w, self.y // self.s.tile_h) in self.s.map.world_map:
                         self.movement_angle *= -1
-                        print(1)
                     if tank.num_level != 2:
                         if ((self.x + dx) // self.s.tile_w, self.y // self.s.tile_h) in other_sprites:
                             dx = 0
