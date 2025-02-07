@@ -294,6 +294,7 @@ class SpriteObject:
                         del self.sprites.list_of_objects_thermal[self.num]
                         self.sprites.all_list = self.sprites.list_of_objects + self.sprites.list_of_objects_thermal
                         del self.sprites.collision_set[self.num]
+                        tank.done = 'не выполнена, колонна уехала'
                         self.set_new_num()
                         self.sprites.collision_set[self.num] = (0, 0)
                         self.v = 0

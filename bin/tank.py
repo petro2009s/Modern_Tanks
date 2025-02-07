@@ -130,11 +130,12 @@ class Tank:
         self.damage = Damage(self)
 
     def start(self):
+        # pygame
         pygame.display.set_icon(self.s.icon)
-
         pygame.event.set_grab(True)
 
         show = True
+        # все кнопки и текст
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                                  is_topleft=True)
@@ -204,6 +205,7 @@ class Tank:
         lock_rect = pygame.Rect(0, 0, self.s.WIDTH * 0.1 / 6, self.s.HEIGHT * 0.15 / 6)
         lock_rect.center = (self.s.thermal_x_d * 1.29, self.s.thermal_y_d_2 * 1.18)
         while show:
+            # проверка всего
             self.check_anim()
             self.check_smog()
             self.check_mission()
@@ -216,7 +218,7 @@ class Tank:
             self.timer()
             if self.menu:
                 show = False
-
+            # проверка наведения на кнопки
             optic_sight_button.check(pygame.mouse.get_pos())
             thermal_sight_button.check(pygame.mouse.get_pos())
             suo_button.check(pygame.mouse.get_pos())
@@ -225,8 +227,9 @@ class Tank:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-
+                # нажатие на кнопки
                 if event.type == pygame.USEREVENT:
+                    # оптический прицел
                     if event.button == optic_sight_button and (self.guide_mission_num >= 2 or self.num_level):
                         if self.guide_mission_num == 2:
                             self.is_guide_hint = True
@@ -240,7 +243,7 @@ class Tank:
                         self.thermal_d = True
                         if self.menu:
                             show = False
-
+                        # обновление дальности и неба
                         d = self.depth_m
                         depth_text1.set_another_text(d[0])
                         depth_text2.set_another_text(d[1])
@@ -249,7 +252,7 @@ class Tank:
                         ammo_text1.set_another_text(self.ammo_list_text[self.current_ammo][0])
                         ammo_text2.set_another_text(self.ammo_list_text[self.current_ammo][1])
                         self.set_sky()
-
+                    # тепловизор
                     elif event.button == thermal_sight_button and (self.guide_mission_num >= 4 or self.num_level):
                         if self.guide_mission_num == 4:
                             self.is_guide_hint = True
@@ -257,11 +260,12 @@ class Tank:
                         self.st = False
 
                         self.thermal_sight()
+
                         self.thermal_d = True
                         self.st = True
                         if self.menu:
                             show = False
-
+                        # обновление дальности и неба
                         d = self.depth_m
                         depth_text1.set_another_text(d[0])
                         depth_text2.set_another_text(d[1])
@@ -270,7 +274,7 @@ class Tank:
                         ammo_text1.set_another_text(self.ammo_list_text[self.current_ammo][0])
                         ammo_text2.set_another_text(self.ammo_list_text[self.current_ammo][1])
                         self.set_sky()
-
+                    # СУО
                     elif event.button == suo_button:
                         if self.num_level == 0:
                             if self.guide_mission_num == 1:
@@ -280,10 +284,13 @@ class Tank:
                             self.suo()
 
                 if event.type == pygame.KEYDOWN:
+                    # выход
                     if event.key == pygame.K_ESCAPE:
                         self.s.display.blit(self.s.gunner_site2, (0, 0))
                         self.exit()
+
                     if self.guide_mission_num >= 7:
+                        # замер дальности
                         if event.key == pygame.K_e and self.rangefinder_suo:
                             d = self.rangefinder()
                             depth_text1.set_another_text(d[0])
@@ -293,6 +300,7 @@ class Tank:
                         self.ammo(event, [ammo_text1, ammo_text2])
 
                     if self.guide_mission_num >= 3:
+                        # приближение
                         if event.key == pygame.K_z:
                             self.zoom = True if self.zoom is False else False
                             self.extra_zoom = False
@@ -304,27 +312,28 @@ class Tank:
                             self.set_sky()
 
                     if self.guide_mission_num >= 9:
+                        # перезарядка
                         if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
                                 self.ammo_list[self.current_ammo] > 0:
                             self.reload = True
                             self.block = True
                             self.current_ammo_in_gun = int(str(self.current_ammo)[:])
-
+                # проверка кнопок
                 optic_sight_button.handle_event(event)
                 thermal_sight_button.handle_event(event)
                 suo_button.handle_event(event)
-
+            # движение и наведение
             if self.guide_mission_num >= 3:
                 self.movement()
                 self.guidance()
-
+            # картинка места наводчика
             self.s.display.blit(self.s.gunner_site, (0, 0))
-
+            # отрисовка тепловизора на экране
             if self.thermal_on:
 
                 pygame.draw.rect(self.s.display, self.floor_thermal_color, floor)
                 pygame.draw.rect(self.s.display, self.sky_thermal_color, self.sky_thermal_d)
-
+                # отрисовка мира
                 if self.zoom:
                     self.ray_casting(
                         self.s.thermal_x_d * 1.008 + self.s.thermal_width_d / 2 - self.s.NUM_RAYS * self.s.SCALE_thermal_d / 2,
@@ -354,29 +363,29 @@ class Tank:
                                          not obj.death]
                     self.world(temp, self.s.thermal_sight_d,
                                (self.s.thermal_x_d * 1.01, self.s.thermal_y_d_2))
-
+                # анимации
                 self.shot(self.s.WIDTH // 2, self.s.HEIGHT // 2 * 0.85)
                 self.smog()
-
+                # отображение все информации на экране
                 if self.zoom or self.extra_zoom:
-
+                    # дальность
                     depth_text1.draw(self.s.display)
                     depth_text2.draw(self.s.display)
                     depth_text3.draw(self.s.display)
                     depth_text4.draw(self.s.display)
-
+                    # тип боеприпаса
                     ammo_text1.draw(self.s.display)
                     ammo_text2.draw(self.s.display)
-
+                    # выбранное орудие
                     weapon_text1.draw(self.s.display)
                     weapon_text2.draw(self.s.display)
                     weapon_text3.draw(self.s.display)
-
+                    # готовность орудия
                     if self.ready:
                         ready_text1.draw(self.s.display)
                         ready_text2.draw(self.s.display)
                         ready_text3.draw(self.s.display)
-
+                    # отображение захвата
                     if self.lock:
                         pygame.draw.rect(self.s.display, (0, 0, 0), lock_rect, int(self.s.WIDTH * 0.004 / 3.7))
 
@@ -386,7 +395,7 @@ class Tank:
             self.s.display.blit(self.s.gunner_site2, (0, 0))
 
             self.draw_minimap(self.x_minimap, self.y_minimap)
-
+            # обучение
             if not self.num_level:
                 if self.is_guide_hint:
                     self.hint(self.s.help_level_descr)
@@ -419,6 +428,7 @@ class Tank:
                     self.is_guide_hint = True
                 if self.guide_mission_num == 14:
                     self.is_guide_hint = True
+            # фпс
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text_bl.draw(self.s.display)
@@ -430,6 +440,7 @@ class Tank:
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
 
+    # обучение
     def hint(self, text_all):
         pygame.display.set_icon(self.s.icon)
 
@@ -478,6 +489,7 @@ class Tank:
         self.guide_mission_num += 1
         self.is_guide_hint = False
 
+    # отрисовка миникарты
     def draw_minimap(self, x, y):
         if self.minimap_displaying:
             self.s.map.draw(self.s.display, x, y, k=self.s.minimap_k)
@@ -516,6 +528,7 @@ class Tank:
                             y + self.pos(k=self.s.minimap_k)[1])
             self.s.display.blit(image, rect2)
 
+    # отрисовка минитанка
     def draw_tank(self, x, y):
         image = pygame.transform.rotate(self.s.minimap_tank_b_scope, -self.movement_angle)
         rect = image.get_rect()
@@ -529,9 +542,10 @@ class Tank:
                         y)
         self.s.display.blit(image, rect2)
 
+    # меню выхода
     def exit(self):
         pygame.display.set_icon(self.s.icon)
-
+        # все кнопки и текст
         exit_to_menu_button = Button(self.s.WIDTH * 0.33, self.s.HEIGHT * 0.51, self.s.WIDTH * 0.33,
                                      self.s.HEIGHT * 0.1, 'Выйти в меню', self.s.size_text_b,
                                      'resources/images/buttons/button_inact.png',
@@ -567,13 +581,13 @@ class Tank:
         else:
             task1 = self.s.task1_1
             task2 = self.s.task1_2
-        task_text_1 = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.3, (200, 200, 200),
+        task_text_1 = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.037, (200, 200, 200),
                            f'Боевая задача: {task1}',
                            int(self.s.WIDTH * 0.01), is_topleft=True)
-        task_text_2 = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.33, (200, 200, 200),
+        task_text_2 = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.067, (200, 200, 200),
                            f'{task2}',
                            int(self.s.WIDTH * 0.01), is_topleft=True)
-        destroyed_targets_text = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.36, (200, 200, 200),
+        destroyed_targets_text = Text(self.s.WIDTH * 0.03, self.s.HEIGHT * 0.097, (200, 200, 200),
                                       f'Уничтожено целей: {self.count_of_destroyed_targets} из {self.count_of_targets}.',
                                       int(self.s.WIDTH * 0.01), is_topleft=True)
 
@@ -585,18 +599,18 @@ class Tank:
         background_text.set_alpha(128)
         background_text.fill((37, 46, 37))
 
-        background_text2 = pygame.Surface((self.s.WIDTH * 0.29, self.s.HEIGHT * 0.2))
+        background_text2 = pygame.Surface((self.s.WIDTH * 0.5, self.s.HEIGHT * 0.2))
         background_text2.set_alpha(128)
         background_text2.fill((37, 46, 37))
 
         self.s.display.blit(background, (0, 0))
-        self.s.display.blit(background_text2, (self.s.WIDTH * 0.02, self.s.HEIGHT * 0.28))
+        self.s.display.blit(background_text2, (self.s.WIDTH * 0.02, self.s.HEIGHT * 0.02))
         self.s.display.blit(background_text, (self.s.WIDTH * 0.68, self.s.HEIGHT * 0.28))
 
         show = True
         pygame.mouse.set_visible(True)
         while show:
-
+            # проверка наведения на кнопки
             continue_button.check(pygame.mouse.get_pos())
             exit_to_menu_button.check(pygame.mouse.get_pos())
             quit_button.check(pygame.mouse.get_pos())
@@ -605,7 +619,7 @@ class Tank:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-
+                # нажатие на кнопки
                 if event.type == pygame.USEREVENT:
                     if event.button == continue_button:
                         show = False
@@ -654,9 +668,11 @@ class Tank:
             self.s.clock.tick(self.s.FPS)
         pygame.mouse.set_visible(False)
 
+    # движение
     def movement(self):
+        # нажатая кнопка
         keys = pygame.key.get_pressed()
-
+        # время
         t = 1 / self.s.FPS
 
         cos_a = math.cos(self.movement_angle * 3.14 / 180)
@@ -664,7 +680,7 @@ class Tank:
 
         a_cur = 0
         v = 0
-
+        # текущее ускорение
         if keys[pygame.K_w]:
             if self.guide_mission_num == 3 and not self.is_guide_button_mission3_pressed[0]:
                 self.is_guide_button_mission3_pressed[0] = True
@@ -676,7 +692,7 @@ class Tank:
                 self.is_guide_button_mission3_pressed[0] = True
             v = max(min(self.v + self.s.a_s * t, self.s.max_speed_w), self.s.max_speed_s)
             a_cur = self.s.a_s
-
+        # остановка
         else:
             if self.v > 0:
                 v = max(self.v - self.s.a_stop * t, 0)
@@ -684,13 +700,13 @@ class Tank:
             elif self.v < 0:
                 v = min(self.v + self.s.a_stop * t, 0)
                 a_cur = self.s.a_stop
-
+        # перемещение
         s = (self.v * t + (a_cur * (t ** 2)) / 2)
         self.sq = s
-
+        # изменение координат
         dx = s * sin_a
         dy = s * cos_a
-
+        # коллизии
         if dx != 0 or dy != 0:
             self.collisions(dx, dy)
 
@@ -701,7 +717,7 @@ class Tank:
             self.x += dx
 
         self.v = v
-
+        # поворот
         if self.v > self.s.min_speed_ad or self.v < 0:
             if keys[pygame.K_d]:
                 temp = min(self.v * 0.008, 7)
@@ -719,14 +735,15 @@ class Tank:
                 if self.stab is False:
                     self.angle_of_view -= temp
 
+    # наведение
     def guidance(self):
         keys = pygame.key.get_pressed()
-
+        # время
         t = 1 / self.s.FPS
-
+        # сбитие захвата
         if int(((self.x - self.lock_x) ** 2 + (self.y - self.lock_y) ** 2) ** 0.5) > float(self.depth) * 1.006:
             self.lock = False
-
+        # захват цели
         if self.lock:
             if (self.x - self.lock_x > 0 and self.y - self.lock_y > 0) or (
                     self.x - self.lock_x > 0 and self.y - self.lock_y < 0):
@@ -734,7 +751,7 @@ class Tank:
 
             else:
                 self.angle_of_view = self.lock_f(self.lock_x, self.lock_y) * 180 / 3.14
-
+        # наведение по кнопкам
         if not self.st:
             if keys[pygame.K_RIGHT] and not self.lock:
                 self.angle_of_view += self.s.tower_v * t
@@ -761,6 +778,7 @@ class Tank:
                     self.set_sky()
 
             else:
+                # наведение мышью
                 if pygame.mouse.get_focused() and not self.lock:
                     dif_x = pygame.mouse.get_pos()[0] - self.s.WIDTH // 2
                     dif_y = pygame.mouse.get_pos()[1] - self.s.HEIGHT // 2
@@ -777,7 +795,7 @@ class Tank:
                         self.set_sky()
                         pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
                         self.angle_of_view += dif_x * self.s.tower_v * t / (self.s.WIDTH * 0.07)
-
+            # тряска
             if self.type == 0:
                 self.horizontal = self.tryaska
                 self.thermal_horizontal = self.tryaska
@@ -830,6 +848,7 @@ class Tank:
 
                 self.set_sky()
             self.angle_of_view %= 360
+            # обучение
             if self.angle_of_view != 0 and self.guide_mission_num == 3 and not self.is_guide_button_mission3_pressed[1]:
                 self.is_guide_button_mission3_pressed[1] = True
 
@@ -837,6 +856,7 @@ class Tank:
                     self.is_guide_button_mission3_pressed[2]:
                 self.is_guide_button_mission3_pressed[2] = True
 
+    # выбор боеприпасов
     def ammo(self, event, text):
         if event.key == pygame.K_1:
             self.current_ammo = 0
@@ -854,6 +874,7 @@ class Tank:
         else:
             text[0].set_another_text(self.ammo_list_text[self.current_ammo])
 
+    # СУО
     def suo(self):
         self.stab = True if self.stab is False else False
         self.rangefinder_suo = True if self.rangefinder_suo is False else False
@@ -862,6 +883,7 @@ class Tank:
         self.thermal_d = True if self.thermal_d is False else False
         self.lock = False
 
+    # счетчик времени и анимаций
     def timer(self):
         if self.shot_timer >= self.shot_time:
             self.is_shot = False
@@ -904,27 +926,38 @@ class Tank:
         if self.is_explosion:
             self.explosion_timer += 1 / self.s.FPS
 
+    # нахождение на карте
     def mapping(self, a, b):
         return (a // self.s.tile_w) * self.s.tile_w, (b // self.s.tile_h) * self.s.tile_h
 
     def mapping_in_map(self, a, b):
         return (a // self.s.tile_w), (b // self.s.tile_h)
 
+    # ray casting
     def ray_casting(self, dr_x=0, dr_y=0, sight_type='1'):
+        # комментарии будут расписаны только для первого типа прицела
+        # список с отображаемыми объектами
         self.walls = []
+        # оптический прицел
         if sight_type == '1':
+            # координаты
             x0, y0 = self.x, self.y
             xm, ym = self.mapping(x0, y0)
+            # текущий угол
             cur_angle = self.angle_of_view - self.s.HALF_FOV_optic + 0.00001
+            # отображение каждого луча
             for i in range(self.s.NUM_RAYS):
+                # синус и косинус текущего угла
                 sin_a = math.sin(cur_angle * 3.14 / 180)
                 cos_a = math.cos(cur_angle * 3.14 / 180)
+                # проверка направления
                 if cos_a >= 0:
                     x = xm + self.s.tile_w
                     dx = 1
                 else:
                     x = xm
                     dx = -1
+                # высчитывание дальности до объекта по y
                 for j in range(0, self.s.map_width, self.s.tile_w):
                     depth_v = (x - x0) / cos_a
                     yv = y0 + depth_v * sin_a
@@ -938,13 +971,14 @@ class Tank:
                         texture_v = None
                         break
                     x += dx * self.s.tile_w
-
+                # проверка направления
                 if sin_a >= 0:
                     y = ym + self.s.tile_h
                     dy = 1
                 else:
                     y = ym
                     dy = -1
+                # высчитывание дальности до объекта по х
                 for j in range(0, self.s.map_height, self.s.tile_h):
                     depth_h = (y - y0) / sin_a
                     xh = x0 + depth_h * cos_a
@@ -957,10 +991,13 @@ class Tank:
                         texture_h = None
                         break
                     y += dy * self.s.tile_h
+                # текущая дальность, смещение текстуры и текстура
                 depth, offset, texture = (depth_v, yv, texture_v) if depth_v < depth_h else (depth_h, xh, texture_h)
                 offset = round(offset) % self.s.tile_w
                 depth *= math.cos((self.angle_of_view - cur_angle) * 3.14 / 180)
+                # проекционная высота
                 proj_height = min(int(self.s.PROJ_COEFF_optic / depth), 5 * self.s.HEIGHT)
+                # текущая часть текстуры
                 if self.s.texture_scale + offset * self.s.texture_scale > self.s.texture_w:
                     wall_column = self.s.textures[texture].subsurface(offset * self.s.texture_scale, 0,
                                                                       self.s.texture_w - offset * self.s.texture_scale,
@@ -969,35 +1006,29 @@ class Tank:
                     wall_column = self.s.textures[texture].subsurface(offset * self.s.texture_scale, 0,
                                                                       self.s.texture_scale, self.s.texture_h)
                 wall_column = pygame.transform.scale(wall_column, (self.s.SCALE_optic, proj_height))
+                # высокая текстура
                 if int(texture) % 2 == 0:
-                    # self.s.display.blit(wall_column,
-                    #                     (dr_x + i * self.s.SCALE_optic,
-                    #                      self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2))
-                    # self.s.display.blit(wall_column,
-                    #                     (dr_x + i * self.s.SCALE_optic,
-                    #                      self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2 - proj_height))
                     pos1 = (dr_x + i * self.s.SCALE_optic,
                             self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2)
                     pos2 = (dr_x + i * self.s.SCALE_optic,
                             self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2 - proj_height)
                     self.walls.append((depth, wall_column, pos1))
                     self.walls.append((depth, wall_column, pos2))
+                # обычная
                 else:
-                    # self.s.display.blit(wall_column,
-                    #                     (dr_x + i * self.s.SCALE_optic,
-                    #                      self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2))
                     pos1 = (dr_x + i * self.s.SCALE_optic,
                             self.horizontal + dr_y + self.s.HEIGHT // 2 - proj_height // 2)
                     self.walls.append((depth, wall_column, pos1))
+                # текущая дальность и проекционная высота по центральному лучу
                 if int(cur_angle) == int(self.angle_of_view):
                     self.depth = str(depth)
                     if int(texture) % 2 == 0:
                         self.proj_height = 1.5 * proj_height
                     else:
                         self.proj_height = proj_height / 2
+                # обновление угла
                 cur_angle += self.s.DELTA_ANGLE_optic
-            # self.s.display.blit(self.s.optic_sight, (dr_x, dr_y))
-
+        # оптический прицел с приближением
         elif sight_type == '2':
             x0, y0 = self.x, self.y
             xm, ym = self.mapping(x0, y0)
@@ -1087,7 +1118,7 @@ class Tank:
                         self.proj_height = proj_height / 2
                 cur_angle += self.s.DELTA_ANGLE_optic_zoom
             # self.s.display.blit(self.s.optic_sight_zoom, (dr_x, dr_y))
-
+        # тепловизионный прицел
         elif sight_type == '3':
             x0, y0 = self.x, self.y
             xm, ym = self.mapping(x0, y0)
@@ -1173,7 +1204,7 @@ class Tank:
                         self.proj_height = proj_height / 2
                 cur_angle += self.s.DELTA_ANGLE_thermal
             # self.s.display.blit(self.s.thermal_sight, (dr_x, dr_y))
-
+        # тепловизионный прицел с приближением
         elif sight_type == '4':
             x0, y0 = self.x, self.y
             xm, ym = self.mapping(x0, y0)
@@ -1259,7 +1290,7 @@ class Tank:
                         self.proj_height = proj_height / 2
                 cur_angle += self.s.DELTA_ANGLE_thermal_zoom
             # self.s.display.blit(self.s.thermal_sight_zoom, (dr_x, dr_y))
-
+        # тепловизионный прицел с сверхприближением
         elif sight_type == '4.5':
             x0, y0 = self.x, self.y
             xm, ym = self.mapping(x0, y0)
@@ -1345,7 +1376,7 @@ class Tank:
                         self.proj_height = proj_height / 2
                 cur_angle += self.s.DELTA_ANGLE_thermal_zoom_extra
             # self.s.display.blit(self.s.thermal_sight_zoom, (dr_x, dr_y))
-
+        # тепловизионный прицел на месте наводчика
         elif sight_type == '3d':
             x0, y0 = self.x, self.y
             xm, ym = self.mapping(x0, y0)
@@ -1431,7 +1462,7 @@ class Tank:
                         self.proj_height = proj_height / 2
                 cur_angle += self.s.DELTA_ANGLE_thermal
             # self.s.display.blit(self.s.thermal_sight_d, (self.s.thermal_x_d * 1.01, self.s.thermal_y_d_2))
-
+        # тепловизионный прицел с сверхприближением на месте наводчика
         elif sight_type == '4.5d':
             x0, y0 = self.x, self.y
             xm, ym = self.mapping(x0, y0)
@@ -1517,7 +1548,7 @@ class Tank:
                         self.proj_height = proj_height / 2
                 cur_angle += self.s.DELTA_ANGLE_thermal_zoom_extra
             # self.s.display.blit(self.s.thermal_sight_zoom_d, (self.s.thermal_x_d, self.s.thermal_y_d_2))
-
+        # тепловизионный прицел с приближением на месте наводчика
         elif sight_type == '4d':
             x0, y0 = self.x, self.y
             xm, ym = self.mapping(x0, y0)
@@ -1604,13 +1635,13 @@ class Tank:
                 cur_angle += self.s.DELTA_ANGLE_thermal_zoom
             # self.s.display.blit(self.s.thermal_sight_zoom_d, (self.s.thermal_x_d, self.s.thermal_y_d_2))
 
+    # оптический прицел
     def optic_sight(self):
         show = True
 
         pygame.event.set_grab(True)
-
         pygame.display.set_icon(self.s.icon)
-
+        # все кнопки и текст
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                                  is_topleft=True)
@@ -1641,7 +1672,7 @@ class Tank:
 
         pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
         while show:
-
+            # проверка всего
             self.check_anim()
             self.check_smog()
             self.check_mission()
@@ -1665,12 +1696,14 @@ class Tank:
                     sys.exit()
 
                 if event.type == pygame.KEYDOWN:
+                    # выход
                     if event.key == pygame.K_ESCAPE:
                         show = False
                     if self.guide_mission_num >= 7:
+                        # дальномер
                         if event.key == pygame.K_e and self.rangefinder_suo:
                             depth_text.set_another_text(self.rangefinder())
-
+                        # захват цели
                         if event.key == pygame.K_q and self.lock_on:
                             if self.is_sprite_depth:
                                 self.true_depth = min(float(self.depth), float(self.depth_sprite))
@@ -1680,14 +1713,16 @@ class Tank:
                             self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
                             self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
                             self.lock = True if self.lock is False else False
-
+                        # выбор боеприпасов
                         self.ammo(event, [ammo_text])
                     if self.guide_mission_num >= 3:
+                        # приближение
                         if event.key == pygame.K_z:
                             self.zoom = True if self.zoom is False else False
                             self.set_sky()
 
                     if self.guide_mission_num >= 9:
+                        # перезарядка
                         if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
                                 self.ammo_list[self.current_ammo] > 0:
                             self.s.reload_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
@@ -1698,6 +1733,7 @@ class Tank:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.guide_mission_num >= 8:
+                        # выстрел
                         if event.button == pygame.BUTTON_LEFT:
                             if self.ready:
                                 self.ammo_list[self.current_ammo_in_gun] -= 1
@@ -1721,6 +1757,7 @@ class Tank:
                                 self.s.shoot_sound.play()
 
                     if self.guide_mission_num >= 7:
+                        # захват цели
                         if event.button == pygame.BUTTON_RIGHT and self.lock_on:
                             if self.is_sprite_depth:
                                 self.true_depth = min(float(self.depth), float(self.depth_sprite))
@@ -1731,10 +1768,13 @@ class Tank:
                             self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
                             self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
                             self.lock = True if self.lock is False else False
-
+            # движение и наведение
             self.movement()
             self.guidance()
+            self.is_sprite_depth = False
+            # небо
             pygame.draw.rect(self.s.display, (135, 206, 235), self.sky)
+            # отрисовка мира
             if not self.zoom:
                 self.ray_casting(self.s.WIDTH // 2 - self.s.NUM_RAYS * self.s.SCALE_optic // 2, 0, sight_type='1')
                 temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects if not obj.death]
@@ -1745,22 +1785,27 @@ class Tank:
                 temp = self.walls + [obj.object_locate(self) for obj in self.s.sprites.list_of_objects if not obj.death]
                 self.world(temp, self.s.optic_sight_zoom,
                            (self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0))
+            # проверка анимаций
             self.shot(self.s.WIDTH // 2, self.s.HEIGHT // 2)
             self.smog()
+
             pygame.draw.rect(self.s.display, (0, 0, 0), black)
             pygame.draw.rect(self.s.display, (0, 0, 0), black2)
+            # прицельные сетки
             if self.zoom:
                 self.s.display.blit(self.s.optic_sight_zoom, (self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0))
             else:
                 self.s.display.blit(self.s.optic_sight, (self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0))
+            # отрисовка миникарты
             self.draw_minimap(self.x_minimap, self.y_minimap)
+            # отрисовка фпс
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text_bl.draw(self.s.display)
             fps_count_text.draw(self.s.display)
-
+            # отрисовка танка
             self.draw_tank(self.s.WIDTH * 0.85, self.s.HEIGHT // 2)
-
+            # отрисовка информации на экране
             depth_text.draw(self.s.display)
             ammo_text.draw(self.s.display)
 
@@ -1770,6 +1815,7 @@ class Tank:
             if self.lock:
                 pygame.draw.circle(self.s.display, (255, 0, 0), (self.s.WIDTH * 0.55, self.s.HEIGHT * 0.933),
                                    self.s.WIDTH * 0.006)
+
             if self.guide_mission_num == 3 and False not in self.is_guide_button_mission3_pressed:
                 self.is_guide_hint = True
 
@@ -1784,14 +1830,12 @@ class Tank:
             self.s.clock.tick(self.s.FPS)
         self.optic = False
 
+    # проверка боевой задачи
     def check_is_done(self):
         if self.count_of_destroyed_targets >= self.count_of_targets:
             self.done = 'выполнена'
-        if self.num_level == 1:
-            print(len(self.s.sprites.list_of_objects_thermal), int(float(self.count_of_destroyed_targets)))
-            if self.done == 'не выполнена' and len(self.s.sprites.list_of_objects_thermal) == 13 + int(float(self.count_of_destroyed_targets)):
-                self.done = 'не выполнена, колонна уехала'
 
+    # проверка уровня
     def check_mission(self):
 
         pygame.event.set_grab(True)
@@ -1802,7 +1846,7 @@ class Tank:
                 self.s.background_sound.stop()
                 self.s.win_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
                 self.s.win_sound.play()
-
+                # весь текст и кнопки
                 end_text_bl = Text(self.s.WIDTH * 0.5028, self.s.HEIGHT * 0.1052, (0, 0, 0), 'Миссия выполнена!',
                                    int(self.s.WIDTH * 0.052))
                 end_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.1, (200, 200, 200), 'Миссия выполнена!',
@@ -1858,7 +1902,7 @@ class Tank:
                 show = True
 
                 while show:
-
+                    # проверка наведения на кнопки
                     exit_to_menu_button.check(pygame.mouse.get_pos())
                     quit_button.check(pygame.mouse.get_pos())
 
@@ -1866,7 +1910,7 @@ class Tank:
                         if event.type == pygame.QUIT:
                             pygame.quit()
                             sys.exit()
-
+                        # нажатие на кнопки
                         if event.type == pygame.USEREVENT:
                             if event.button == quit_button:
                                 pygame.quit()
@@ -1890,10 +1934,10 @@ class Tank:
                                 self.s.shoot_sound.stop()
                                 self.menu = True
                                 show = False
-
+                        # проверка кнопок
                         exit_to_menu_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
                         quit_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
-
+                    # отрисовка всего
                     self.s.display.blit(img, (0, 0))
                     self.s.display.blit(background, (self.s.WIDTH * 0.026, self.s.HEIGHT * 0.24))
 
@@ -1922,7 +1966,7 @@ class Tank:
 
                     pygame.display.flip()
                     self.s.clock.tick(self.s.FPS)
-
+        # колонна уехала
         elif self.done == 'не выполнена, колонна уехала':
             pygame.display.set_icon(self.s.icon)
             self.s.background_sound.stop()
@@ -2047,6 +2091,7 @@ class Tank:
                 pygame.display.flip()
                 self.s.clock.tick(self.s.FPS)
 
+    # анимация выстрела
     def shot(self, x, y):
         if self.shot_anim:
             shot_frames_delta = self.s.shot_he_frames_delta if self.current_shooted_ammo_for_tank == 1 else self.s.shot_frames_delta
@@ -2074,6 +2119,7 @@ class Tank:
                 self.s.display.blit(frame, rect)
             self.shot_anim_counter += 1
 
+    # анимация дыма
     def smog(self):
         if self.smog_anim:
             if self.smog_anim_counter % self.s.shot_smog_frames_delta == 0:
@@ -2103,6 +2149,7 @@ class Tank:
                 self.s.display.blit(frame, (x, y))
             self.smog_anim_counter += 1
 
+    # проверка анимаций
     def check_anim(self):
         shot_frames = self.s.shot_he_frames if self.current_shooted_ammo_for_tank == 1 else self.s.shot_frames
 
@@ -2110,18 +2157,19 @@ class Tank:
             self.shot_anim = False
             self.shot_anim_counter = 0
 
+    # проверка анимации дыма
     def check_smog(self):
         if self.smog_anim_counter > self.s.shot_smog_frames:
             self.smog_anim = False
             self.smog_anim_counter = 0
 
+    # тепловизионный прицел
     def thermal_sight(self):
         show = True
 
         pygame.event.set_grab(True)
-
         pygame.display.set_icon(self.s.icon)
-
+        # весь текст и кнопки
         fps_count_text_bl = Text(self.s.WIDTH * 0.961, self.s.HEIGHT * 0.972, (0, 0, 0),
                                  str(int(self.s.clock.get_fps())) + ' FPS', int(self.s.WIDTH * 0.0104),
                                  is_topleft=True)
@@ -2210,7 +2258,7 @@ class Tank:
         pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
 
         while show:
-
+            # проверка всего
             self.check_anim()
             self.check_smog()
             self.check_mission()
@@ -2239,18 +2287,19 @@ class Tank:
                     sys.exit()
 
                 if event.type == pygame.KEYDOWN:
+                    # выход
                     if event.key == pygame.K_ESCAPE:
                         show = False
                     if self.guide_mission_num >= 7:
                         self.ammo(event, [ammo_text1, ammo_text2])
-
+                        # замер дальности
                         if event.key == pygame.K_e and self.rangefinder_suo:
                             d = self.rangefinder()
                             depth_text1.set_another_text(d[0])
                             depth_text2.set_another_text(d[1])
                             depth_text3.set_another_text(d[2])
                             depth_text4.set_another_text(d[3])
-
+                        # захват цели
                         if event.key == pygame.K_q and self.lock_on:
                             if self.is_sprite_depth:
                                 self.true_depth = min(float(self.depth), float(self.depth_sprite))
@@ -2261,6 +2310,7 @@ class Tank:
                             self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
                             self.lock = True if self.lock is False else False
                     if self.guide_mission_num >= 3:
+                        # приближение
                         if event.key == pygame.K_z:
                             self.zoom = True if self.zoom is False else False
                             self.extra_zoom = False
@@ -2274,6 +2324,7 @@ class Tank:
                             self.set_sky()
 
                     if self.guide_mission_num >= 9:
+                        # перезарядка
                         if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
                                 self.ammo_list[self.current_ammo] > 0:
                             self.reload = True
@@ -2284,6 +2335,7 @@ class Tank:
                             self.s.reload_sound.play()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    # выстрел
                     if event.button == pygame.BUTTON_LEFT:
                         if self.ready:
                             self.ammo_list[self.current_ammo_in_gun] -= 1
@@ -2305,7 +2357,7 @@ class Tank:
 
                             self.s.shoot_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
                             self.s.shoot_sound.play()
-
+                    # захват цели
                     if event.button == pygame.BUTTON_RIGHT and self.lock_on:
                         if self.is_sprite_depth:
                             self.true_depth = min(float(self.depth), float(self.depth_sprite))
@@ -2316,12 +2368,13 @@ class Tank:
                         self.lock_x = self.x + self.true_depth * math.cos(self.angle_of_view * 3.14 / 180)
                         self.lock_y = self.y + self.true_depth * math.sin(self.angle_of_view * 3.14 / 180)
                         self.lock = True if self.lock is False else False
-
+            # движение и наведение
             self.movement()
             self.guidance()
             self.is_sprite_depth = False
-
+            # отрисовки тепловизора
             if self.thermal_on:
+                # отрисовка мира
                 if self.zoom:
                     self.ray_casting((self.s.WIDTH - self.s.NUM_RAYS * self.s.SCALE_thermal) // 2,
                                      self.s.thermal_y, sight_type='4')
@@ -2351,24 +2404,29 @@ class Tank:
                     self.world(temp, self.s.thermal_sight,
                                (self.s.thermal_x + (self.s.WIDTH - self.s.thermal_base_width) // 2,
                                 self.s.thermal_y))
-
+                # анимации
                 self.shot(self.s.WIDTH // 2, self.s.HEIGHT // 2 * 0.85)
                 self.smog()
-
+                # отрисовка информации на экране
                 if self.zoom or self.extra_zoom:
+                    # дальность
                     depth_text1.draw(self.s.display)
                     depth_text2.draw(self.s.display)
                     depth_text3.draw(self.s.display)
                     depth_text4.draw(self.s.display)
+                    # тип боеприпаса
                     ammo_text1.draw(self.s.display)
                     ammo_text2.draw(self.s.display)
+                    # тип орудия
                     weapon_text1.draw(self.s.display)
                     weapon_text2.draw(self.s.display)
                     weapon_text3.draw(self.s.display)
+                    # готовность орудия
                     if self.ready:
                         ready_text1.draw(self.s.display)
                         ready_text2.draw(self.s.display)
                         ready_text3.draw(self.s.display)
+                    # захват
                     if self.lock:
                         pygame.draw.rect(self.s.display, (0, 0, 0), lock_rect, int(self.s.WIDTH * 0.004))
                 else:
@@ -2376,16 +2434,18 @@ class Tank:
 
             pygame.draw.rect(self.s.display, (150, 150, 150), z)
             pygame.draw.rect(self.s.display, (150, 150, 150), v)
+            # отрисовки картинки экрана
             self.s.display.blit(self.s.thermal_image, ((self.s.WIDTH - self.s.thermal_base_width) // 2, 0))
-
+            # отрисовка миникарты
             self.draw_minimap(self.x_minimap, self.y_minimap)
-
+            # фпс
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text_bl.draw(self.s.display)
             fps_count_text.draw(self.s.display)
-
+            # отрисовка минитанка
             self.draw_tank(self.s.WIDTH * 0.9, self.s.HEIGHT // 2)
+            # обучение
             if self.guide_mission_num == 5:
                 self.is_guide_hint = True
 
@@ -2409,6 +2469,7 @@ class Tank:
             self.s.clock.tick(self.s.FPS)
         self.thermal = False
 
+    # дальномер
     def rangefinder(self):
         k = self.now_k()
         horizontal = self.now_horizontal()
@@ -2428,6 +2489,7 @@ class Tank:
             self.depth_m = depth[:]
         return depth
 
+    # захват цели
     def lock_f(self, x, y):
         dx = self.x - x
         dy = self.y - y
@@ -2437,10 +2499,12 @@ class Tank:
         else:
             return 3.14 / 2
 
+    # проверка на нахождение в стенах и спрайтах
     def check_wall(self, x, y):
         all_map = self.s.map.world_map | set(self.s.sprites.collision_set.values())
         return (int(x), int(y)) in all_map
 
+    # коллизии
     def collisions(self, dx, dy):
         self.stuck = False
 
@@ -2450,7 +2514,7 @@ class Tank:
         tx = 0
         if dx != 0:
             tx = self.side // 2 * abs(dx) / dx
-
+        # проверка по х
         if self.check_wall((self.x + tx + dx) // self.s.tile_w, (self.y) // self.s.tile_h):
             if tx > 0:
                 temp = ((self.x + tx + dx) // self.s.tile_w) * self.s.tile_w
@@ -2458,7 +2522,7 @@ class Tank:
                 temp = ((self.x + tx + dx) // self.s.tile_w + 1) * self.s.tile_w
             self.x = temp - tx
             self.stuck = True
-
+        # проверка по y
         if self.check_wall(self.x // self.s.tile_w, (self.y - dy - ty) // self.s.tile_h):
             if ty > 0:
                 temp = ((self.y - dy - ty) // self.s.tile_h + 1) * self.s.tile_h
@@ -2466,15 +2530,17 @@ class Tank:
                 temp = ((self.y - dy - ty) // self.s.tile_h) * self.s.tile_h
             self.y = temp + ty
             self.stuck = True
-
+        # нет столкновений
         if not self.check_wall((self.x + tx + dx) // self.s.tile_w, (self.y - ty - dy) // self.s.tile_h):
             self.y -= dy
             self.x += dx
             self.stuck = False
 
+    # позиция на миникарте
     def pos(self, k=1):
         return (self.x // k, self.y // k)
 
+    # отрисовка мира
     def world(self, walls, mark, mark_pos):
         for i in sorted(walls, key=lambda x: x[0], reverse=True):
             if i[0]:
@@ -2483,6 +2549,7 @@ class Tank:
                 self.s.display.blit(obj, pos)
         self.s.display.blit(mark, mark_pos)
 
+    # проверка движения спрайтов
     def movement_check(self):
         if self.num_level == 0:
             for i in self.s.sprites.list_of_objects:
@@ -2511,6 +2578,7 @@ class Tank:
                 if i.type == 'mrap':
                     i.y_movement(self)
 
+    # окно смерти
     def check_death(self):
 
         pygame.event.set_grab(True)
@@ -2523,7 +2591,7 @@ class Tank:
 
             self.s.explode_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
             self.s.explode_sound.play()
-
+            # весь текст и кнопки
             death_text_bl = Text(self.s.WIDTH * 0.5028, self.s.HEIGHT * 0.1052, (0, 0, 0), 'Вас уничтожили!',
                                  int(self.s.WIDTH * 0.052))
             death_text = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.1, (200, 200, 200), 'Вас уничтожили!',
@@ -2584,7 +2652,7 @@ class Tank:
             show = True
 
             while show:
-
+                # проверка наведения на кнопки
                 exit_to_menu_button.check(pygame.mouse.get_pos())
                 quit_button.check(pygame.mouse.get_pos())
 
@@ -2592,7 +2660,7 @@ class Tank:
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         sys.exit()
-
+                    # нажатие на кнопки
                     if event.type == pygame.USEREVENT:
                         if event.button == quit_button:
                             pygame.quit()
@@ -2616,10 +2684,10 @@ class Tank:
                             self.s.shoot_sound.stop()
                             self.menu = True
                             show = False
-
+                    # проверка кнопок
                     exit_to_menu_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
                     quit_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
-
+                # отрисовка всего
                 self.s.display.blit(self.s.destroyed_image, (0, 0))
                 self.s.display.blit(background, (self.s.WIDTH * 0.026, self.s.HEIGHT * 0.16))
 
@@ -2652,6 +2720,7 @@ class Tank:
                 pygame.display.flip()
                 self.s.clock.tick(self.s.FPS)
 
+    # текущая горизонталь
     def now_horizontal(self):
         if self.zoom:
             if self.thermal:
@@ -2678,6 +2747,7 @@ class Tank:
             elif self.thermal_d:
                 return 1 * self.thermal_horizontal_d
 
+    # текущий коэффициент приближения
     def now_k(self):
         if self.zoom:
             if self.thermal:
@@ -2704,6 +2774,7 @@ class Tank:
             elif self.thermal_d:
                 return 0.85
 
+    # текущий проекционный коэффициент
     def now_proj_coef(self):
         if self.zoom:
             if self.thermal:
@@ -2732,6 +2803,7 @@ class Tank:
             elif self.thermal_d:
                 return self.s.PROJ_COEFF_thermal_d
 
+    # установка неба
     def set_sky(self):
         if self.zoom:
             self.sky = pygame.Rect(self.s.WIDTH // 2 - self.s.HEIGHT // 2, 0, self.s.HEIGHT,

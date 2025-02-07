@@ -11,21 +11,24 @@ from bin.tank import Tank
 class Game:
     def __init__(self):
         pygame.init()
+        # инициализация настроек
         self.s = Settings()
+        # параметры pygame'а
         pygame.display.set_caption('World of Modern Tanks')
         pygame.display.set_icon(self.s.icon)
         pygame.mouse.set_visible(False)
+        # музыка
         self.s.music_menu.play(-1)
         self.s.music_menu.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
-
+    # начальное окно
     def start_game(self, apply_sett=""):
         pygame.display.set_icon(self.s.icon)
+
         if apply_sett:
             self.settings_menu()
+
         show = True
-
-        # menu_im = self.s.menu_list[random.randint(0, 4)]
-
+        # весь текст и кнопки
         header_bl = Text(self.s.WIDTH * 0.5028, self.s.HEIGHT * 0.1052, (0, 0, 0), 'World of Modern Tanks',
                          int(self.s.WIDTH * 0.052))
         header = Text(self.s.WIDTH * 0.5, self.s.HEIGHT * 0.1, (200, 200, 200), 'World of Modern Tanks',
@@ -55,33 +58,32 @@ class Game:
         pygame.event.set_grab(True)
 
         while show:
-
+            # проверка наведение на кнопки
             quit_button.check(pygame.mouse.get_pos())
             settings_button.check(pygame.mouse.get_pos())
             play_button.check(pygame.mouse.get_pos())
 
             for event in pygame.event.get():
+                # выход
                 if event.type == pygame.QUIT:
-                    # self.s.update_db()
                     pygame.quit()
                     sys.exit()
-
+                # проверка нажатия на кнопки
                 if event.type == pygame.USEREVENT:
                     if event.button == quit_button:
-                        # self.s.update_db()
                         pygame.quit()
                         sys.exit()
                     if event.button == settings_button:
                         self.settings_menu()
                     if event.button == play_button:
                         self.game_menu()
-
+                # проверка кнопок
                 play_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
                 settings_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
                 quit_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
-
-            # self.s.display.blit(menu_im, (0, 0))
+            # отрисовка всего
             self.s.gif.render(self.s.display, (0, 0))
+
             play_button.draw(self.s.display)
             quit_button.draw(self.s.display)
             settings_button.draw(self.s.display)
@@ -98,10 +100,12 @@ class Game:
                 self.s.display.blit(self.s.cursor, pygame.mouse.get_pos())
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
-
+    # меню настроек
     def settings_menu(self):
         pygame.display.set_icon(self.s.icon)
+
         sett = True
+        # весь текст и кнопки
         menu_im = self.s.menu_list[random.randint(0, 4)]
 
         full_dict_temp = self.s.full_dict.copy()
@@ -297,6 +301,7 @@ class Game:
         pygame.event.set_grab(True)
 
         while sett:
+            # проверка наведения
             back_button.check(pygame.mouse.get_pos())
 
             for i in range(3):
@@ -335,7 +340,7 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         sett = False
-
+                # проверка нажатия на кнопки
                 if event.type == pygame.USEREVENT:
                     if event.button == back_button:
                         sett = False
@@ -476,7 +481,7 @@ class Game:
                         sett = False
                         self.s.update_size()
                         self.start_game("apply_set")
-
+                # проверка кнопок
                 back_button.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
 
                 for i in gr_list:
@@ -493,7 +498,7 @@ class Game:
 
                 for i in button_list:
                     i.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
-
+            # отрисовка всего
             self.s.display.blit(menu_im, (0, 0))
             fps_count_text_bl.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
             fps_count_text.set_another_text(str(int(self.s.clock.get_fps())) + ' FPS')
@@ -507,7 +512,7 @@ class Game:
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
         self.s.update_db()
-
+    # игровое меню
     def game_menu(self):
         pygame.display.set_icon(self.s.icon)
         gm = True
@@ -518,7 +523,7 @@ class Game:
         MAX_AMMO = 22 - 3
         CURRENT_AMMO = 3
         AMMO = 22
-
+        # весь текст и кнопки
         menu_im = self.s.menu_list[random.randint(0, 4)]
 
         header_bl = Text(self.s.WIDTH * 0.502, self.s.HEIGHT * 0.053, (0, 0, 0), 'Игра', int(self.s.WIDTH * 0.03125))
@@ -665,6 +670,7 @@ class Game:
             k4 += 0.0167
             guide_list.append(temp)
 
+        k4 = 0.43
         mission1_list = []
         for i in self.s.mission1_descr:
             temp = Text(round(self.s.WIDTH // 2 * 0.9), round(self.s.HEIGHT * k4), (200, 200, 200), i,
@@ -672,7 +678,7 @@ class Game:
                         is_topleft=True)
             k4 += 0.0167
             mission1_list.append(temp)
-
+        k4 = 0.43
         mission2_list = []
         for i in self.s.mission2_descr:
             temp = Text(round(self.s.WIDTH // 2 * 0.9), round(self.s.HEIGHT * k4), (200, 200, 200), i,
@@ -706,7 +712,7 @@ class Game:
 
         pygame.event.set_grab(True)
         while gm:
-
+            # проверка наведения на кнопки
             apfsds_txt.is_cl = True
             he_txt.is_cl = True
             heat_txt.is_cl = True
@@ -732,7 +738,7 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         gm = False
-
+                # проверка нажатия на кнопки
                 if event.type == pygame.USEREVENT:
                     if event.button == back_button:
                         gm = False
@@ -818,7 +824,7 @@ class Game:
 
                 for i in button_list:
                     i.handle_event(event, self.s.volume_sound * (self.s.volume_general / 100))
-
+            # отрисовка всего
             self.s.display.blit(background, (self.s.WIDTH * 0.026, self.s.HEIGHT * 0.02315))
 
             for i in button_list:
@@ -852,15 +858,16 @@ class Game:
                 self.s.display.blit(self.s.cursor, pygame.mouse.get_pos())
             pygame.display.flip()
             self.s.clock.tick(self.s.FPS)
-
+    # начало игры
     def play(self, APFSDS_COUNT, HE_COUNT, HEAT_COUNT):
+        # установка уровня
         self.s.set_lvl()
 
         pygame.event.set_grab(True)
-
         pygame.display.set_icon(self.s.icon)
+        # инициализация танка
         tank = Tank(self.s, self.s.start_point[0], self.s.start_point[1], 0, self.s.minimap_k, 0, 0, APFSDS_COUNT,
                     HE_COUNT, HEAT_COUNT, self.s.minimap_dict[0],
                     num_level=[i for i in self.s.lvl_dict if self.s.lvl_dict[i]][0])
+        # начало игры
         tank.start()
-        self.s.update_sprites()
