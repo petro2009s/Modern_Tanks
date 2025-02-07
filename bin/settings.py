@@ -13,7 +13,7 @@ import math
 class Settings:
     def __init__(self):
         # база данных
-        self.bd = DBController('resources/ModernTanksDB')
+        self.bd = DBController('ModernTanksDB')
         # разрешение
         self.monitors = screeninfo.get_monitors()
         self.monitor = int(self.bd.select('monitor_table', 'id')[0][0])
