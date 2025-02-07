@@ -135,7 +135,7 @@ class Sprite:
                              v=-0.05 * self.s.tile_w * self.s.FPS / 60, hp=70,
                              death_anim=True, a2=1.5, k_exp=1.5)
 
-                ]
+            ]
         self.all_list = self.list_of_objects + self.list_of_objects_thermal
         # коллизии
         self.collision_set = {}
@@ -327,7 +327,8 @@ class SpriteObject:
         for i in range(len(self.sprites.all_list)):
             if self.sprites.all_list[i].num == self.num:
                 if self.sprites.all_list[i].death_anim_counter >= self.s.bmp_death_frames:
-                    if (self.sprites.all_list[i].type == 'bmp' or self.sprites.all_list[i].type == 'mrap') and not self.sprites.all_list[i].death:
+                    if (self.sprites.all_list[i].type == 'bmp' or self.sprites.all_list[i].type == 'mrap') and not \
+                    self.sprites.all_list[i].death:
                         tank.count_of_destroyed_targets = str(int(tank.count_of_destroyed_targets) + 1)
 
                     elif self.sprites.all_list[i].type == 'tank' and not self.sprites.all_list[i].death:
@@ -341,7 +342,6 @@ class SpriteObject:
                     del self.sprites.list_of_objects_thermal[self.sprites.all_list[i].num]
                     self.sprites.all_list = self.sprites.list_of_objects + self.sprites.list_of_objects_thermal
                     del self.sprites.collision_set[self.num]
-
 
                     self.set_new_num()
 
@@ -384,7 +384,8 @@ class SpriteObject:
                 if self.sprites.all_list[i].num == self.num:
                     self.sprites.all_list[i].v = 0
                     if self.num == self.sprites.all_list[i].num:
-                        if self.sprites.all_list[i].type == 'bmp' or self.sprites.all_list[i].type == 'oth' or self.sprites.all_list[i].type == 'mrap':
+                        if self.sprites.all_list[i].type == 'bmp' or self.sprites.all_list[i].type == 'oth' or \
+                                self.sprites.all_list[i].type == 'mrap':
                             if tank.current_shooted_ammo == 0:
                                 self.sprites.all_list[i].hp -= 70
                             elif tank.current_shooted_ammo == 1:
@@ -409,7 +410,6 @@ class SpriteObject:
                         self.sprites.all_list[i].death = True
                     else:
                         self.sprites.all_list[i].is_death_anim = True
-
 
         tank.count_of_destroyed_targets = str(int(float(tank.count_of_destroyed_targets)))
 

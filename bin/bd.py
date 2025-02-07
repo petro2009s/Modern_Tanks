@@ -76,7 +76,6 @@ CREATE TABLE monitor_table (
             print(e)
         return result
 
-
     def update_to_db(self, table, title, value, where_title="", where_value=""):
         query = f"""
                 UPDATE {table}
@@ -140,7 +139,6 @@ CREATE TABLE monitor_table (
         self.query(query)
         self.query(query2)
 
-
     # Функция для отбора из БД
     def select(self, table, titles="*", where=None):
         query = f"""
@@ -149,7 +147,3 @@ CREATE TABLE monitor_table (
         if where:
             query += f"\nWHERE {where}"
         return self.query(query)
-
-
-
-

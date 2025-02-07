@@ -29,6 +29,7 @@ class Map:
                     self.world_map_dict[(i, j)] = '7'
                 elif char == '9':
                     self.world_map_dict[(i, j)] = '9'
+
     # отображение миникарты
     def draw(self, display, x0, y0, k=1, floor=None, walls=None):
         if floor:
