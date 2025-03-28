@@ -398,7 +398,7 @@ class Settings:
         # время РПГ
         self.rpg_time = 10
         # время перезарядки
-        self.reload_time = 6
+        self.reload_time = 5
         # анимация выстрела
         self.shot_anim = [pygame.image.load(f'resources/sprites/explode1_sprite/frame_{str(i + 1)}.png').convert_alpha()
                           for i in

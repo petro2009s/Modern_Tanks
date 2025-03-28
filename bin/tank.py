@@ -15,11 +15,11 @@ class Tank:
         self.s = settings
         # звуки
         self.s.music_menu.stop()
-        self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100 * 0.85)
-        pygame.mixer.music.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100 * 0.5 * 0.65)
+        self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100 * 0.7)
+        pygame.mixer.music.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100 * 0.5)
         pygame.mixer.music.play(-1)
         if self.s.volume_music == 0:
-            self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100 * 0.5 * 0.85)
+            self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100 * 0.5 * 0.7)
         self.s.background_sound.play(-1)
         # иконка
         pygame.display.set_icon(self.s.icon)
