@@ -15,9 +15,11 @@ class Tank:
         self.s = settings
         # звуки
         self.s.music_menu.stop()
-        self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
+        self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100 * 0.85)
+        pygame.mixer.music.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100 * 0.5 * 0.65)
+        pygame.mixer.music.play(-1)
         if self.s.volume_music == 0:
-            self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100 * 0.5)
+            self.s.background_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100 * 0.5 * 0.85)
         self.s.background_sound.play(-1)
         # иконка
         pygame.display.set_icon(self.s.icon)
@@ -734,6 +736,10 @@ class Tank:
 
                 if self.stab is False:
                     self.angle_of_view -= temp
+        if self.v == 0:
+            pygame.mixer.music.pause()
+        else:
+            pygame.mixer.music.unpause()
 
     # наведение
     def guidance(self):
@@ -914,6 +920,19 @@ class Tank:
                 horizontal = self.now_horizontal()
                 if self.s.HEIGHT // 2 - self.proj_height + horizontal < self.s.HEIGHT // 2 * k:
                     self.shot_anim = True
+                    if not self.is_sprite_depth:
+                        if self.current_shooted_ammo == 0:
+                            self.s.apfsds_ground_sound.set_volume(
+                                self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.apfsds_ground_sound.play()
+                        else:
+                            self.s.he_heat_ground_sound.set_volume(
+                                self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.he_heat_ground_sound.play()
+                    else:
+                        self.s.he_heat_ground_sound.set_volume(
+                            self.s.volume_general / 100 * self.s.volume_sound / 100)
+                        self.s.he_heat_ground_sound.play()
                 self.explosion_time = None
                 self.explosion_timer = 0
 
@@ -1844,7 +1863,7 @@ class Tank:
             if ((self.x // self.s.tile_w), (self.y // self.s.tile_h)) in self.s.end_point:
                 pygame.display.set_icon(self.s.icon)
                 self.s.background_sound.stop()
-                self.s.win_sound.set_volume(self.s.volume_general / 100 * self.s.volume_music / 100)
+                self.s.win_sound.set_volume(self.s.volume_general / 100)
                 self.s.win_sound.play()
                 # весь текст и кнопки
                 end_text_bl = Text(self.s.WIDTH * 0.5028, self.s.HEIGHT * 0.1052, (0, 0, 0), 'Миссия выполнена!',
@@ -2535,6 +2554,14 @@ class Tank:
             self.y -= dy
             self.x += dx
             self.stuck = False
+
+        if self.stuck:
+            if self.v > self.s.max_speed_w * 0.7:
+                self.s.collision_hs_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                self.s.collision_hs_sound.play()
+            else:
+                self.s.collision_ls_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                self.s.collision_ls_sound.play()
 
     # позиция на миникарте
     def pos(self, k=1):

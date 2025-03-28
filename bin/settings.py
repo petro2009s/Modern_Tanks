@@ -77,11 +77,17 @@ class Settings:
         self.music_menu = pygame.mixer.Sound("resources/sounds/music_menu.mp3")
         self.shoot_sound = pygame.mixer.Sound("resources/sounds/shoot1.mp3")
         self.reload_sound = pygame.mixer.Sound("resources/sounds/reload.mp3")
-        self.background_sound = pygame.mixer.Sound("resources/sounds/background.mp3")
+        self.background_sound = pygame.mixer.Sound("resources/sounds/t3485_idle.wav")
+        pygame.mixer.music.load("resources/sounds/t6b_trans_moving.wav")
         self.explode_sound = pygame.mixer.Sound("resources/sounds/explode.mp3")
         self.fpv_sound = pygame.mixer.Sound("resources/sounds/drone.mp3")
         self.win_sound = pygame.mixer.Sound("resources/sounds/win.mp3")
         self.lose_sound = pygame.mixer.Sound("resources/sounds/lose2.mp3")
+        self.sprite_explode_sound = pygame.mixer.Sound("resources/sounds/armoured_destroy.wav")
+        self.collision_hs_sound = pygame.mixer.Sound("resources/sounds/tank_tank_collision_highspeed.wav")
+        self.collision_ls_sound = pygame.mixer.Sound("resources/sounds/tank_tank_collision_lowspeed.wav")
+        self.he_heat_ground_sound = pygame.mixer.Sound("resources/sounds/he88hit_explosion.wav")
+        self.apfsds_ground_sound = pygame.mixer.Sound("resources/sounds/subcalibre85hit_ground.wav")
         # настройки
         self.graph_dict = [self.bd.select('graph_table', 'low')[0][0], self.bd.select('graph_table', 'mid')[0][0],
                            self.bd.select('graph_table', 'high')[0][0]]

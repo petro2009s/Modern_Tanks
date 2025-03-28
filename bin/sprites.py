@@ -409,6 +409,8 @@ class SpriteObject:
                         self.sprites.all_list[i].death = True
                     else:
                         self.sprites.all_list[i].is_death_anim = True
+                        self.s.sprite_explode_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                        self.s.sprite_explode_sound.play()
 
         tank.count_of_destroyed_targets = str(int(float(tank.count_of_destroyed_targets)))
 
