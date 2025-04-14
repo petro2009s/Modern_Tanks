@@ -144,12 +144,10 @@ class Settings:
         self.minimap_k = 5
         self.minimap_tank_base = pygame.image.load('resources/images/tank/tank_minimap_base.png').convert_alpha()
         self.minimap_tank_tower_base = pygame.image.load('resources/images/tank/tank_minimap_tower.png').convert_alpha()
-        self.minimap_tank_base_scope = pygame.image.load('resources/images/tank/tank_minimap_base.png').convert_alpha()
+        self.minimap_tank_base_scope = pygame.image.load(
+            'resources/images/minimap_tank/minimap_tank_base_scope.png').convert_alpha()
         self.minimap_tank_tower_scope = pygame.image.load(
-            'resources/images/tank/tank_minimap_tower.png').convert_alpha()
-
-        thermal_texture(self.minimap_tank_base_scope, 50, 60)
-        thermal_texture(self.minimap_tank_tower_scope, 50, 60)
+            'resources/images/minimap_tank/minimap_tank_tower_scope.png').convert_alpha()
 
         self.minimap_tank_b = pygame.transform.scale(self.minimap_tank_base,
                                                      (self.WIDTH * 0.0625 // self.minimap_k,
@@ -229,6 +227,17 @@ class Settings:
         self.texture_7_base = pygame.image.load('resources/images/textures/building2.png').convert_alpha()
         self.texture_9_base = pygame.image.load('resources/images/textures/building3.png').convert_alpha()
 
+        self.texture_1_base_thermal = pygame.image.load(
+            'resources/images/thermal_textures/thermal_texture_3.png').convert_alpha()
+        self.texture_2_base_thermal = pygame.image.load(
+            'resources/images/thermal_textures/thermal_texture_1.png').convert_alpha()
+        self.texture_5_base_thermal = pygame.image.load(
+            'resources/images/thermal_textures/thermal_texture_5.png').convert_alpha()
+        self.texture_7_base_thermal = pygame.image.load(
+            'resources/images/thermal_textures/thermal_texture_7.png').convert_alpha()
+        self.texture_9_base_thermal = pygame.image.load(
+            'resources/images/thermal_textures/thermal_texture_9.png').convert_alpha()
+
         self.textures = {'3': pygame.transform.scale(self.texture_1_base,
                                                      (self.texture_w, self.texture_h)),
                          '1': pygame.transform.scale(self.texture_2_base,
@@ -243,22 +252,20 @@ class Settings:
                                                      (self.texture_w, self.texture_h)),
                          }
         # тепловизионные текстуры
-        self.thermal_textures = {'3': (pygame.transform.scale(self.texture_1_base,
+        self.thermal_textures = {'3': (pygame.transform.scale(self.texture_1_base_thermal,
                                                               (self.texture_w, self.texture_h)), 30),
-                                 '1': (pygame.transform.scale(self.texture_2_base,
+                                 '1': (pygame.transform.scale(self.texture_2_base_thermal,
                                                               (self.texture_w, self.texture_h)), 20),
-                                 '2': (pygame.transform.scale(self.texture_2_base,
+                                 '2': (pygame.transform.scale(self.texture_2_base_thermal,
                                                               (self.texture_w, self.texture_h)), 40),
-                                 '5': (pygame.transform.scale(self.texture_5_base,
+                                 '5': (pygame.transform.scale(self.texture_5_base_thermal,
                                                               (self.texture_w, self.texture_h)), 40),
-                                 '7': (pygame.transform.scale(self.texture_7_base,
+                                 '7': (pygame.transform.scale(self.texture_7_base_thermal,
                                                               (self.texture_w, self.texture_h)), 40),
-                                 '9': (pygame.transform.scale(self.texture_9_base,
+                                 '9': (pygame.transform.scale(self.texture_9_base_thermal,
                                                               (self.texture_w, self.texture_h)), 50),
 
                                  }
-        for i, j in self.thermal_textures.items():
-            thermal_texture(j[0], j[1], self.max_t)
 
         # координаты оптического прицела
         self.optic_sight_x = 0.5 * self.WIDTH
@@ -343,45 +350,54 @@ class Settings:
         self.test_sprite3 = pygame.image.load('resources/sprites/bush2.png').convert_alpha()
         self.test_sprite4 = pygame.image.load('resources/sprites/bush3.png').convert_alpha()
 
-        self.bush_sprite2 = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        self.bush_sprite_thermal2 = pygame.transform.scale(self.test_sprite2, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        thermal_texture(self.bush_sprite_thermal2, 20, 50)
+        self.test_sprite_thermal = pygame.image.load(
+            'resources/sprites_thermal/bush_sprite_thermal.png').convert_alpha()
+        self.test_sprite2_thermal = pygame.image.load(
+            'resources/sprites_thermal/bush_sprite_thermal2.png').convert_alpha()
+        self.test_sprite3_thermal = pygame.image.load(
+            'resources/sprites_thermal/bush_sprite_thermal3.png').convert_alpha()
+        self.test_sprite4_thermal = pygame.image.load(
+            'resources/sprites_thermal/bush_sprite_thermal4.png').convert_alpha()
 
-        self.bush_sprite3 = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        self.bush_sprite_thermal3 = pygame.transform.scale(self.test_sprite3, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        thermal_texture(self.bush_sprite_thermal3, 20, 50)
+        self.bush_sprite2 = pygame.transform.scale(self.test_sprite2, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal2 = pygame.transform.scale(self.test_sprite2_thermal,
+                                                           (self.WIDTH * 0.4, self.WIDTH * 0.4))
 
-        self.bush_sprite4 = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        self.bush_sprite_thermal4 = pygame.transform.scale(self.test_sprite4, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        thermal_texture(self.bush_sprite_thermal4, 20, 50)
+        self.bush_sprite3 = pygame.transform.scale(self.test_sprite3, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal3 = pygame.transform.scale(self.test_sprite3_thermal,
+                                                           (self.WIDTH * 0.4, self.WIDTH * 0.4))
+
+        self.bush_sprite4 = pygame.transform.scale(self.test_sprite4, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal4 = pygame.transform.scale(self.test_sprite4_thermal,
+                                                           (self.WIDTH * 0.4, self.WIDTH * 0.4))
 
         self.bush_sprite = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        thermal_texture(self.bush_sprite_thermal, 20, self.max_t)
+        self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite_thermal,
+                                                          (self.WIDTH * 0.4, self.WIDTH * 0.4))
 
         self.tree_sprite = pygame.image.load('resources/sprites/tree.png').convert_alpha()
-        self.tree_sprite_thermal = pygame.transform.scale(self.tree_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        thermal_texture(self.tree_sprite_thermal, 20, self.max_t)
+        self.tree_sprite_thermal = pygame.image.load(
+            'resources/sprites_thermal/tree_sprite_thermal.png').convert_alpha()
+        self.tree_sprite_thermal = pygame.transform.scale(self.tree_sprite_thermal,
+                                                          (self.WIDTH * 0.4, self.WIDTH * 0.4))
         # параметры спрайтов
         self.center_ray = self.NUM_RAYS // 2 - 1
         self.FAKE_RAYS = int(self.NUM_RAYS * 2)
         # объемные спрайты
         self.test_sprite_v = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha() for i in
                               range(8)]
-        self.test_sprite_v_thermal = [pygame.image.load(f'resources/sprites/bmp_sprite/{i * 45}.png').convert_alpha()
+        self.test_sprite_v_thermal = [pygame.image.load(
+            f'resources/sprites_thermal/bmp_sprite_thermal/bmp_sprite_thermal_{i * 45}.png').convert_alpha()
                                       for i in range(8)]
-        for i in self.test_sprite_v_thermal:
-            thermal_texture(i, 80, 80)
 
         self.tank_sprite = [
             pygame.image.load(f'resources/sprites/tank_sprite/tank{str((i * 45 + 90) % 360)}_p.png').convert_alpha() for
             i in
             range(8)]
         self.tank_sprite_thermal = [
-            pygame.image.load(f'resources/sprites/tank_sprite/tank{str((i * 45 + 90) % 360)}_p.png').convert_alpha()
+            pygame.image.load(
+                f'resources/sprites_thermal/tank_sprite_thermal/tank_sprite_thermal_{i * 45}.png').convert_alpha()
             for i in range(8)]
-        for i in self.tank_sprite_thermal:
-            thermal_texture(i, 80, 80)
 
         self.mrap_sprite = [
             pygame.image.load(f'resources/sprites/mrap_sprite/mrap_{str((i * 45 + 90) % 360)}_p.png').convert_alpha()
@@ -389,10 +405,9 @@ class Settings:
             i in
             range(8)]
         self.mrap_sprite_thermal = [
-            pygame.image.load(f'resources/sprites/mrap_sprite/mrap_{str((i * 45 + 90) % 360)}_p.png').convert_alpha()
+            pygame.image.load(
+                f'resources/sprites_thermal/mrap_sprite_thermal/mrap_sprite_thermal_{i * 45}.png').convert_alpha()
             for i in range(8)]
-        for i in self.mrap_sprite_thermal:
-            thermal_texture(i, 80, 80)
         # время FPV-дрона
         self.fpv_time = 10
         # время РПГ
@@ -404,10 +419,10 @@ class Settings:
                           for i in
                           range(3)]
         self.shot_anim_thermal = [
-            pygame.image.load(f'resources/sprites/explode1_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
+            pygame.image.load(
+                f'resources/sprites_thermal/explode1_sprite_thermal/explode1_sprite_thermal_frame_{str(i + 1)}.png').convert_alpha()
+            for i in
             range(3)]
-        for i in self.shot_anim_thermal:
-            thermal_texture(i, 200, self.max_t)
         # параметры анимации выстрела
         self.shot_anim_time = 0.3
         self.shot_frames = int(self.shot_anim_time * self.FPS)
@@ -419,10 +434,10 @@ class Settings:
             for i in
             range(5)]
         self.shot_he_anim_thermal = [
-            pygame.image.load(f'resources/sprites/explode2_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
+            pygame.image.load(
+                f'resources/sprites_thermal/explode2_sprite_thermal/explode2_sprite_thermal_frame_{str(i + 1)}.png').convert_alpha()
+            for i in
             range(5)]
-        for i in self.shot_he_anim_thermal:
-            thermal_texture(i, 200, self.max_t)
         # параметры анимации выстрела фугасного снаряда
         self.shot_he_anim_time = 0.4
         self.shot_he_frames = int(self.shot_he_anim_time * self.FPS)
@@ -434,10 +449,11 @@ class Settings:
             for i in
             range(10)]
         self.shot_smog_anim_thermal = [
-            pygame.image.load(f'resources/sprites/smog_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
+            pygame.image.load(
+                f'resources/sprites_thermal/smog_sprite_thermal/smog_sprite_thermal_frame_{str(i + 1)}.png').convert_alpha()
+            for i in
             range(10)]
-        for i in self.shot_smog_anim_thermal:
-            thermal_texture(i, 100, self.max_t)
+
         # параметры анимации дыма
         self.shot_smog_anim_time = 0.3
         self.shot_smog_frames = int(self.shot_smog_anim_time * self.FPS)
@@ -449,10 +465,11 @@ class Settings:
             for i in
             range(14)]
         self.bmp_death_anim_thermal = [
-            pygame.image.load(f'resources/sprites/big_explode_sprite/frame_{str(i + 1)}.png').convert_alpha() for i in
+            pygame.image.load(
+                f'resources/sprites_thermal/big_explode_sprite_thermal/big_explode_sprite_thermal_frame_{str(i + 1)}.png').convert_alpha()
+            for i in
             range(14)]
-        for i in self.bmp_death_anim_thermal:
-            thermal_texture(i, 100, self.max_t)
+
         # параметры анимации смерти техники
         self.bmp_death_anim_time = 0.8
         self.bmp_death_frames = int(self.bmp_death_anim_time * self.FPS)
@@ -508,10 +525,9 @@ class Settings:
                 i in
                 range(8)]
             self.tank_sprite_thermal = [
-                pygame.image.load(f'resources/sprites/tank_sprite/tank{str((i * 45 + 90) % 360)}_p.png').convert_alpha()
+                pygame.image.load(
+                    f'resources/sprites_thermal/tank_sprite_thermal/tank_sprite_thermal_{str(i * 45)}.png').convert_alpha()
                 for i in range(8)]
-            for i in self.tank_sprite_thermal:
-                thermal_texture(i, 80, 80)
             # типы спрайтов
             self.sprite_types = {'bush_thermal': self.bush_sprite_thermal,
                                  'bush': self.bush_sprite,
@@ -563,10 +579,9 @@ class Settings:
                 i in
                 range(8)]
             self.tank_sprite_thermal = [
-                pygame.image.load(f'resources/sprites/tank_sprite/tank{str(i * 45)}_p.png').convert_alpha()
+                pygame.image.load(
+                    f'resources/sprites_thermal/tank_sprite_thermal/tank_sprite_thermal_{str((i * 45 - 90) % 360)}.png').convert_alpha()
                 for i in range(8)]
-            for i in self.tank_sprite_thermal:
-                thermal_texture(i, 80, 80)
             # типы спрайтов
             self.sprite_types = {'bush_thermal': self.bush_sprite_thermal,
                                  'bush': self.bush_sprite,
@@ -619,10 +634,9 @@ class Settings:
                 i in
                 range(8)]
             self.tank_sprite_thermal = [
-                pygame.image.load(f'resources/sprites/tank_sprite/tank{str(i * 45)}_p.png').convert_alpha()
+                pygame.image.load(
+                    f'resources/sprites_thermal/tank_sprite_thermal/tank_sprite_thermal_{str((i * 45 - 90) % 360)}.png').convert_alpha()
                 for i in range(8)]
-            for i in self.tank_sprite_thermal:
-                thermal_texture(i, 80, 80)
             # типы спрайтов
             self.sprite_types = {'bush_thermal': self.bush_sprite_thermal,
                                  'bush': self.bush_sprite,
@@ -788,22 +802,20 @@ class Settings:
                                                      (self.texture_w, self.texture_h)),
                          }
 
-        self.thermal_textures = {'3': (pygame.transform.scale(self.texture_1_base,
+        self.thermal_textures = {'3': (pygame.transform.scale(self.texture_1_base_thermal,
                                                               (self.texture_w, self.texture_h)), 30),
-                                 '1': (pygame.transform.scale(self.texture_2_base,
+                                 '1': (pygame.transform.scale(self.texture_2_base_thermal,
                                                               (self.texture_w, self.texture_h)), 20),
-                                 '2': (pygame.transform.scale(self.texture_2_base,
+                                 '2': (pygame.transform.scale(self.texture_2_base_thermal,
                                                               (self.texture_w, self.texture_h)), 40),
-                                 '5': (pygame.transform.scale(self.texture_5_base,
+                                 '5': (pygame.transform.scale(self.texture_5_base_thermal,
                                                               (self.texture_w, self.texture_h)), 40),
-                                 '7': (pygame.transform.scale(self.texture_7_base,
+                                 '7': (pygame.transform.scale(self.texture_7_base_thermal,
                                                               (self.texture_w, self.texture_h)), 40),
-                                 '9': (pygame.transform.scale(self.texture_9_base,
+                                 '9': (pygame.transform.scale(self.texture_9_base_thermal,
                                                               (self.texture_w, self.texture_h)), 50),
 
                                  }
-        for i, j in self.thermal_textures.items():
-            thermal_texture(j[0], j[1], self.max_t)
 
         self.optic_sight_x = 0.5 * self.WIDTH
         self.optic_sight_y = 0.1 * self.WIDTH
@@ -873,24 +885,26 @@ class Settings:
         self.thermal_sight_zoom_d = pygame.transform.scale(self.thermal_sight_zoom_base,
                                                            (self.thermal_width / 4, self.thermal_height / 4))
 
-        self.bush_sprite2 = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        self.bush_sprite_thermal2 = pygame.transform.scale(self.test_sprite2, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        thermal_texture(self.bush_sprite_thermal2, 20, 50)
+        self.bush_sprite2 = pygame.transform.scale(self.test_sprite2, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal2 = pygame.transform.scale(self.test_sprite2_thermal,
+                                                           (self.WIDTH * 0.4, self.WIDTH * 0.4))
 
-        self.bush_sprite3 = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        self.bush_sprite_thermal3 = pygame.transform.scale(self.test_sprite3, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        thermal_texture(self.bush_sprite_thermal3, 20, 50)
+        self.bush_sprite3 = pygame.transform.scale(self.test_sprite3, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal3 = pygame.transform.scale(self.test_sprite3_thermal,
+                                                           (self.WIDTH * 0.4, self.WIDTH * 0.4))
 
-        self.bush_sprite4 = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        self.bush_sprite_thermal4 = pygame.transform.scale(self.test_sprite4, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        thermal_texture(self.bush_sprite_thermal4, 20, 50)
+        self.bush_sprite4 = pygame.transform.scale(self.test_sprite4, (self.WIDTH * 0.4, self.WIDTH * 0.4))
+        self.bush_sprite_thermal4 = pygame.transform.scale(self.test_sprite4_thermal,
+                                                           (self.WIDTH * 0.4, self.WIDTH * 0.4))
 
         self.bush_sprite = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        thermal_texture(self.bush_sprite_thermal, 20, self.max_t)
+        self.bush_sprite_thermal = pygame.transform.scale(self.test_sprite_thermal,
+                                                          (self.WIDTH * 0.4, self.WIDTH * 0.4))
 
-        self.tree_sprite_thermal = pygame.transform.scale(self.tree_sprite, (self.WIDTH * 0.4, self.WIDTH * 0.4))
-        thermal_texture(self.tree_sprite_thermal, 20, self.max_t)
+        self.tree_sprite_thermal = pygame.image.load(
+            'resources/sprites_thermal/tree_sprite_thermal.png').convert_alpha()
+        self.tree_sprite_thermal = pygame.transform.scale(self.tree_sprite_thermal,
+                                                          (self.WIDTH * 0.4, self.WIDTH * 0.4))
 
         self.center_ray = self.NUM_RAYS // 2 - 1
         self.FAKE_RAYS = int(self.NUM_RAYS * 2)
@@ -937,13 +951,13 @@ class Settings:
 
 
 # функция для создания тепловизионных текстур
-def thermal_texture(surface, t, max_t):
-    w, h = surface.get_size()
-    for x in range(w):
-        for y in range(h):
-            a = surface.get_at((x, y))[3]
-            r, g, b = surface.get_at((x, y))[0:3]
-            color = min(r, g, b)
-            color *= abs(t / max_t)
-            color = min(max(max(color, 0), 5), 255)
-            surface.set_at((x, y), pygame.Color(int(color), int(color), int(color), a))
+# def thermal_texture(surface, t, max_t):
+#     w, h = surface.get_size()
+#     for x in range(w):
+#         for y in range(h):
+#             a = surface.get_at((x, y))[3]
+#             r, g, b = surface.get_at((x, y))[0:3]
+#             color = min(r, g, b)
+#             color *= abs(t / max_t)
+#             color = min(max(max(color, 0), 5), 255)
+#             surface.set_at((x, y), pygame.Color(int(color), int(color), int(color), a))

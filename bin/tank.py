@@ -73,7 +73,7 @@ class Tank:
         self.current_shooted_ammo_for_tank = None
         # все счетчики времени и время
         self.shot_timer = 0
-        self.shot_time = 0.5
+        self.shot_time = 1.5
         self.reload_timer = 0
         self.reload_time = self.s.reload_time
         self.explosion_timer = 0
@@ -757,8 +757,9 @@ class Tank:
 
             else:
                 self.angle_of_view = self.lock_f(self.lock_x, self.lock_y) * 180 / 3.14
-        # наведение по кнопкам
-        if not self.st:
+        # наведение
+        if not self.st and not self.is_shot:
+            # наведение по кнопкам
             if keys[pygame.K_RIGHT] and not self.lock:
                 self.angle_of_view += self.s.tower_v * t
 
@@ -799,8 +800,8 @@ class Tank:
                             self.max_hor_thermal_d)
 
                         self.set_sky()
-                        pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
-                        self.angle_of_view += dif_x * self.s.tower_v * t / (self.s.WIDTH * 0.07)
+                    pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
+                    self.angle_of_view += dif_x * self.s.tower_v * t / (self.s.WIDTH * 0.07)
             # тряска
             if self.type == 0:
                 self.horizontal = self.tryaska
