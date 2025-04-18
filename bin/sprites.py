@@ -234,10 +234,11 @@ class SpriteObject:
                         if (self.s.center_ray - self.a1 * (
                                 10 - HALF_FOV) * proj_height * self.k / 300) <= current_ray <= (
                                 self.s.center_ray + self.a1 * (10 - HALF_FOV) * proj_height * self.k / 300):
-                            if self.s.HEIGHT // 2 * k - horizontal >= \
-                                    sprite_pos[1] * self.a2 and (
-                                    sprite_pos[1] + proj_height) * self.a2 >= (self.s.HEIGHT // 2 * k - horizontal):
-
+                            print(1)
+                            if self.s.HEIGHT // 2 * k >= \
+                                    sprite_pos[1] and (
+                                    sprite_pos[1] + proj_height) >= (self.s.HEIGHT // 2 * k):
+                                print(2)
                                 tank.depth_sprite = str(dist)
                                 tank.is_sprite_depth = True
                                 # выстрел по спрайту
@@ -426,7 +427,7 @@ class SpriteObject:
                 drx, dry = ((self.s.WIDTH - self.s.NUM_RAYS * self.s.SCALE_thermal) // 2,
                             self.s.thermal_y)
                 height = self.s.thermal_height
-                k = 0.6
+                k = 0.8
                 return (DELTA_ANGLE, PROJ_COEFF, horizontal, SCALE, HALF_FOV, drx, dry, height, k)
 
             elif tank.optic:
@@ -437,7 +438,7 @@ class SpriteObject:
                 height = self.s.HEIGHT
                 HALF_FOV = self.s.HALF_FOV_optic_zoom
                 drx, dry = (self.s.WIDTH // 2 - self.s.NUM_RAYS * self.s.SCALE_optic_zoom // 2, 0)
-                k = 0.95
+                k = 1
                 return (DELTA_ANGLE, PROJ_COEFF, horizontal, SCALE, HALF_FOV, drx, dry, height, k)
 
             elif tank.thermal_d:
@@ -450,7 +451,7 @@ class SpriteObject:
                     self.s.thermal_x_d * 1.008 + self.s.thermal_width_d / 2 - self.s.NUM_RAYS * self.s.SCALE_thermal_d / 2,
                     self.s.thermal_y_d)
                 height = self.s.thermal_height_d
-                k = 0.6
+                k = 0.8
                 return (DELTA_ANGLE, PROJ_COEFF, horizontal, SCALE, HALF_FOV, drx, dry, height, k)
 
             else:
@@ -466,7 +467,7 @@ class SpriteObject:
                 HALF_FOV = self.s.HALF_FOV_thermal_zoom_extra
                 drx, dry = ((self.s.WIDTH - self.s.NUM_RAYS * self.s.SCALE_thermal) // 2,
                             self.s.thermal_y)
-                k = 0.6
+                k = 0.8
                 return (DELTA_ANGLE, PROJ_COEFF, horizontal, SCALE, HALF_FOV, drx, dry, height, k)
 
             elif tank.thermal_d:
@@ -479,7 +480,7 @@ class SpriteObject:
                     self.s.thermal_y_d)
                 height = self.s.thermal_height_d
                 HALF_FOV = self.s.HALF_FOV_thermal_zoom_extra
-                k = 0.6
+                k = 0.8
                 return (DELTA_ANGLE, PROJ_COEFF, horizontal, SCALE, HALF_FOV, drx, dry, height, k)
             else:
                 return (False, False, False, False, False, False, False, False, False)
@@ -493,7 +494,7 @@ class SpriteObject:
                 drx, dry = ((self.s.WIDTH - self.s.NUM_RAYS * self.s.SCALE_thermal) // 2,
                             self.s.thermal_y)
                 HALF_FOV = self.s.HALF_FOV_thermal
-                k = 0.6
+                k = 0.8
                 return (DELTA_ANGLE, PROJ_COEFF, horizontal, SCALE, HALF_FOV, drx, dry, height, k)
 
             elif tank.optic:
@@ -517,7 +518,7 @@ class SpriteObject:
                     self.s.thermal_y_d)
                 height = self.s.thermal_height_d
                 HALF_FOV = self.s.HALF_FOV_thermal
-                k = 0.6
+                k = 0.8
                 return (DELTA_ANGLE, PROJ_COEFF, horizontal, SCALE, HALF_FOV, drx, dry, height, k)
             else:
                 return (False, False, False, False, False, False, False, False, False)
