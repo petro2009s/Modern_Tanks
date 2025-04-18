@@ -234,11 +234,9 @@ class SpriteObject:
                         if (self.s.center_ray - self.a1 * (
                                 10 - HALF_FOV) * proj_height * self.k / 300) <= current_ray <= (
                                 self.s.center_ray + self.a1 * (10 - HALF_FOV) * proj_height * self.k / 300):
-                            print(1)
                             if self.s.HEIGHT // 2 * k >= \
                                     sprite_pos[1] and (
                                     sprite_pos[1] + proj_height) >= (self.s.HEIGHT // 2 * k):
-                                print(2)
                                 tank.depth_sprite = str(dist)
                                 tank.is_sprite_depth = True
                                 # выстрел по спрайту
