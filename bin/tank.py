@@ -319,6 +319,9 @@ class Tank:
                                 self.ammo_list[self.current_ammo] > 0:
                             self.s.reload_voice_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
                             self.s.reload_voice_sound.play()
+
+                            self.s.reload_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.reload_sound.play()
                             self.reload = True
                             self.block = True
                             self.current_ammo_in_gun = int(str(self.current_ammo)[:])
@@ -1758,6 +1761,7 @@ class Tank:
                             self.s.reload_voice_sound.set_volume(
                                 self.s.volume_general / 100 * self.s.volume_sound / 100)
                             self.s.reload_voice_sound.play()
+
                             self.s.reload_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
                             self.s.reload_sound.play()
                             self.reload = True
