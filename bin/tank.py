@@ -317,9 +317,16 @@ class Tank:
                         # перезарядка
                         if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
                                 self.ammo_list[self.current_ammo] > 0:
+                            self.s.reload_voice_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.reload_voice_sound.play()
                             self.reload = True
                             self.block = True
                             self.current_ammo_in_gun = int(str(self.current_ammo)[:])
+                        elif event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
+                                self.ammo_list[self.current_ammo] == 0:
+                            self.s.no_shell_voice_sound.set_volume(
+                                self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.no_shell_voice_sound.play()
                 # проверка кнопок
                 optic_sight_button.handle_event(event)
                 thermal_sight_button.handle_event(event)
@@ -901,6 +908,9 @@ class Tank:
             pygame.mouse.set_pos((self.s.WIDTH // 2, self.s.HEIGHT // 2))
 
         if self.reload_timer >= self.reload_time:
+            self.s.ready_voice_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+            self.s.ready_voice_sound.play()
+
             self.reload = False
             self.block = False
             self.ready = True
@@ -1745,17 +1755,28 @@ class Tank:
                         # перезарядка
                         if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
                                 self.ammo_list[self.current_ammo] > 0:
+                            self.s.reload_voice_sound.set_volume(
+                                self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.reload_voice_sound.play()
                             self.s.reload_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
                             self.s.reload_sound.play()
                             self.reload = True
                             self.block = True
                             self.current_ammo_in_gun = int(str(self.current_ammo)[:])
+                        elif event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
+                                self.ammo_list[self.current_ammo] == 0:
+                            self.s.no_shell_voice_sound.set_volume(
+                                self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.no_shell_voice_sound.play()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.guide_mission_num >= 8:
                         # выстрел
                         if event.button == pygame.BUTTON_LEFT:
                             if self.ready:
+                                self.s.fire_voice_sound.set_volume(
+                                    self.s.volume_general / 100 * self.s.volume_sound / 100)
+                                self.s.fire_voice_sound.play()
                                 self.ammo_list[self.current_ammo_in_gun] -= 1
 
                                 self.current_shooted_ammo_for_tank = int(str(self.current_ammo_in_gun)[:])
@@ -2347,17 +2368,27 @@ class Tank:
                         # перезарядка
                         if event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
                                 self.ammo_list[self.current_ammo] > 0:
+                            self.s.reload_voice_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.reload_voice_sound.play()
                             self.reload = True
                             self.block = True
                             self.current_ammo_in_gun = int(str(self.current_ammo)[:])
 
                             self.s.reload_sound.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
                             self.s.reload_sound.play()
-
+                        elif event.key == pygame.K_r and self.ready is False and self.is_shot is False and self.reload is False and \
+                                self.ammo_list[self.current_ammo] == 0:
+                            self.s.no_shell_voice_sound.set_volume(
+                                self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.no_shell_voice_sound.play()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     # выстрел
                     if event.button == pygame.BUTTON_LEFT:
                         if self.ready:
+                            self.s.fire_voice_sound.set_volume(
+                                self.s.volume_general / 100 * self.s.volume_sound / 100)
+                            self.s.fire_voice_sound.play()
+
                             self.ammo_list[self.current_ammo_in_gun] -= 1
                             self.current_shooted_ammo_for_tank = int(str(self.current_ammo_in_gun)[:])
                             self.current_ammo_in_gun = None
@@ -2507,6 +2538,13 @@ class Tank:
         else:
             depth = '9999'
             self.depth_m = depth[:]
+
+        depth_int = int(depth)
+        for key, value in self.s.distance_voice.items():
+            if depth_int in key:
+                value.set_volume(self.s.volume_general / 100 * self.s.volume_sound / 100)
+                value.play()
+                break
         return depth
 
     # захват цели

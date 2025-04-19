@@ -75,8 +75,30 @@ class Settings:
         self.cursor = pygame.transform.scale(self.cursor_base, (self.WIDTH * 0.03125, self.WIDTH * 0.03125))
         # звуки и музыка
         self.music_menu = pygame.mixer.Sound("resources/sounds/music_menu.mp3")
-        self.shoot_sound = pygame.mixer.Sound("resources/sounds/shoot1.mp3")
+        self.shoot_sound = pygame.mixer.Sound("resources/sounds/fire.wav")
+        self.fire_voice_sound = pygame.mixer.Sound("resources/sounds/shoot1.mp3")
         self.reload_sound = pygame.mixer.Sound("resources/sounds/reload.mp3")
+        self.reload_voice_sound = pygame.mixer.Sound("resources/sounds/reload_shell.wav")
+        self.ready_voice_sound = pygame.mixer.Sound("resources/sounds/ready.wav")
+        self.no_shell_voice_sound = pygame.mixer.Sound("resources/sounds/no_shell.wav")
+        self.distance_voice = {
+            range(0, 175): pygame.mixer.Sound("resources/sounds/SDistance100.wav"),
+            range(175, 275): pygame.mixer.Sound("resources/sounds/SDistance200.wav"),
+            range(275, 375): pygame.mixer.Sound("resources/sounds/SDistance300.wav"),
+            range(375, 475): pygame.mixer.Sound("resources/sounds/SDistance400.wav"),
+            range(475, 575): pygame.mixer.Sound("resources/sounds/SDistance500.wav"),
+            range(575, 675): pygame.mixer.Sound("resources/sounds/SDistance600.wav"),
+            range(675, 775): pygame.mixer.Sound("resources/sounds/SDistance700.wav"),
+            range(775, 875): pygame.mixer.Sound("resources/sounds/SDistance800.wav"),
+            range(875, 975): pygame.mixer.Sound("resources/sounds/SDistance900.wav"),
+            range(975, 1075): pygame.mixer.Sound("resources/sounds/SDistance1000.wav"),
+            range(1075, 1175): pygame.mixer.Sound("resources/sounds/SDistance1100.wav"),
+            range(1175, 1275): pygame.mixer.Sound("resources/sounds/SDistance1200.wav"),
+            range(1275, 1375): pygame.mixer.Sound("resources/sounds/SDistance1300.wav"),
+            range(1375, 1475): pygame.mixer.Sound("resources/sounds/SDistance1400.wav"),
+            range(1475, 1575): pygame.mixer.Sound("resources/sounds/SDistance1500.wav"),
+            range(1575, 1675): pygame.mixer.Sound("resources/sounds/SDistance1600.wav")
+        }
         self.background_sound = pygame.mixer.Sound("resources/sounds/t3485_idle.wav")
         pygame.mixer.music.load("resources/sounds/t6b_trans_moving.wav")
         self.explode_sound = pygame.mixer.Sound("resources/sounds/explode.mp3")
